@@ -15,10 +15,8 @@ from google import genai
 from google.genai import types
 
 from scraper.config import (
-    GEMINI_API_KEY,
     GEMINI_BATCH_MODE,
     GEMINI_ENABLE_PROMPT_CACHING,
-    GEMINI_MODEL,
     GEMINI_PROMPT_CACHE_TTL,
     GEMINI_THINKING_BUDGET,
 )
@@ -29,6 +27,9 @@ from scraper.models import (
     extract_date_from_bulletin_code,
     is_valid_product_model,
     parse_to_utc_iso,
+)
+from scraper.providers import (
+    resolve_provider_and_model,
 )
 from scraper.vendors import detect_vendor_from_url_or_text, normalize_stage_name
 
@@ -133,10 +134,6 @@ def _gemini_item_to_product_record(
     if not utc_date and item.bulletin_code:
         utc_date = extract_date_from_bulletin_code(item.bulletin_code)
 
-    # Mandatory date enforcement: NO NULL ALLOWED
-    if not utc_date:
-        return None
-
     # Clean replacement: eliminate generic placeholders
     clean_repl = None
     if item.replacement:
@@ -144,12 +141,14 @@ def _gemini_item_to_product_record(
         if r_cand and not any(kw in r_cand.lower() for kw in ["consult", "representative", "official sales", "contact your", "representative"]):
             clean_repl = r_cand
 
+    # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
     meta: Dict[str, Any] = {
         "replacement": clean_repl,
         "family": item.category or "General Automation",
         "source_url": source_url or "",
         "bulletin_title": item.bulletin_code or "Official Lifecycle Notice",
         "raw_stage_label": raw_status,
+        "missing_date": True if not utc_date else False,
         "notes": item.notes,
     }
 
@@ -197,12 +196,15 @@ class GeminiExtractor:
         enable_prompt_caching: Optional[bool] = None,
         cache_ttl: Optional[str] = None,
         batch_mode: Optional[bool] = None,
+        provider: Optional[str] = None,
+        api_base: Optional[str] = None,
     ):
-        if api_key is not None:
-            self.api_key = api_key
-        else:
-            self.api_key = GEMINI_API_KEY or os.getenv("GEMINI_API_KEY", "")
-        self.model_name = model_name or GEMINI_MODEL or "gemini-1.5-flash"
+        self.provider, self.model_name, self.api_key = resolve_provider_and_model(
+            provider=provider,
+            model=model_name,
+            api_key=api_key,
+        )
+        self.api_base = api_base or os.getenv("OPENAI_BASE_URL", "")
         self.client = None
 
         # Token & Cost Optimization Settings
@@ -213,6 +215,8 @@ class GeminiExtractor:
         self._active_cache_name: Optional[str] = None
 
         self.token_metrics: Dict[str, Any] = {
+            "provider": self.provider,
+            "model": self.model_name,
             "total_calls": 0,
             "thinking_budget_applied": self.thinking_budget,
             "prompt_cache_enabled": self.enable_prompt_caching,
@@ -220,57 +224,92 @@ class GeminiExtractor:
             "batch_calls": 0,
         }
 
-        if self.api_key and self.api_key != "your_gemini_api_key_here":
-            try:
-                self.client = genai.Client(api_key=self.api_key)
-                logger.info(
-                    f"Initialized Google GenAI Client with model: {self.model_name} "
-                    f"(thinking_budget={self.thinking_budget}, prompt_caching={self.enable_prompt_caching}, batch_mode={self.batch_mode})"
-                )
-            except Exception as e:
-                logger.warning(f"Could not initialize Google GenAI Client: {e}")
+        if self.provider == "gemini":
+            if self.api_key and self.api_key != "your_gemini_api_key_here":
+                try:
+                    self.client = genai.Client(api_key=self.api_key)
+                    logger.info(
+                        f"Initialized Google GenAI Client with model: {self.model_name} "
+                        f"(thinking_budget={self.thinking_budget}, prompt_caching={self.enable_prompt_caching}, batch_mode={self.batch_mode})"
+                    )
+                except Exception as e:
+                    logger.warning(f"Could not initialize Google GenAI Client: {e}")
+            else:
+                logger.info("No valid GEMINI_API_KEY provided. Operating in deterministic/fallback mode.")
         else:
-            logger.info("No valid GEMINI_API_KEY provided. Operating in deterministic/fallback mode.")
+            if self.is_configured():
+                logger.info(
+                    f"Initialized Multi-Provider AI Extractor: provider='{self.provider}', model='{self.model_name}'"
+                )
+            else:
+                logger.info(f"No valid API key provided for provider '{self.provider}'. Operating in deterministic/fallback mode.")
 
     def is_configured(self) -> bool:
-        """Check if Gemini client is ready for live API queries."""
-        return bool(self.client and self.api_key and self.api_key != "your_gemini_api_key_here")
+        """Check if AI client is ready for live API queries."""
+        if self.provider == "gemini":
+            return bool(self.client and self.api_key and self.api_key != "your_gemini_api_key_here")
+        if self.provider in ("ollama", "local"):
+            return True
+        return bool(self.api_key and self.api_key != "your_gemini_api_key_here" and not self.api_key.startswith("your_"))
 
     def test_connection(self) -> Tuple[bool, str]:
         """
-        Tests the Google Gemini API key by sending a minimal test probe.
-        If the primary model is unavailable or 404s, automatically probes supported fallback models.
+        Tests the configured AI provider and API key by sending a minimal test probe.
+        If using Gemini and the primary model is unavailable or 404s, automatically probes supported fallback models.
         Returns (success: bool, message: str).
         """
-        if not self.is_configured() or not self.client:
-            return False, "GEMINI_API_KEY is not configured or is the default placeholder."
+        if not self.is_configured():
+            return False, f"{self.provider.upper()}_API_KEY is not configured or is the default placeholder."
 
-        # Candidate models to probe in order of preference
-        candidate_models = [self.model_name]
-        for fallback in ["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]:
-            if fallback not in candidate_models:
-                candidate_models.append(fallback)
+        if self.provider == "gemini":
+            if not self.client:
+                return False, "Google GenAI client could not be initialized."
+            # Candidate models to probe in order of preference
+            candidate_models = [self.model_name]
+            for fallback in ["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]:
+                if fallback not in candidate_models:
+                    candidate_models.append(fallback)
 
-        last_err = ""
-        for mod in candidate_models:
-            try:
-                response = self.client.models.generate_content(
-                    model=mod,
-                    contents="Reply with: 'GEMINI_OK'"
-                )
-                text = (response.text or "").strip()
-                self.model_name = mod
-                return True, f"Connection successful! Model '{mod}' responded: {text}"
-            except Exception as e:
-                last_err = str(e)
-                # If model is unavailable (503), rate-limited (429), or deprecated (404), probe next candidate
-                if any(kw in last_err.lower() for kw in ["404", "not_found", "not found", "no longer available", "503", "unavailable", "high demand", "429"]):
-                    logger.warning(f"Model '{mod}' unavailable or busy. Probing next candidate...")
-                    continue
-                # For auth or permissions errors (400/401/403), do not cycle models
-                break
+            last_err = ""
+            for mod in candidate_models:
+                try:
+                    response = self.client.models.generate_content(
+                        model=mod,
+                        contents="Reply with: 'GEMINI_OK'"
+                    )
+                    text = (response.text or "").strip()
+                    self.model_name = mod
+                    return True, f"Connection successful! Model '{mod}' responded: {text}"
+                except Exception as e:
+                    last_err = str(e)
+                    # If model is unavailable (503), rate-limited (429), or deprecated (404), probe next candidate
+                    if any(kw in last_err.lower() for kw in ["404", "not_found", "not found", "no longer available", "503", "unavailable", "high demand", "429"]):
+                        logger.warning(f"Model '{mod}' unavailable or busy. Probing next candidate...")
+                        continue
+                    # For auth or permissions errors (400/401/403), do not cycle models
+                    break
 
-        return False, f"Gemini API Error: {last_err}"
+            return False, f"Gemini API Error: {last_err}"
+
+        # Providers: OpenAI, Claude, Azure, AWS Bedrock, Ollama, etc. via LiteLLM
+        try:
+            import litellm
+            litellm.suppress_debug_info = True
+            call_kwargs: Dict[str, Any] = {"model": self.model_name, "max_tokens": 10}
+            if self.api_key:
+                call_kwargs["api_key"] = self.api_key
+            if self.api_base:
+                call_kwargs["api_base"] = self.api_base
+            resp = litellm.completion(
+                messages=[{"role": "user", "content": "Reply with: 'OK'"}],
+                **call_kwargs
+            )
+            txt = ""
+            if resp and getattr(resp, "choices", None):
+                txt = getattr(resp.choices[0].message, "content", "") or "OK"
+            return True, f"Connection successful! Provider '{self.provider}' model '{self.model_name}' responded: {txt.strip()}"
+        except Exception as e:
+            return False, f"{self.provider.upper()} API Error: {e}"
 
     def _build_thinking_config(self) -> Optional[types.ThinkingConfig]:
         """
@@ -547,8 +586,8 @@ class GeminiExtractor:
         """
         detected_vendor = detect_vendor_from_url_or_text(source_url or "", markdown_chunk)
 
-        if not self.is_configured() or not self.client:
-            logger.info(f"GEMINI_API_KEY not configured. Running deterministic extractor for vendor '{detected_vendor}'.")
+        if not self.is_configured() or (self.provider == "gemini" and not self.client):
+            logger.info(f"{self.provider.upper()} API not configured. Running deterministic extractor for vendor '{detected_vendor}'.")
             return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
 
         clean_text = clean_token_efficient_markdown(markdown_chunk)
@@ -558,9 +597,19 @@ class GeminiExtractor:
             f"Vendor: {detected_vendor}\n\n"
             f"Content to analyze:\n```\n{clean_text}\n```\n"
         )
+
+        if self.provider != "gemini":
+            return self._extract_with_litellm(
+                markdown_chunk=markdown_chunk,
+                user_prompt=user_prompt,
+                detected_vendor=detected_vendor,
+                source_url=source_url,
+            )
+
         cache_name = self.get_or_create_prompt_cache() if self.enable_prompt_caching else None
         thinking_cfg = self._build_thinking_config()
-        self.token_metrics["total_calls"] += 1
+        if not self.client:
+            return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
 
         max_api_retries = 2
         for attempt in range(max_api_retries + 1):
@@ -649,6 +698,83 @@ class GeminiExtractor:
                 return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
 
         return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
+
+    def _extract_with_litellm(
+        self,
+        markdown_chunk: str,
+        user_prompt: str,
+        detected_vendor: str,
+        source_url: Optional[str] = None,
+    ) -> List[ProductRecord]:
+        """
+        Executes structured lifecycle extraction via LiteLLM for multi-provider support
+        (OpenAI, Anthropic Claude, Azure OpenAI, AWS Bedrock, Ollama, etc.).
+        """
+        try:
+            import litellm
+
+            litellm.suppress_debug_info = True
+            logger.info(f"Calling {self.provider.upper()} ({self.model_name}) for structured lifecycle extraction...")
+            self.token_metrics["total_calls"] += 1
+
+            system_prompt = (
+                EXTRACTION_SYSTEM_INSTRUCTION
+                + "\n\nCRITICAL: Return ONLY valid JSON matching this schema:\n"
+                + '{"vendor_name": "string", "products": [{"vendor_name": "string", "model_name": "string", "os": "string or null", "firmware": "string or null", "status": "string", "stage_date_utc": "YYYY-MM-DDTHH:MM:SSZ or null", "category": "string", "replacement": "string or null", "notes": "string or null", "bulletin_code": "string or null"}]}'
+            )
+            call_kwargs: Dict[str, Any] = {
+                "model": self.model_name,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "temperature": 0.1,
+            }
+            if self.api_key:
+                call_kwargs["api_key"] = self.api_key
+            if self.api_base:
+                call_kwargs["api_base"] = self.api_base
+
+            # Enable json_object mode if supported
+            m_lower = self.model_name.lower()
+            if any(kw in m_lower for kw in ["gpt-", "o1", "o3", "claude-3-5", "llama"]):
+                call_kwargs["response_format"] = {"type": "json_object"}
+
+            resp = litellm.completion(**call_kwargs)
+            raw_text = ""
+            if resp and getattr(resp, "choices", None):
+                raw_text = getattr(resp.choices[0].message, "content", "") or ""
+
+            if not raw_text.strip():
+                logger.warning(f"Empty response from {self.provider}. Executing fallback extractor.")
+                return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
+
+            cleaned_json = raw_text.strip()
+            if "```" in cleaned_json:
+                m_fence = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', cleaned_json, re.DOTALL)
+                if m_fence:
+                    cleaned_json = m_fence.group(1).strip()
+                else:
+                    cleaned_json = re.sub(r'^```(?:json)?\s*', '', cleaned_json)
+                    cleaned_json = re.sub(r'\s*```$', '', cleaned_json).strip()
+
+            data = json.loads(cleaned_json)
+            batch = GeminiExtractionBatch.model_validate(data)
+            processed_products = []
+            for item in batch.products:
+                p = _gemini_item_to_product_record(
+                    item,
+                    default_vendor=detected_vendor,
+                    source_url=source_url,
+                )
+                if p:
+                    processed_products.append(p)
+
+            logger.info(f"{self.provider.upper()} successfully extracted {len(processed_products)} per-stage product records.")
+            return processed_products
+        except Exception as e:
+            logger.error(f"Error querying {self.provider.upper()} API ({self.model_name}): {e}. Executing fallback extractor.")
+            return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
 
     def fallback_rule_based_extraction(
         self,
@@ -826,10 +952,7 @@ class GeminiExtractor:
                     if not utc_date and bulletin_code:
                         utc_date = extract_date_from_bulletin_code(bulletin_code)
 
-                    # MANDATORY DATE ENFORCEMENT: Reject any stage milestone without a date (NO NULL ALLOWED)
-                    if not utc_date:
-                        continue
-
+                    # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
                     metadata_dict = {
                         "replacement": replacement,
                         "family": detected_category,
@@ -841,6 +964,7 @@ class GeminiExtractor:
                         "raw_stage_label": raw_label,
                         "raw_date_str": raw_date_str or None,
                         "all_milestones": milestone_summary,
+                        "missing_date": True if not utc_date else False,
                         "notes": f"Catalog series: {current_series}" if current_series else None
                     }
 
@@ -1169,3 +1293,9 @@ class GeminiExtractor:
         # Flush final item
         flush_records()
         return products
+
+
+# Universal multi-provider aliases for backward & forward compatibility
+UniversalAIExtractor = GeminiExtractor
+LLMExtractor = GeminiExtractor
+

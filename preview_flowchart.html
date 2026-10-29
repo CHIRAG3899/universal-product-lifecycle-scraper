@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Universal Scraper - Mermaid Diagrams Preview</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292f;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #ffffff;
+        }
+        h1, h2 {
+            border-bottom: 1px solid #d0d7de;
+            padding-bottom: 0.3em;
+        }
+        .mermaid {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #2ea44f;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mermaid Diagram Preview Verification</h1>
+    <span class="status-badge">Live Preview Mode</span>
+
+    <h2>1. 🌟 Key Architecture & Highlights (LR)</h2>
+    <div class="mermaid">
+graph LR
+    A["Raw Portals & Bulletins<br/>(HTML, SPAs, PDFs)"] --> B["Crawl4AI & HTTP Fallback<br/>(Async Headless Chromium)"]
+    B --> C["Universal Multi-Provider AI<br/>(Gemini, OpenAI, Claude, Azure, AWS, Ollama)"]
+    D --> E["Master CSV & JSON<br/>(10-Column SQL Ready)"]
+    C --> D["Sanitisation & Normalisation<br/>(Zero Defaults & Non-Null)"]
+
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    style C fill:#ede7f6,stroke:#512da8,stroke-width:2px;
+    style D fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    style E fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
+    </div>
+
+    <h2>2. 🔄 6-Stage Visible Workflow Pipeline</h2>
+    <div class="mermaid">
+graph TD
+    S1["Stage 1: Discovery & Crawling<br/>• Crawl4AI Async Headless Chromium<br/>• Deep Intra-Domain EOL Links<br/>• Kernel SSRF & Allowed Domain Guard"]
+    S2["Stage 2: AI / Apollo Extraction<br/>• Next.js Apollo GraphQL Cache<br/>• HTML DOM Table Extraction<br/>• PDF Bulletin Parser (pypdf)<br/>• Gemini Structured JSON Extraction"]
+    S3["Stage 3: Normalisation<br/>• Unpack Model Suffixes & Ranges<br/>• Hydrate Bulletin Milestone Dates<br/>• ISO 8601 UTC Standardization<br/>• Manufacturer-Exact Terminology"]
+    S4["Stage 4: Sanitisation & Security<br/>• 4 Mandatory Non-Null Fields<br/>• Cookie Banner & Nav Purging<br/>• CSV Formula Injection Shield<br/>• Zero-Defaults Policy Enforcement"]
+    S5["Stage 5: Deduplication & Merge<br/>• Load Master CSV into Memory<br/>• SHA-256 Record Fingerprinting<br/>• Non-Overwriting Incremental Merge"]
+    S6["Stage 6: Export & Observability<br/>• Export 10-Column Clean CSV<br/>• Modular Per-Vendor JSON Export<br/>• Audit Artifacts & Webhook Alerts"]
+
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+
+    style S1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    style S2 fill:#ede7f6,stroke:#4527a0,stroke-width:2px;
+    style S3 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    style S4 fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    style S5 fill:#fce4ec,stroke:#c2185b,stroke-width:2px;
+    style S6 fill:#fbe9e7,stroke:#bf360c,stroke-width:2px;
+    </div>
+
+    <h2>3. 🚦 Enterprise Pre-Commit Gate (8 Checks)</h2>
+    <div class="mermaid">
+graph TD
+    Commit["git commit"] --> Gate["scripts/pre_commit_check.py"]
+    Gate --> C1["1. AST Syntax Check"]
+    Gate --> C2["2. Ruff Linter & Style"]
+    Gate --> C3["3. Mypy Static Typing"]
+    Gate --> C4["4. Secret & SSRF Guard"]
+    Gate --> C5["5. 140-Vendor Config Validation"]
+    Gate --> C6["6. Database Zero-Null Invariant"]
+    Gate --> C7["7. 142 Automated Unit Tests"]
+    Gate --> C8["8. E2E Synthetic Flow Sandbox"]
+
+    C1 --> Decision{"All Checks Pass?"}
+    C2 --> Decision
+    C3 --> Decision
+    C4 --> Decision
+    C5 --> Decision
+    C6 --> Decision
+    C7 --> Decision
+    C8 --> Decision
+
+    Decision -- Yes --> Pass["Commit Approved (Exit Code 0)"]
+    Decision -- No --> Fail["COMMIT REJECTED (Exit Code 1)<br/>Commit Aborted"]
+
+    style Pass fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px;
+    style Fail fill:#ffcdd2,stroke:#c62828,stroke-width:2px;
+    </div>
+
+    <h2>4. 🗺️ Full Website Network Map Discovery</h2>
+    <div class="mermaid">
+graph TD
+    Root["Vendor Base URL / Domain"] --> Sitemaps["1. XML Sitemaps & robots.txt<br/>(sitemap.xml, sitemap_index.xml)"]
+    Root --> BFS["2. Breadth-First Search (BFS) Queue<br/>(Multi-Depth Traversal: Depth 1 → Depth 2)"]
+    
+    Sitemaps --> P1["Priority 1: Direct Notices<br/>(EOL, LTB, EOS, Phase-Out, Obsolescence)"]
+    BFS --> P2["Priority 2: Product Category Trees<br/>(PLCs, Drives, Switches, Sensors, Machine Controllers, HMIs)"]
+    BFS --> P3["Priority 3: Pagination Networks<br/>(?page=2, rel='next', .pagination a)"]
+
+    P1 --> Engine["Universal AICrawler Engine<br/>(Crawl4AI + DOM Table + Gemini AI)"]
+    P2 --> Engine
+    P3 --> Engine
+    Engine --> Output["Discrete Normalized Records (Zero Missing Models)"]
+
+    style Root fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    style Sitemaps fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    style BFS fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    style Engine fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    style Output fill:#fbe9e7,stroke:#bf360c,stroke-width:2px;
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>

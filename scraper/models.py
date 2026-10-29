@@ -337,7 +337,7 @@ class ProductRecord(BaseModel):
     status: str = Field(default="Discontinued", min_length=1, description="Unified lifecycle status representing exact official vendor terminology without limitation (MANDATORY, NO NULL ALLOWED)")
     stage: str = Field(default="", description="Lifecycle stage matching exact vendor terminology without limitation")
     vendor_status: str = Field(default="", description="EXACT official terminology used by the vendor (e.g., 'Phase-Out', 'Delivery Release', 'End of Sale', 'Classic', 'Limited', 'Obsolete')")
-    stage_date_utc: str = Field(min_length=1, description="ISO 8601 UTC timestamp: YYYY-MM-DDTHH:MM:SSZ (MANDATORY, NO NULL ALLOWED)")
+    stage_date_utc: Optional[str] = Field(default=None, description="ISO 8601 UTC timestamp: YYYY-MM-DDTHH:MM:SSZ or None if vendor does not publish date")
     source_url: Optional[str] = Field(default="", description="Source portal or bulletin URL")
     category: Optional[str] = Field(default="General Automation", description="Normalized category: PLC, Industrial PC, HMI, Inverter, etc.")
     product_category: Optional[str] = Field(default="General Automation", description="Normalized category")
@@ -380,6 +380,11 @@ class ProductRecord(BaseModel):
                 rec_dt = extract_date_from_bulletin_code(b_code or b_title)
                 if rec_dt:
                     data["stage_date_utc"] = rec_dt
+                else:
+                    data["stage_date_utc"] = None
+                    if "metadata" not in data or not isinstance(data.get("metadata"), dict):
+                        data["metadata"] = {}
+                    data["metadata"]["missing_date"] = True
 
             # Model is allowed empty ONLY for software applications or well-known OS entries (e.g. Linux, Debian, Windows)
             cat = (data.get("category") or data.get("product_category") or "").strip()
@@ -428,14 +433,15 @@ class ProductRecord(BaseModel):
 
     @field_validator("stage_date_utc", mode="before")
     def validate_utc(cls, v):
-        if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan"):
-            raise ValueError("stage_date_utc is mandatory and cannot be null, empty, or N/A")
+        if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan", "unknown", "tbd", "undefined", ""):
+            return None
         cleaned = v.strip()
         if cleaned.endswith("Z") and "T" in cleaned:
             return cleaned
         parsed = parse_to_utc_iso(cleaned)
         if not parsed:
-            raise ValueError(f"stage_date_utc is mandatory and could not be parsed to valid UTC ISO 8601 date: '{v}'")
+            # Missing or unparseable dates should not drop genuine lifecycle models
+            return None
         return parsed
 
     @field_validator("replacement", mode="before")

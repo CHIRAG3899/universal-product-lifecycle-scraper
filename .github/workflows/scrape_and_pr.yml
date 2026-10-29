@@ -1,0 +1,104 @@
+name: "Automated Lifecycle Scraper & PR Update"
+
+on:
+  schedule:
+    # Run every Monday at 02:00 UTC
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+    inputs:
+      vendor:
+        description: "Target vendor ID to scrape (or 'all' for all configured enterprise vendors)"
+        required: false
+        default: "all"
+        type: string
+      provider:
+        description: "AI Provider (gemini, openai, anthropic, azure, bedrock, ollama)"
+        required: false
+        default: "gemini"
+        type: choice
+        options:
+          - gemini
+          - openai
+          - anthropic
+          - azure
+          - bedrock
+          - ollama
+      model:
+        description: "Optional custom LLM model name override (leave blank for provider default)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  scrape-and-create-pr:
+    name: "Scrape Lifecycle Portals & Open PR"
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Set up Python 3.11"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: "Install Dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: "Install Playwright Browsers (Crawl4AI Headless Chromium)"
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: "Execute Lifecycle Crawler & AI Extractor"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AI_PROVIDER: ${{ inputs.provider || 'gemini' }}
+          AI_MODEL: ${{ inputs.model || '' }}
+        run: |
+          TARGET_VENDOR="${{ inputs.vendor || 'all' }}"
+          PROVIDER="${{ inputs.provider || 'gemini' }}"
+          MODEL_ARG=""
+          if [ -n "${{ inputs.model }}" ]; then
+            MODEL_ARG="--model ${{ inputs.model }}"
+          fi
+
+          if [ "$TARGET_VENDOR" = "all" ] || [ -z "$TARGET_VENDOR" ]; then
+            echo "[CI/CD] Executing crawl across ALL configured enterprise vendors..."
+            python cli.py --all-vendors --provider "$PROVIDER" $MODEL_ARG
+          else
+            echo "[CI/CD] Executing crawl for vendor: $TARGET_VENDOR..."
+            python cli.py --vendor "$TARGET_VENDOR" --provider "$PROVIDER" $MODEL_ARG
+          fi
+
+      - name: "Generate PR Metrics & Health Report"
+        run: |
+          python scripts/generate_pr_metrics.py
+
+      - name: "Create or Update Pull Request"
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "data(lifecycle): automated multi-vendor crawl and dataset refresh"
+          title: "Automated Lifecycle Dataset Update & Metrics [Weekly Run]"
+          body-path: output/pr_description.md
+          branch: data/automated-lifecycle-refresh
+          delete-branch: true
+          labels: |
+            automated-pr
+            dataset-update
+            lifecycle-intelligence
+          draft: false

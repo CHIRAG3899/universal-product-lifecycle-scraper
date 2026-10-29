@@ -1,10 +1,10 @@
-# 🌐 Universal Multi-Vendor EOL & Lifecycle AI Scraper
+# 🌐 Universal Multi-Vendor Product Lifecycle Intelligence Scraper
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+" />
   <img src="https://img.shields.io/badge/Linter-Ruff-red.svg?style=for-the-badge&logo=ruff&logoColor=white" alt="Ruff" />
   <img src="https://img.shields.io/badge/Type_Checked-Mypy-blueviolet.svg?style=for-the-badge" alt="Mypy" />
-  <img src="https://img.shields.io/badge/AI_Engine-Google_Gemini-4285F4.svg?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini" />
+  <img src="https://img.shields.io/badge/AI_Engine-Universal_Multi--Provider_LLM-4285F4.svg?style=for-the-badge" alt="Universal Multi-Provider AI" />
   <img src="https://img.shields.io/badge/Crawler-Crawl4AI-orange.svg?style=for-the-badge" alt="Crawl4AI" />
   <img src="https://img.shields.io/badge/Vendors-140_Enterprise-success.svg?style=for-the-badge" alt="140 Vendors" />
   <img src="https://img.shields.io/badge/Quality_Gate-8_Stages_Passing-brightgreen.svg?style=for-the-badge" alt="8-Stage Gate" />
@@ -12,32 +12,36 @@
 
 An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, and **End of Service / End of Support (EOS)** milestones.
 
-The platform natively supports **140 global enterprise vendors** across **Operational Technology (OT)**, **Internet of Things (IoT)**, and **Enterprise IT & Networking**. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and **Google Gemini** (`gemini-3.5-flash-lite`, `gemini-3.5-flash`, `gemini-flash-latest` via the official `google-genai` SDK).
+The platform natively supports **140 global enterprise vendors** across **Operational Technology (OT)**, **Internet of Things (IoT)**, and **Enterprise IT & Networking**. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and pluggable **Universal Multi-Provider AI** (OpenAI GPT-4o, Anthropic Claude 3.5, Google Gemini, Microsoft Azure OpenAI, Amazon AWS Bedrock, and Local Ollama/vLLM).
 
 ---
 
 > [!IMPORTANT]
 > ### 🛡️ Pre-Commit Quality Gate & Zero-Tolerance Policy
 > **Don't Commit if They Don't Pass**:
-> The repository enforces an automated **8-stage pre-commit gate** (`scripts/pre_commit_check.py`). Any failure in **Ruff linting**, **Mypy static typing**, unit tests (142 tests), or database schema invariants **strictly aborts `git commit` with exit code 1**.
+> The repository enforces an automated **8-stage pre-commit gate** (`scripts/pre_commit_check.py`). Any failure in **Ruff linting**, **Mypy static typing**, unit tests (150+ tests), or database schema invariants **strictly aborts `git commit` with exit code 1**.
 > 
-> **Zero-Null Invariant**: The core fields—`vendor_name`, `status`, and `stage_date_utc`—are **100% mandatory with zero nulls allowed**. Missing dates are hydrated from circular headers or crawl snapshot dates. For hardware records (PLCs, drives, inverters, switches, sensors, cameras, etc.), `model_name` is **strictly mandatory and cannot be null or empty under any circumstance**. `model_name` is allowed to be empty/blank **ONLY** in case of software applications or well-known OS entries (e.g., Linux, Debian, Windows, Ubuntu, RHEL, CentOS, SUSE, FreeBSD, VxWorks, QNX).
+> **Zero Dropped EOL Records Rule**: Products that have reached End of Life (EOL), Discontinued, Phase-Out, or Obsolete product cycle as per vendor **must always have an entry even without a date present**. Missing date will NEVER drop a record. All models reaching end of lifecycle produce an entry with full metadata.
+>
+> **Identification Invariants**: `vendor_name` and `status` are strictly mandatory with zero nulls allowed. For hardware records (PLCs, drives, inverters, switches, sensors, cameras, etc.), `model_name` is **strictly mandatory and cannot be null or empty under any circumstance**. `model_name` is allowed to be empty/blank **ONLY** in case of software applications or well-known OS entries (e.g., Linux, Debian, Windows, Ubuntu, RHEL, CentOS, SUSE, FreeBSD, VxWorks, QNX).
 
 ---
 
 ## 📋 Table of Contents
 1. [Key Architecture & Highlights](#-key-architecture--highlights)
-2. [Google Gemini Setup & Cost Optimizations](#-google-gemini-setup--cost-optimizations)
+2. [Universal Multi-Provider AI Architecture & Setup](#-universal-multi-provider-ai-architecture--setup)
 3. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
 4. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
-5. [Top 140 Enterprise Vendors Registry](#-top-140-enterprise-vendors-registry)
-6. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
-7. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
-8. [Zero-Defaults Policy & Dynamic Terminology](#-zero-defaults-policy--dynamic-terminology)
-9. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
-10. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
-11. [Automated Verification & Testing](#-automated-verification--testing)
-12. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
+5. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
+6. [Top 140 Enterprise Vendors Registry](#-top-140-enterprise-vendors-registry)
+7. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
+8. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
+9. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
+10. [Zero-Defaults Policy & Dynamic Terminology](#-zero-defaults-policy--dynamic-terminology)
+11. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
+12. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
+13. [Automated Verification & Testing](#-automated-verification--testing)
+14. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
 
 ---
 
@@ -46,7 +50,7 @@ The platform natively supports **140 global enterprise vendors** across **Operat
 ```mermaid
 graph LR
     A["Raw Portals & Bulletins<br/>(HTML, SPAs, PDFs)"] --> B["Crawl4AI & HTTP Fallback<br/>(Async Headless Chromium)"]
-    B --> C["Google Gemini 3.5 Flash<br/>(Semantic Reasoner)"]
+    B --> C["Universal Multi-Provider AI<br/>(Gemini, OpenAI, Claude, Azure, AWS, Ollama)"]
     D --> E["Master CSV & JSON<br/>(10-Column SQL Ready)"]
     C --> D["Sanitisation & Normalisation<br/>(Zero Defaults & Non-Null)"]
 
@@ -57,39 +61,120 @@ graph LR
     style E fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
 ```
 
+- **Universal Multi-Provider AI (Zero Lock-In)**: Works out-of-the-box with **Google Gemini**, **OpenAI** (GPT-4o, GPT-4o-mini), **Anthropic Claude** (Sonnet 3.5, Haiku 3.5), **Microsoft Azure OpenAI**, **Amazon AWS Bedrock**, and **Local / On-Premise Ollama** with automatic provider resolution and deterministic fallback.
 - **140 Out-of-the-Box Enterprise Vendors**: 54 Operational Technology (OT), 44 Internet of Things (IoT), and 42 Enterprise IT/Networking vendors pre-configured in [`configs/vendors.yaml`](configs/vendors.yaml), including **JTEKT Toyoda**, **Rockwell Automation**, **Siemens**, **Mitsubishi Electric**, **Cisco Meraki**, and **Hitachi Industrial**.
-- **Zero Status Limitations**: Preserves the manufacturer's exact official lifecycle milestone (*Phase-Out Product, Delivery Release, Announced Discontinuation, End of Sale, Last Date of Support, Classic, Limited, Obsolete, Active Mature, Stop Shipment, Discontinued, EOL*). No artificial whitelist or enum restriction.
-- **Strict Mandatory 4-Field Zero-Null Invariant**: Guarantees `vendor_name`, `model_name`, `status`, and `stage_date_utc` are 100% non-null. Missing row dates are hydrated from circular codes or crawl timestamps.
+- **Zero Dropped EOL Records**: Guarantees that any product marked with an End-of-Life, Discontinued, Phase-Out, or Obsolete status has a permanent entry in the dataset even when explicit dates are absent.
 - **Deep PDF & Pagination Ingestion**: Extracts discontinuation notices from `.pdf` documents (`pypdf`) and traverses paginated support tables (`?page=`, `rel="next"`).
 - **Ruff & Mypy Hardened Pre-Commit Gate**: Blocks commits automatically if any linter error, style violation, or type signature mismatch occurs.
-- **Google Native Token Slashing**: Up to 90% prompt caching discount, 50% asynchronous batch mode discount, and 0-budget thinking capping.
+- **Optimized Token Economics**: Dynamic prompt caching, asynchronous batch processing, and capped reasoning budgets across cloud providers to eliminate unnecessary API expenses.
 
 ---
 
-## 🔑 Google Gemini Setup & Cost Optimizations
+## 🔌 Universal Multi-Provider AI Architecture & Setup
 
-### Free API Key Setup (30 Seconds)
-1. Get a free API key from **[Google AI Studio](https://aistudio.google.com/app/apikey)**.
-2. Run the interactive key configurator:
-   ```bash
-   python setup_key.py
-   # Or via CLI:
-   python cli.py --setup-key
-   ```
-   *The utility probes candidate models, verifies connectivity, and updates `.env` automatically.*
+The framework is completely provider-agnostic. While **Google Gemini** offers a generous free tier with native prompt caching and 0-budget thinking capping, you can seamlessly plug and work with **any AI provider** (OpenAI, Anthropic Claude, Microsoft Azure OpenAI, Amazon AWS Bedrock, or local on-premise Ollama) with zero code rewrites.
 
-### 💰 Google Native Cost Optimization Strategies
+### 🌐 Supported AI Providers Matrix
+
+| Provider | Supported Models | Authentication / Env Vars | Key Architectural Benefit |
+|---|---|---|---|
+| **Google Gemini** *(Default)* | `gemini-3.5-flash-lite`<br/>`gemini-3.5-flash` | `GEMINI_API_KEY` | Free API tier, 90% prompt caching discount, 50% batch discount, 0-budget reasoning capping. |
+| **OpenAI** | `gpt-4o-mini`<br/>`gpt-4o`<br/>`o1`, `o3` | `OPENAI_API_KEY` | Industry-standard schema extraction, sub-second latency, structured JSON output mode. |
+| **Anthropic Claude** | `claude-3-5-haiku-20241022`<br/>`claude-3-5-sonnet-20241022` | `ANTHROPIC_API_KEY` | Exceptional reasoning on complex multi-page PDF bulletins and dense nested technical tables. |
+| **Microsoft Azure OpenAI** | `azure/<deployment-name>` | `AZURE_OPENAI_API_KEY`<br/>`AZURE_OPENAI_ENDPOINT`<br/>`AZURE_OPENAI_API_VERSION` | Enterprise corporate compliance, private VNet endpoints, SOC2/ISO-27001 certifications. |
+| **Amazon AWS Bedrock** | `bedrock/anthropic.claude-3-5-haiku-20241022-v1:0`<br/>`bedrock/meta.llama3` | `AWS_ACCESS_KEY_ID`<br/>`AWS_SECRET_ACCESS_KEY`<br/>`AWS_REGION_NAME` | Native AWS IAM role execution, zero external credentials required on EC2/ECS/EKS instances. |
+| **Local / On-Premise** | `ollama/llama3.2`<br/>`ollama/mistral`<br/>`vllm/<model>` | `OPENAI_BASE_URL=http://localhost:11434/v1` | 100% offline, zero cloud data egress, air-gapped defense and government network compliance. |
+
+---
+
+### ⚡ Quick Interactive Provider Configurator
+Run the interactive setup tool to configure and validate any provider:
+```bash
+python setup_key.py
+# Or through CLI:
+python cli.py --setup-key
+```
+Select your desired provider (`1` for Gemini, `2` for OpenAI, `3` for Claude, `4` for Azure, `5` for AWS Bedrock, `6` for Ollama). The configurator validates your credentials live and persists your settings to `.env`.
+
+---
+
+### 💻 CLI Multi-Provider Execution Examples
+
+Switch providers dynamically at runtime using the `--provider` and `--model` flags:
+
+```bash
+# 1. Google Gemini (Default free tier with Flash reasoning)
+python cli.py --vendor siemens --provider gemini --model gemini-3.5-flash-lite
+
+# 2. OpenAI GPT-4o-mini (Cost-effective structured JSON)
+python cli.py --vendor siemens --provider openai --model gpt-4o-mini
+
+# 3. Anthropic Claude 3.5 Haiku / Sonnet
+python cli.py --vendor mitsubishi --provider anthropic --model claude-3-5-haiku-20241022
+
+# 4. Microsoft Azure OpenAI (Enterprise Private Cloud)
+python cli.py --vendor cisco_systems --provider azure --model azure/my-gpt4o-deployment
+
+# 5. Amazon AWS Bedrock (IAM-backed Claude 3.5)
+python cli.py --vendor rockwell_automation --provider bedrock --model bedrock/anthropic.claude-3-5-haiku-20241022-v1:0
+
+# 6. Local Ollama (Zero Cloud Data Transfer / Air-Gapped)
+python cli.py --vendor omron --provider ollama --model ollama/llama3.2 --api-base http://localhost:11434/v1
+```
+
+---
+
+### 🛠️ Programmatic Python SDK: Plugging Any Provider
+
+Import `UniversalAIExtractor` or initialize `LifecyclePipeline` with any provider of your choice:
+
+```python
+from scraper import UniversalAIExtractor, LifecyclePipeline
+
+# Option A: Plug OpenAI
+pipeline_openai = LifecyclePipeline(
+    provider="openai",
+    model="gpt-4o-mini",
+    api_key="sk-..."  # Or read from OPENAI_API_KEY
+)
+await pipeline_openai.execute(vendor_id="siemens")
+
+# Option B: Plug Anthropic Claude
+pipeline_claude = LifecyclePipeline(
+    provider="anthropic",
+    model="claude-3-5-sonnet-20241022",
+    api_key="sk-ant-..."  # Or read from ANTHROPIC_API_KEY
+)
+
+# Option C: Plug Azure OpenAI
+pipeline_azure = LifecyclePipeline(
+    provider="azure",
+    model="azure/production-gpt4o",
+    api_key="<azure-key>",
+    api_base="https://my-company.openai.azure.com/"
+)
+
+# Option D: Plug Local Ollama (Completely Offline / On-Premise)
+extractor_ollama = UniversalAIExtractor(
+    provider="ollama",
+    model_name="ollama/llama3.2",
+    api_base="http://localhost:11434/v1"
+)
+```
+
+---
+
+### 💰 Cost & Token Optimization Strategies (Google Gemini)
 
 > [!TIP]
-> **Slashing AI Crawling Costs**:
-> Enterprise web crawling processes repetitive DOM structures. Use Google's native primitives to slash API token costs:
+> When operating on Google Gemini, enterprise crawling utilizes native cloud primitives to slash API token costs:
 
 | Strategy | Cost Impact | How It Works | Command Flag / Env |
 |---|---|---|---|
 | **Thinking Budget Capping** | **60–80% Output Token Savings** | Caps internal reasoning tokens to 0 on Flash models (`gemini-3.5-flash-lite`, `gemini-3.5-flash`), eliminating costly chain-of-thought generation on simple schema extraction. | `--thinking-budget 0`<br/>`GEMINI_THINKING_BUDGET=0` |
 | **Native Prompt Caching** | **Up to 90% Input Token Discount** | Pre-caches invariant extraction schemas and prompts via `client.caches.create()` across repetitive site structures. | `--prompt-caching`<br/>`GEMINI_ENABLE_PROMPT_CACHING=true` |
 | **Asynchronous Batch API** | **50% Overall Token Discount** | Submits non-interactive crawls via `client.batches.create()` with `InlinedRequest`, cutting input and output pricing by half. | `--batch-mode`<br/>`GEMINI_BATCH_MODE=true` |
-| **Token-Efficient Trimming** | **15–30% Input Token Reduction** | Strips HTML comments, repetitive table dividers, and duplicate whitespaces before sending text to the LLM. | Built-in by default |
+| **Token-Efficient Trimming** | **15–30% Input Token Reduction** | Strips HTML comments, repetitive table dividers, and duplicate whitespaces before sending text to any LLM. | Built-in by default |
 
 ---
 
@@ -98,46 +183,26 @@ graph LR
 All scraper operations execute through 6 observable stages, logged in real-time to the console and web dashboard:
 
 ```mermaid
-flowchart TD
-    subgraph S1 ["Stage 1: Discovery & Crawling"]
-        A1["Fetch Base URL via Crawl4AI"]
-        A2["Follow Intra-Domain EOL Links"]
-        A3["Kernel SSRF & Domain Whitelist Guard"]
-    end
-    subgraph S2 ["Stage 2: AI / Apollo Extraction"]
-        B1["Next.js Apollo Cache Ingestion"]
-        B2["HTML DOM Table & Card Extraction"]
-        B3["PDF Bulletin Text Parsing (pypdf)"]
-        B4["Gemini Structured JSON Extraction"]
-    end
-    subgraph S3 ["Stage 3: Normalisation"]
-        C1["Unpack Model Suffixes & Ranges"]
-        C2["Hydrate Bulletin Publication Dates"]
-        C3["Normalize Dates to ISO 8601 UTC"]
-        C4["Retain Exact Manufacturer Status"]
-    end
-    subgraph S4 ["Stage 4: Sanitisation & Security"]
-        D1["Enforce 4 Mandatory Non-Null Fields"]
-        D2["Purge Cookie Banners & Nav Noise"]
-        D3["Sanitize CSV Formulas (=, +, -, @)"]
-        D4["Enforce Zero-Defaults (No Fake OS/FW)"]
-    end
-    S4 --- Step 4: Sanitisation
+graph TD
+    S1["Stage 1: Discovery & Crawling<br/>• Crawl4AI Async Headless Chromium<br/>• Deep Intra-Domain EOL Links<br/>• Kernel SSRF & Allowed Domain Guard"]
+    S2["Stage 2: AI / Apollo Extraction<br/>• Next.js Apollo GraphQL Cache<br/>• HTML DOM Table Extraction<br/>• PDF Bulletin Parser (pypdf)<br/>• Gemini Structured JSON Extraction"]
+    S3["Stage 3: Normalisation<br/>• Unpack Model Suffixes & Ranges<br/>• Hydrate Bulletin Milestone Dates<br/>• ISO 8601 UTC Standardization<br/>• Manufacturer-Exact Terminology"]
+    S4["Stage 4: Sanitisation & Security<br/>• 4 Mandatory Non-Null Fields<br/>• Cookie Banner & Nav Purging<br/>• CSV Formula Injection Shield<br/>• Zero-Defaults Policy Enforcement"]
+    S5["Stage 5: Deduplication & Merge<br/>• Load Master CSV into Memory<br/>• SHA-256 Record Fingerprinting<br/>• Non-Overwriting Incremental Merge"]
+    S6["Stage 6: Export & Observability<br/>• Export 10-Column Clean CSV<br/>• Modular Per-Vendor JSON Export<br/>• Audit Artifacts & Webhook Alerts"]
 
-    subgraph Step 5: Deduplication
-        E1["Load Historical Master CSV"]
-        E2["Compute SHA-256 Fingerprints in Memory"]
-        E3["Non-Overwriting Incremental Append & Upsert"]
-    end
-    S5 --- Step 5: Deduplication
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
 
-    subgraph Step 6: Export
-        F1["Drop Internal Fingerprint Column"]
-        F2["Write output/all_vendors_lifecycle.csv"]
-        F3["Write output/<vendor>_lifecycle.json"]
-        F4["Dispatch Alerts & Metrics"]
-    end
-    S6 --- Step 6: Export
+    style S1 fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    style S2 fill:#ede7f6,stroke:#4527a0,stroke-width:2px;
+    style S3 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    style S4 fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    style S5 fill:#fce4ec,stroke:#c2185b,stroke-width:2px;
+    style S6 fill:#fbe9e7,stroke:#bf360c,stroke-width:2px;
 ```
 
 ---
@@ -188,6 +253,74 @@ python -m unittest discover tests -v
 # Install/reinstall Git hook to .git/hooks/pre-commit
 python scripts/install_hooks.py
 ```
+
+---
+
+## 🏷️ Complete Manufacturer-Exact Lifecycle Status Terminology Registry
+
+Industrial automation (OT), embedded semiconductor (IoT), and enterprise datacenter (IT) equipment manufacturers **do not adhere to a single unified status vocabulary**. Each vendor defines rigorous proprietary lifecycle phases governing procurement availability, firmware bug-fix freezes, component repair windows, and final service obsolescence.
+
+> [!IMPORTANT]
+> ### 🛡️ Zero Dropped EOL Records Invariant
+> Products that have reached **End of Life (EOL)**, **Discontinued**, **Phase-Out**, or **Obsolete** status as per vendor circulars **always have a permanent entry in the dataset even when no date is present**. Missing dates will NEVER drop a record. The extractor tags undated records with `"missing_date": true` in metadata, guaranteeing 100% catalog coverage for asset management.
+
+### Key Lifecycle Phasing Models Across Major Manufacturers
+
+| Vendor / Manufacturer | Sector | Phasing Model | Exact Vendor Status Terminology | Operational Impact & Engineering Meaning |
+|:---|:---:|:---|:---|:---|
+| **Rockwell Automation (Allen-Bradley)** | **OT** | 4-Phase Lifecycle | `Active` | Current offering within product family; recommended for all new designs. |
+| | | | `Active Mature` | Actively manufactured and supported; newer successor generation exists. |
+| | | | `End of Life` | Discontinuation date announced; orders accepted until published Last Time Buy (LTB). |
+| | | | `Discontinued` | Manufacturing ceased; repair services and remanufactured units only while inventory lasts. |
+| **Siemens (SiePortal)** | **OT** | 4-Stage Milestone Lifecycle | `Delivery Release (Lieferfreigabe)` | General commercial availability; standard series production. |
+| | | | `Phase-Out Product (Auslauftyp)` | Phase-out announced; available as new for 1–2 years while migration begins. |
+| | | | `Product Cancellation (Produktabkündigung)` | Series production halted; available primarily as replacement/spare parts (Ersatzteil). |
+| | | | `Product Discontinuation (Lieferstopp)` | Complete discontinuation; spare part deliveries and repair agreements ceased. |
+| **Schneider Electric** | **OT** | Commercial & Support Timeline | `Commercialised` | Active commercial catalog model available for standard purchase. |
+| | | | `End of Commercialisation (EoC)` | Commercial sales window concluded; final customer deliveries executed. |
+| | | | `End of Standard Support` | Firmware updates, driver releases, and standard technical phone support expire. |
+| | | | `End of Extended Support / Obsolescence` | Complete retirement; no spare parts or factory maintenance available. |
+| **ABB** | **OT** | 4-Phase Model | `Active` | Full lifecycle services, continuous enhancement, and active volume production. |
+| | | | `Classic` | Mature product line; replacement actively recommended for new installations. |
+| | | | `Limited` | Manufacturing stopped; services limited to available spare parts and workshop repair. |
+| | | | `Obsolete` | End of lifecycle; spares exhausted, technical advice on best-effort basis only. |
+| **Omron Corporation** | **OT** | Production to Maintenance Transition | `Active Production` | Standard catalog model in volume production. |
+| | | | `Discontinuation Announced (生産終了予告)` | Formal notice issued communicating the final order deadline (Last Time Buy). |
+| | | | `Discontinued (生産終了 / 製造中止)` | Factory manufacturing permanently terminated. |
+| | | | `Maintenance Termination (修理対応終了)` | Standard 7-year post-discontinuation repair window expired; service ceased. |
+| **Mitsubishi Electric** | **OT** | 7-Year Maintenance Timeline | `Active / Current Production` | Standard series catalog offering. |
+| | | | `Discontinuation Announced` | Technical bulletin published with Last Time Buy deadline and successor model. |
+| | | | `Discontinued (製造中止 / 生産終了)` | Production ended; new equipment orders no longer accepted. |
+| | | | `Repair Termination (修理対応終了)` | 7-year spare parts supply and workshop repair service period concluded. |
+| **Intel Corporation** | **IoT** | Product Discontinuation Notice (PDN) | `Launched` | Volume production silicon and embedded processors. |
+| | | | `Product Discontinuation Notice (PDN)` | Formal notification of impending lifecycle termination. |
+| | | | `Last Time Buy (LTB)` | Final date for non-cancellable, non-returnable purchase orders. |
+| | | | `Last Time Ship (LTS)` | Final date for factory delivery and dispatch. |
+| | | | `End of Interactive Support (EOIS)` | Technical phone/chat support, errata updates, and microcode patches frozen. |
+| **Texas Instruments / NXP / STMicro** | **IoT** | Silicon Longevity Commitment | `Active` | In volume production and recommended for new designs. |
+| | | | `Not Recommended for New Designs (NRND)` | Existing customers supported, but newer pin-compatible silicon advised. |
+| | | | `Last Time Buy (LTB)` | Final order placement deadline before wafer fab shutdown. |
+| | | | `Obsolete / Discontinued` | Device retired; no longer manufactured or orderable. |
+| **Cisco Systems** | **IT** | 6-Milestone End-of-Life Policy | `End-of-Life Announcement Date` | Official bulletin published detailing the entire lifecycle timeline. |
+| | | | `End-of-Sale Date (EoS)` | Last date to order the product through standard Cisco sales channels. |
+| | | | `End of SW Maintenance Releases` | Final software release for maintenance bug fixes and maintenance releases. |
+| | | | `End of Vulnerability/Security Support` | Final security and vulnerability patches released. |
+| | | | `End of Routine Failure Analysis` | Last date hardware engineering will diagnose operational failures. |
+| | | | `Last Date of Support (LDoS)` | Final date to receive service contracts, parts replacement, and TAC assistance. |
+| **HPE (Hewlett Packard Enterprise)** | **IT** | Server & Aruba 3-Milestone Policy | `Active` | Standard commercial availability and full warranty support. |
+| | | | `End of Sale (EOS)` | Commercial sales window closed; server or switch no longer orderable. |
+| | | | `End of Engineering Support (EOES)` | Firmware, SPP updates, and driver maintenance conclude. |
+| | | | `End of Service Life (EOSL)` | Complete termination of hardware support and maintenance contracts. |
+| **Fortinet / Palo Alto Networks** | **IT** | Security Appliance Lifecycle | `End of Order (EOO) / End of Sale (EoS)` | Final purchase order cutoff for firewall appliance or security subscription. |
+| | | | `End of Engineering Support (EOES / EoE)` | Operating system maintenance releases and vulnerability patches frozen. |
+| | | | `End of Support (EOS / EoL)` | Complete technical TAC support retired; hardware unit decommissioned. |
+
+> [!TIP]
+> **Generate / Inspect Full 140-Vendor Terminology Catalog**:
+> To generate and inspect the exhaustive status terminology across all 140 vendors:
+> ```bash
+> python scripts/generate_vendor_status_registry.py --print
+> ```
 
 ---
 
@@ -367,6 +500,42 @@ python scripts/install_hooks.py
 
 ---
 
+## 🔄 Automated GitHub Actions CI/CD Pipeline & PR Metrics Report
+
+The pipeline is fully automated via GitHub Actions ([`.github/workflows/scrape_and_pr.yml`](.github/workflows/scrape_and_pr.yml)). It executes on a weekly schedule or on-demand, crawls vendor portals, merges new findings into the master dataset, and automatically opens a Pull Request with a rich diagnostic metrics report.
+
+### Workflow Triggers
+- **Weekly Scheduled Cron**: Automatically runs every Monday at 02:00 UTC (`0 2 * * 1`).
+- **Manual Workflow Dispatch (`workflow_dispatch`)**: Trigger ad-hoc runs directly from GitHub Actions UI with custom parameters:
+  - Target Vendor (`all` or specific vendor ID like `siemens`, `cisco`, `rockwell_automation`)
+  - AI Provider (`gemini`, `openai`, `anthropic`, `azure`, `bedrock`, `ollama`)
+  - Optional custom model override
+
+### Pull Request Metrics & Health Report
+Every automated run compiles an extensive Markdown report (`output/pr_description.md`) that forms the Pull Request description, detailing:
+
+1. **Executive Pipeline Health Summary**:
+   - Total verified product records in master CSV.
+   - Succeeded vendors count vs. failed vendors count.
+   - Overall pipeline status badge (`HEALTHY`, `DEGRADED`, or `CRITICAL_FAILURE`).
+2. **Vendors Unable to Provide Data (Forensic Failure Diagnostics)**:
+   - Specific vendor names and target URLs that failed to provide data.
+   - Exact failure stage and classified root cause:
+     - `Anti-Bot / Cloudflare Block (403)`: Anti-bot challenge detected.
+     - `Network Timeout`: Connection latency or gateway timeout.
+     - `Endpoint Not Found (404)`: Entry point URL drifted or moved.
+     - `Empty DOM / SPA Pagination`: Dynamic JS rendering issue.
+   - Recommended engineering remediation for each failure.
+3. **Data Quality & Hygiene Invariants**:
+   - **Exact UTC Dates Coverage %**: Percentage of milestones with verified ISO 8601 UTC timestamps.
+   - **Undated EOL Records Preserved**: Total count of models that reached end-of-lifecycle where the vendor omitted explicit milestone dates (retained 100% without dropping).
+   - **Rich Metadata Richness %**: Percentage of records populated with successor parts, categories, and bulletin codes.
+   - **Semantic Firmware Normalization**: Count of firmware versions normalized to `X.Y.Z`.
+4. **Impending Last-Time-Buy (LTB) Urgent Notices (Next 90 Days)**:
+   - Critical procurement table highlighting models nearing order cutoff dates within 90 days across all vendors.
+
+---
+
 ## 🗺️ Full Website Network Map Discovery & Zero Category Bias
 
 Enterprise hardware lifecycle notices are distributed across diverse digital channels—not solely under URLs labeled `"lifecycle"`. The crawler maps the complete manufacturer website architecture without artificial product category restrictions:
@@ -380,7 +549,9 @@ graph TD
     BFS --> P2["Priority 2: Product Category Trees<br/>(PLCs, Drives, Switches, Sensors, Machine Controllers, HMIs)"]
     BFS --> P3["Priority 3: Pagination Networks<br/>(?page=2, rel='next', .pagination a)"]
 
-    P1 & P2 & P3 --> Engine["Universal AICrawler Engine<br/>(Crawl4AI + DOM Table + Gemini AI)"]
+    P1 --> Engine["Universal AICrawler Engine<br/>(Crawl4AI + DOM Table + Universal AI Extractor)"]
+    P2 --> Engine
+    P3 --> Engine
     Engine --> Output["Discrete Normalized Records (Zero Missing Models)"]
 
     style Root fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
@@ -444,7 +615,7 @@ The exported master CSV strictly follows the **10-column database snake_case sch
 | **`vendor_name`** | `VARCHAR(100)` | **MANDATORY (NO NULL)** | Clean manufacturer name | `JTEKT Toyoda` |
 | **`model_name`** | `VARCHAR(120)` | **MANDATORY (NO NULL)** | Discrete part number or model code | `PC3JX-CPU` |
 | **`status`** | `VARCHAR(80)` | **MANDATORY (NO NULL)** | Manufacturer-exact lifecycle status | `Discontinued` |
-| **`stage_date_utc`** | `TIMESTAMP WITH TIME ZONE` | **MANDATORY (NO NULL)** | ISO 8601 UTC milestone timestamp | `2026-09-30T00:00:00Z` |
+| **`stage_date_utc`** | `TIMESTAMP WITH TIME ZONE` | **Preserved (Non-Dropping)** | ISO 8601 UTC milestone timestamp or empty string if date is unspecified by vendor | `2026-09-30T00:00:00Z` |
 | **`source_url`** | `VARCHAR(500)` | Optional | Canonical portal URL where extracted | `https://toyoda.jtekt.co.jp/...` |
 | **`os`** | `VARCHAR(60)` | Optional | Operating system runtime (or empty string) | `""` |
 | **`firmware`** | `VARCHAR(40)` | Optional | Semantic firmware version (or empty string) | `""` |
@@ -453,7 +624,7 @@ The exported master CSV strictly follows the **10-column database snake_case sch
 | **`metadata`** | `JSONB` / `TEXT` | Optional | Extended JSON attributes and audit traces | `{"series": "TOYOPUC", ...}` |
 
 > [!NOTE]
-> The internal deduplication column `Fingerprint` is **strictly excluded from the exported CSV**, delivering a clean, presentation-ready dataset.
+> The internal deduplication column `Fingerprint` is **strictly excluded from the exported CSV**, delivering a clean, presentation-ready dataset. Products that reached End of Life without a published date are **100% preserved** with `"missing_date": true` in metadata.
 
 ---
 
@@ -461,7 +632,7 @@ The exported master CSV strictly follows the **10-column database snake_case sch
 
 ### CLI Commands (`cli.py`)
 ```bash
-# 1. Interactive Gemini API key configuration
+# 1. Interactive Multi-Provider AI key configuration
 python cli.py --setup-key
 
 # 2. List all 140 supported enterprise vendors

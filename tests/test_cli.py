@@ -35,7 +35,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         output = mock_stdout.getvalue()
         self.assertIn("ENTERPRISE MULTI-VENDOR LIFECYCLE", output)
         self.assertIn("140 Top Vendors", output)
-        self.assertIn("Crawl4AI + Google Gemini", output)
+        self.assertIn("Universal Multi-Provider AI", output)
 
     @patch("setup_key.main")
     async def test_02_setup_key_flag(self, mock_setup_main):

@@ -169,7 +169,7 @@ function setupEventListeners() {
       testKeyBtn.textContent = "...";
       keyValidationStatus.style.display = "block";
       keyValidationStatus.style.color = "var(--accent-cyan)";
-      keyValidationStatus.textContent = "Testing key with Google Gemini API...";
+      keyValidationStatus.textContent = "Testing key with AI engine...";
 
       try {
         const res = await fetch("/api/test-key", {
@@ -601,7 +601,7 @@ async function runLiveCrawl() {
   // Simulated progression timer for visible UI feedback while request is processing
   const progressTimer = setTimeout(() => {
     setWorkflowStep(2);
-    crawlerProgressText.textContent = "STEP 2/6: Extracting unstructured tables, DOM nodes & Apollo props via Gemini AI...";
+    crawlerProgressText.textContent = "STEP 2/6: Extracting unstructured tables, DOM nodes & Apollo props via Universal AI Extractor...";
   }, 2500);
 
   const progressTimer2 = setTimeout(() => {

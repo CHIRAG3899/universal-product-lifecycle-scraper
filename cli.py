@@ -35,7 +35,7 @@ def print_banner():
   ENTERPRISE MULTI-VENDOR LIFECYCLE & OBSOLESCENCE AI SCRAPER
   Framework: 140 Top Vendors (OT / IoT / IT) | Config-Driven | Zero Defaults | Append & Deduplicate
   Stages: [1] Discovery -> [2] Extraction -> [3] Normalisation -> [4] Sanitisation -> [5] Deduplication -> [6] Export
-  Engine: Crawl4AI + Google Gemini (gemini-3.5-flash-lite / gemini-3.5-flash via google-genai)
+  Engine: Crawl4AI + Universal Multi-Provider AI (OpenAI, Claude, Azure, AWS Bedrock, Google, Ollama)
 ===================================================================================================
 """
     print(banner)
@@ -49,8 +49,10 @@ async def main():
     parser.add_argument("--site-crawl", action="store_true", default=True, help="Crawl the vendor's entire website domain rather than only specific pages (default: True)")
     parser.add_argument("--no-site-crawl", dest="site_crawl", action="store_false", help="Disable domain-level discovery crawl and target only entry-point URLs")
     parser.add_argument("--url", default=None, help="Ad-hoc website or portal URL to crawl")
-    parser.add_argument("--api-key", default=None, help="Google Gemini API key")
-    parser.add_argument("--model", default=GEMINI_MODEL, help="Gemini Model name")
+    parser.add_argument("--provider", default=None, choices=["gemini", "openai", "anthropic", "claude", "azure", "aws", "bedrock", "ollama", "local", "openrouter", "auto"], help="AI Provider: gemini, openai, anthropic, azure, bedrock, ollama (default: auto-detected from environment)")
+    parser.add_argument("--api-key", default=None, help="AI Provider API key (Google Gemini, OpenAI, Anthropic Claude, Azure, AWS Bedrock)")
+    parser.add_argument("--api-base", default=None, help="Custom API Base URL for local models or proxies (e.g. http://localhost:11434/v1)")
+    parser.add_argument("--model", default=GEMINI_MODEL, help="AI Model name (default: GEMINI_MODEL)")
     parser.add_argument("--webhook-url", default=None, help="Webhook URL for enterprise alerting (Slack/Teams)")
     parser.add_argument("--compare-modes", action="store_true", help="Display deep technical comparison between Generic IDE Crawler and AI Crawler")
     parser.add_argument("--list-vendors", action="store_true", help="List all 140 supported enterprise vendors across OT, IoT, and IT")
@@ -75,7 +77,12 @@ async def main():
         return
 
     if args.clean_artifacts:
-        pipeline = LifecyclePipeline(api_key=args.api_key, model=args.model)
+        clean_kwargs = {"api_key": args.api_key, "model": args.model}
+        if args.provider:
+            clean_kwargs["provider"] = args.provider
+        if args.api_base:
+            clean_kwargs["api_base"] = args.api_base
+        pipeline = LifecyclePipeline(**clean_kwargs)
         import shutil
         runs_dir = pipeline.artifacts_dir
         deleted = 0
@@ -94,13 +101,19 @@ async def main():
         print("\n=================================================================================\n")
         return
 
-    pipeline = LifecyclePipeline(
-        api_key=args.api_key,
-        model=args.model,
-        batch_mode=args.batch_mode,
-        thinking_budget=args.thinking_budget,
-        enable_prompt_caching=args.prompt_caching
-    )
+    pipeline_kwargs = {
+        "api_key": args.api_key,
+        "model": args.model,
+        "batch_mode": args.batch_mode,
+        "thinking_budget": args.thinking_budget,
+        "enable_prompt_caching": args.prompt_caching,
+    }
+    if args.provider:
+        pipeline_kwargs["provider"] = args.provider
+    if args.api_base:
+        pipeline_kwargs["api_base"] = args.api_base
+
+    pipeline = LifecyclePipeline(**pipeline_kwargs)
 
     if args.clear_checkpoint:
         if pipeline.checkpoint_mgr.clear_checkpoint():

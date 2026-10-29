@@ -207,6 +207,40 @@ class TestStorage(unittest.TestCase):
         self.assertEqual(deleted, 1)
         self.assertFalse(orphan_tmp.exists())
 
+    def test_undated_eol_records_preserved_not_dropped(self):
+        """Verifies that products reaching EOL without dates are retained in storage and master CSV."""
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        storage = MasterStorageManager(master_csv_path=self.master_csv, output_dir=self.output_dir)
+
+        undated_products = [
+            ProductRecord(
+                vendor_name="Rockwell Automation",
+                model_name="1756-L61",
+                status="End of Life",
+                stage_date_utc=None,
+                metadata={"replacement": "1756-L71"}
+            ),
+            ProductRecord(
+                vendor_name="Siemens",
+                model_name="S7-300 CPU 315-2DP",
+                status="Discontinued",
+                stage_date_utc="",
+                metadata={"family": "S7-300"}
+            )
+        ]
+
+        total, new_cnt, upd_cnt = storage.upsert_and_persist(undated_products)
+        self.assertEqual(total, 2)
+        self.assertEqual(new_cnt, 2)
+
+        # Load back from CSV and verify both undated records exist
+        loaded = storage.load_existing_records()
+        self.assertEqual(len(loaded), 2)
+        loaded_models = {r["model_name"] for r in loaded.values()}
+        self.assertIn("1756-L61", loaded_models)
+        self.assertIn("S7-300 CPU 315-2DP", loaded_models)
+
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -49,7 +49,9 @@ class LifecyclePipeline:
         run_id: Optional[str] = None,
         batch_mode: Optional[bool] = None,
         thinking_budget: Optional[int] = None,
-        enable_prompt_caching: Optional[bool] = None
+        enable_prompt_caching: Optional[bool] = None,
+        provider: Optional[str] = None,
+        api_base: Optional[str] = None,
     ):
         self.config_path = config_path or (BASE_DIR / "configs" / "vendors.yaml")
         self.config = self._load_config()
@@ -66,7 +68,9 @@ class LifecyclePipeline:
             model_name=model,
             thinking_budget=thinking_budget,
             enable_prompt_caching=enable_prompt_caching,
-            batch_mode=batch_mode
+            batch_mode=batch_mode,
+            provider=provider,
+            api_base=api_base,
         )
         self.crawler = UniversalAICrawler(gemini_extractor=self.gemini)
         self.storage = MasterStorageManager(self.master_csv, self.output_dir)
@@ -219,12 +223,14 @@ class LifecyclePipeline:
                 if not st_val or st_val.lower() in ("n/a", "none", "null", "nan") or len(st_val) > 40:
                     purged_noise_count += 1
                     continue
+                # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
                 if not dt_val or dt_val.lower() in ("n/a", "none", "null", "nan"):
-                    purged_noise_count += 1
-                    continue
+                    p.stage_date_utc = None
+                    if isinstance(p.metadata, dict):
+                        p.metadata["missing_date"] = True
                 sanitized_products.append(p)
 
-            print(f"  -> Mandatory 4-Field & Model Validator: Purged {purged_noise_count} invalid/incomplete elements. Retained {len(sanitized_products)} clean products.")
+            print(f"  -> Field & Model Validator: Purged {purged_noise_count} invalid noise elements. Retained {len(sanitized_products)} clean products (including undated EOL models).")
             print("  -> CSV Formula Injection Shield: Sanitized formula trigger characters (=, +, -, @)")
             print(f"  -> SSRF Protection: Verified private IP restrictions across {len(allowed_domains)} allowed domains")
             vendor_products = sanitized_products

@@ -86,8 +86,14 @@ class MasterStorageManager:
                 if not status or status.lower() in ("n/a", "none", "null", "nan") or len(status) > 40:
                     continue
 
-                # MANDATORY INVARIANT: stage_date_utc must not be empty or null
-                if not d_utc or d_utc.lower() in ("n/a", "none", "null", "nan", ""):
+                # Date normalization: if present, ensure UTC ISO format; if missing, preserve without dropping
+                if d_utc and d_utc.lower() not in ("n/a", "none", "null", "nan", ""):
+                    if not (d_utc.endswith("Z") and "T" in d_utc):
+                        parsed_d = parse_to_utc_iso(d_utc)
+                        if parsed_d:
+                            d_utc = parsed_d
+                            row_dict["stage_date_utc"] = parsed_d
+                else:
                     # Attempt date recovery from bulletin metadata
                     meta_raw = row_dict.get("metadata", "{}")
                     try:
@@ -97,20 +103,12 @@ class MasterStorageManager:
                         if recovered:
                             d_utc = recovered
                             row_dict["stage_date_utc"] = recovered
+                        else:
+                            d_utc = ""
+                            row_dict["stage_date_utc"] = ""
                     except Exception:
-                        pass
-
-                # If still no valid date, REJECT AND DROP (NO NULL ALLOWED)
-                if not d_utc or d_utc.lower() in ("n/a", "none", "null", "nan", ""):
-                    continue
-
-                # Ensure strict UTC ISO format (YYYY-MM-DDTHH:MM:SSZ)
-                if not (d_utc.endswith("Z") and "T" in d_utc):
-                    parsed_d = parse_to_utc_iso(d_utc)
-                    if not parsed_d:
-                        continue
-                    d_utc = parsed_d
-                    row_dict["stage_date_utc"] = parsed_d
+                        d_utc = ""
+                        row_dict["stage_date_utc"] = ""
 
                 # Recompute deterministic SHA-256 hash if missing
                 if not fp:
@@ -148,7 +146,7 @@ class MasterStorageManager:
             status_val = (p.status or p.vendor_status or p.stage or "").strip()
             d_utc = (p.stage_date_utc or "").strip()
 
-            # MANDATORY 4-FIELD GUARD: NO NULL / EMPTY ALLOWED
+            # MANDATORY 3-FIELD GUARD: NO NULL / EMPTY ALLOWED FOR VENDOR, MODEL, STATUS
             if not v_name or v_name.lower() in ("n/a", "none", "null", "nan"):
                 continue
             is_sw_os = is_well_known_os_or_software(category=p.category, os_name=p.os, model_name=m_name)
@@ -160,13 +158,15 @@ class MasterStorageManager:
                     continue
             if not status_val or status_val.lower() in ("n/a", "none", "null", "nan") or len(status_val) > 40:
                 continue
-            if not d_utc or d_utc.lower() in ("n/a", "none", "null", "nan"):
-                continue
-            if not (d_utc.endswith("Z") and "T" in d_utc):
-                parsed = parse_to_utc_iso(d_utc)
-                if not parsed:
-                    continue
-                d_utc = parsed
+
+            # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
+            if d_utc and d_utc.lower() not in ("n/a", "none", "null", "nan", ""):
+                if not (d_utc.endswith("Z") and "T" in d_utc):
+                    parsed = parse_to_utc_iso(d_utc)
+                    if parsed:
+                        d_utc = parsed
+            else:
+                d_utc = ""
 
             model_part = (m_name or p.os or "").strip().upper()
             fp = str(p.fingerprint or hashlib.sha256(f"{v_name}|{model_part}|{status_val}|{d_utc}".encode("utf-8")).hexdigest()[:16])
@@ -247,11 +247,18 @@ class MasterStorageManager:
         if export_df.empty:
             export_df = pd.DataFrame(columns=desired_columns)
         else:
-            # Strict database readiness filter: drop any row where mandatory fields are null or empty
-            for col in ["vendor_name", "status", "stage_date_utc"]:
+            # Strict database readiness filter: drop rows where mandatory vendor or status are null/empty
+            for col in ["vendor_name", "status"]:
                 if col in export_df.columns:
                     export_df = export_df.dropna(subset=[col])
                     export_df = export_df[~export_df[col].astype(str).str.strip().str.lower().isin(["", "nan", "none", "null", "n/a"])]
+
+            # Clean stage_date_utc: keep valid dates or normalize to empty string (never drop records for missing dates)
+            if "stage_date_utc" in export_df.columns:
+                export_df["stage_date_utc"] = export_df["stage_date_utc"].fillna("").astype(str).str.strip()
+                export_df["stage_date_utc"] = export_df["stage_date_utc"].apply(
+                    lambda v: "" if v.lower() in ("nan", "none", "null", "n/a", "unknown", "tbd") else v
+                )
 
             # model_name must be non-empty unless software/well-known OS
             if "model_name" in export_df.columns:

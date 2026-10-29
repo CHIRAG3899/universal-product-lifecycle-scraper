@@ -16,25 +16,25 @@ graph TD
     Pipeline -->|"Load Config"| Config["configs/vendors.yaml (140 Vendors)"]
     Pipeline -->|"Step 1: Discovery"| Crawler["UniversalAICrawler (scraper/crawl_engine.py)"]
     
-    subgraph "Crawling & Ingestion Tier"
+    subgraph T1 ["Crawling & Ingestion Tier"]
         Crawler -->|"Try Headless Chromium"| C4AI["Crawl4AI Engine"]
         Crawler -->|"On Bot Defense / Error"| HTTPFall["Resilient HTTP Fallback (Chrome Headers)"]
         Crawler -->|"Parse Next.js State"| Apollo["__NEXT_DATA__ Apollo GraphQL"]
-        Crawler -->|"Parse DOM Tables"| HTMLTable["Standard HTML <table> Parser"]
+        Crawler -->|"Parse DOM Tables"| HTMLTable["Standard HTML Table Parser"]
     end
 
-    subgraph "Cognitive AI Tier"
+    subgraph T2 ["Cognitive AI Tier"]
         Apollo --> ExtractBlock["Markdown Table Blocks"]
         HTMLTable --> ExtractBlock
         C4AI --> ExtractBlock
-        ExtractBlock -->|"Structured Prompt"| Gemini["GeminiExtractor (scraper/gemini_extractor.py)"]
-        Gemini -->|"Probe Model Candidate"| GenAI["Google GenAI SDK (gemini-1.5-flash / gemini-2.0-flash / gemini-3.8-flash)"]
-        GenAI -->|"On 404 / 429"| ModelFallback["Dynamic Failover & Exponential Backoff"]
-        GenAI -->|"On Markdown Fences"| StripFence["Code-Fence Stripper (```json)"]
+        ExtractBlock -->|"Structured Prompt"| Extractor["UniversalAIExtractor (scraper/gemini_extractor.py)"]
+        Extractor -->|"Multi-Provider Router"| Providers["Google Gemini / OpenAI / Claude / Azure / AWS / Ollama"]
+        Providers -->|"On 404 / 429"| ModelFallback["Dynamic Failover & Exponential Backoff"]
+        Providers -->|"On Markdown Fences"| StripFence["Code-Fence Stripper"]
         StripFence --> Batch["GeminiExtractionBatch (Pydantic v2)"]
     end
 
-    subgraph "Normalization & Security Tier"
+    subgraph T3 ["Normalization & Security Tier"]
         Batch --> Norm["Step 3: Normalisation (scraper/models.py)"]
         Norm -->|"One Record Per Status"| Explode["Stage Normalization (Vendor-Specific Lifecycle Phases)"]
         Norm -->|"UTC ISO 8601"| DateParser["Multilingual Date Parser (EN/DE/FR/ES/JA)"]
@@ -45,7 +45,7 @@ graph TD
         Sec -->|"Block Private/Hex/Dec IPs"| SSRF["SSRF Boundary Guard"]
     end
 
-    subgraph "Storage & Observability Tier"
+    subgraph T4 ["Storage & Observability Tier"]
         Sec --> Dedup["Step 5: Deduplication (scraper/storage.py)"]
         Dedup -->|"SHA-256 Hash"| Fingerprint["SHA-256(Vendor|Model|Stage|Date)"]
         Fingerprint --> Merge["Non-Overwriting Incremental Append"]
@@ -127,6 +127,7 @@ The following matrix documents the latent vulnerabilities identified during adve
 | **GAP 14** | **Vendor YAML Silent Key Overwriting** | PyYAML `safe_load()` silently overwrites duplicated mapping keys without error | Merged all entry points and domains for `keyence`, `danfoss`, `delta_electronics`, and `cognex`. Built **raw-line AST key scanner into Pre-Commit Check 5** and `test_config.py`, enforcing zero duplicated keys, zero duplicated names, and zero duplicated URLs across all 140 vendors. |
 | **GAP 15** | **DOM Table Premature Multiplication Bug** | `if len(rows_data) >= 2: tables.append(...)` was nested inside the `tr` row loop | De-indented table append outside the row loop. A 100-row table now produces **exactly 1 table dictionary** containing all 100 rows rather than 99 duplicate partial tables. Validated in `test_crawl_engine.py` (Test 09). |
 | **GAP 16** | **Network Map & Product Category Blindspots** | Crawler only followed links with narrow `lifecycle` keyword; missed product category trees and sitemaps | Implemented **XML Sitemap & robots.txt Discovery (`discover_sitemap_urls`)**, **unrestricted product category tree discovery** (PLCs, drives, switches, sensors, optics, power, systems), **multi-depth BFS traversal (`--max-depth`, `--max-pages`)**, and **URL normalization**. Validated in `test_crawl_engine.py` (Tests 10, 11). |
+| **GAP 17** | **Single AI Provider Lock-In** | System only supported Google Gemini SDK | Built **Universal Multi-Provider AI Abstraction Layer (`UniversalAIExtractor`)** with native support for **OpenAI** (GPT-4o/mini), **Anthropic Claude** (Sonnet/Haiku), **Azure OpenAI**, **AWS Bedrock**, and **Local Ollama/vLLM** with zero vendor lock-in and automatic provider resolution. Validated in `test_multi_provider.py`. |
 
 ---
 

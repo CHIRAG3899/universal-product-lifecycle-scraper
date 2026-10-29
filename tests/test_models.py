@@ -229,7 +229,7 @@ class TestModels(unittest.TestCase):
             )
 
     def test_mandatory_fields_strictly_enforced_no_nulls(self):
-        """Verifies that vendor_name, model_name, status, and stage_date_utc strictly reject null/empty values."""
+        """Verifies that vendor_name, model_name, and status strictly reject null/empty values, while undated EOL models are preserved."""
         # 1. vendor_name missing/empty/None
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="2026-09-30")
@@ -246,13 +246,17 @@ class TestModels(unittest.TestCase):
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="", stage="", vendor_status="", stage_date_utc="2026-09-30")
 
-        # 4. stage_date_utc missing/empty/None
-        with self.assertRaises(ValueError):
-            ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="")
-        with self.assertRaises(ValueError):
-            ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc=None)
-        with self.assertRaises(ValueError):
-            ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="not-a-date")
+        # 4. stage_date_utc missing/empty/None: MUST NOT drop record, sets stage_date_utc=None and metadata.missing_date=True
+        rec_empty = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="")
+        self.assertIsNone(rec_empty.stage_date_utc)
+        self.assertTrue(rec_empty.metadata.get("missing_date"))
+
+        rec_none = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc=None)
+        self.assertIsNone(rec_none.stage_date_utc)
+        self.assertTrue(rec_none.metadata.get("missing_date"))
+
+        rec_unparseable = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="not-a-date")
+        self.assertIsNone(rec_unparseable.stage_date_utc)
 
     def test_bulletin_code_date_recovery(self):
         """Verifies that stage_date_utc is automatically recovered from bulletin code in metadata if not directly passed."""
@@ -350,11 +354,13 @@ class TestModels(unittest.TestCase):
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="Siemens", model_name="", category="Drive", status="Phase-Out", stage_date_utc="2026-09-30")
 
-        # 8. Mandatory status and date still strictly enforced even for OS/Software
+        # 8. Mandatory status strictly enforced even for OS/Software; undated OS entries preserved
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="Microsoft", model_name="", category="Operating System", os="Windows 7", status="", stage_date_utc="2020-01-14")
         with self.assertRaises(ValueError):
-            ProductRecord(vendor_name="Microsoft", model_name="", category="Operating System", os="Windows 7", status="End of Support", stage_date_utc="")
+            ProductRecord(vendor_name="", model_name="", category="Operating System", os="Windows 7", status="End of Support", stage_date_utc="2020-01-14")
+        win_undated = ProductRecord(vendor_name="Microsoft", model_name="", category="Operating System", os="Windows 7", status="End of Support", stage_date_utc="")
+        self.assertIsNone(win_undated.stage_date_utc)
 
 
 if __name__ == "__main__":

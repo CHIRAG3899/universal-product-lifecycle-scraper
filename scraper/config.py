@@ -16,10 +16,31 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Load .env if present
 load_dotenv(BASE_DIR / ".env")
 
+# Universal Multi-Provider AI Settings (Gemini, OpenAI, Claude, Azure, AWS Bedrock, Ollama)
+AI_PROVIDER = os.getenv("AI_PROVIDER", os.getenv("LLM_PROVIDER", "auto")).lower()
+AI_MODEL = os.getenv("AI_MODEL", os.getenv("LLM_MODEL", ""))
+
 # Google Gemini Settings
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Default to the universally available production model gemini-3.5-flash-lite
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+
+# OpenAI / Compatible Settings (Local Ollama, vLLM, OpenRouter)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "")
+
+# Anthropic Claude Settings
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+
+# Microsoft Azure OpenAI Settings
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+
+# Amazon AWS Bedrock Settings
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+AWS_REGION_NAME = os.getenv("AWS_REGION_NAME", "us-east-1")
 
 # Gemini Token & Cost Optimization Settings
 # 1. Thinking Budget: 0 disables/minimizes reasoning tokens on Flash models, slashing output token costs
