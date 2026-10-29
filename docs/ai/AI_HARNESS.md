@@ -135,21 +135,21 @@ The following matrix documents the latent vulnerabilities identified during adve
 When executing tasks autonomously, AI agents should reference these standardized procedures:
 
 ### Playbook A: When Adding a New Feature or Modifying Code
-1. Inspect the 10-column database schema in [`scraper/models.py`](file:///c:/Code/AI%20scraper/scraper/models.py). Ensure no internal columns are exposed.
+1. Inspect the 10-column database schema in [`scraper/models.py`](../../scraper/models.py). Ensure no internal columns are exposed.
 2. Verify that date parsing adheres to UTC ISO 8601 formatting and the 4 mandatory fields are 100% non-null.
 3. Add dedicated unit tests in the appropriate `tests/test_*.py` file.
-4. Execute all 130 tests: `python -m unittest discover tests -v`.
+4. Execute all 142 tests: `python -m unittest discover tests -v`.
 5. Run the 8-stage pre-commit quality gate: `python scripts/pre_commit_check.py` (which includes Ruff and Mypy).
 
 ### Playbook B: When Onboarding a New Hardware/Software Manufacturer
-1. Add vendor metadata to [`configs/vendors.yaml`](file:///c:/Code/AI%20scraper/configs/vendors.yaml).
+1. Add vendor metadata to [`configs/vendors.yaml`](../../configs/vendors.yaml).
 2. Validate that `allowed_domains` includes the target hostnames.
 3. Enforce the zero-config defaults policy: omit `default_os` and `default_firmware`.
 4. Validate configuration via Check 5 of `scripts/pre_commit_check.py`.
 
 ### Playbook C: When Troubleshooting Gemini API Errors
-1. If the API returns `404 NOT_FOUND` for a model, check [`GeminiExtractor.test_connection`](file:///c:/Code/AI%20scraper/scraper/gemini_extractor.py).
-2. Ensure the candidate probing list is active: `["gemini-1.5-flash", "gemini-2.0-flash", "gemini-3.8-flash", "gemini-1.5-pro"]`.
+1. If the API returns `404 NOT_FOUND` for a model, check [`GeminiExtractor.test_connection`](../../scraper/gemini_extractor.py).
+2. Ensure the candidate probing list is active: `["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]`.
 3. Run `python setup_key.py` to test and persist the verified working model into `.env`.
 
 ### Playbook D: When Minimizing API Cost & Token Consumption

@@ -12,14 +12,14 @@
 
 An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, and **End of Service / End of Support (EOS)** milestones.
 
-The platform natively supports **140 global enterprise vendors** across **Operational Technology (OT)**, **Internet of Things (IoT)**, and **Enterprise IT & Networking**. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and **Google Gemini** (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-3.8-flash` via the official `google-genai` SDK).
+The platform natively supports **140 global enterprise vendors** across **Operational Technology (OT)**, **Internet of Things (IoT)**, and **Enterprise IT & Networking**. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and **Google Gemini** (`gemini-3.5-flash-lite`, `gemini-3.5-flash`, `gemini-flash-latest` via the official `google-genai` SDK).
 
 ---
 
 > [!IMPORTANT]
 > ### 🛡️ Pre-Commit Quality Gate & Zero-Tolerance Policy
 > **Don't Commit if They Don't Pass**:
-> The repository enforces an automated **8-stage pre-commit gate** (`scripts/pre_commit_check.py`). Any failure in **Ruff linting**, **Mypy static typing**, unit tests (138+ tests), or database schema invariants **strictly aborts `git commit` with exit code 1**.
+> The repository enforces an automated **8-stage pre-commit gate** (`scripts/pre_commit_check.py`). Any failure in **Ruff linting**, **Mypy static typing**, unit tests (142 tests), or database schema invariants **strictly aborts `git commit` with exit code 1**.
 > 
 > **Zero-Null Invariant**: The core fields—`vendor_name`, `status`, and `stage_date_utc`—are **100% mandatory with zero nulls allowed**. Missing dates are hydrated from circular headers or crawl snapshot dates. For hardware records (PLCs, drives, inverters, switches, sensors, cameras, etc.), `model_name` is **strictly mandatory and cannot be null or empty under any circumstance**. `model_name` is allowed to be empty/blank **ONLY** in case of software applications or well-known OS entries (e.g., Linux, Debian, Windows, Ubuntu, RHEL, CentOS, SUSE, FreeBSD, VxWorks, QNX).
 
@@ -30,7 +30,7 @@ The platform natively supports **140 global enterprise vendors** across **Operat
 2. [Google Gemini Setup & Cost Optimizations](#-google-gemini-setup--cost-optimizations)
 3. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
 4. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
-5. [Top 140 Enterprise Vendors Registry (Interactive)](#-top-140-enterprise-vendors-registry)
+5. [Top 140 Enterprise Vendors Registry](#-top-140-enterprise-vendors-registry)
 6. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
 7. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
 8. [Zero-Defaults Policy & Dynamic Terminology](#-zero-defaults-policy--dynamic-terminology)
@@ -46,9 +46,9 @@ The platform natively supports **140 global enterprise vendors** across **Operat
 ```mermaid
 graph LR
     A["Raw Portals & Bulletins<br/>(HTML, SPAs, PDFs)"] --> B["Crawl4AI & HTTP Fallback<br/>(Async Headless Chromium)"]
-    B --> C["Google Gemini 2.5 Flash<br/>(Semantic Reasoner)"]
-    C --> D["Sanitisation & Normalisation<br/>(Zero Defaults & Non-Null)"]
+    B --> C["Google Gemini 3.5 Flash<br/>(Semantic Reasoner)"]
     D --> E["Master CSV & JSON<br/>(10-Column SQL Ready)"]
+    C --> D["Sanitisation & Normalisation<br/>(Zero Defaults & Non-Null)"]
 
     style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
     style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
@@ -57,7 +57,7 @@ graph LR
     style E fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
 ```
 
-- **140 Out-of-the-Box Enterprise Vendors**: 54 Operational Technology (OT), 44 Internet of Things (IoT), and 42 Enterprise IT/Networking vendors pre-configured in [`configs/vendors.yaml`](file:///c:/Code/universal-lifecycle-scraper/configs/vendors.yaml), including **JTEKT Toyoda**, **Rockwell Automation**, **Siemens**, **Mitsubishi Electric**, **Cisco Meraki**, and **Hitachi Industrial**.
+- **140 Out-of-the-Box Enterprise Vendors**: 54 Operational Technology (OT), 44 Internet of Things (IoT), and 42 Enterprise IT/Networking vendors pre-configured in [`configs/vendors.yaml`](configs/vendors.yaml), including **JTEKT Toyoda**, **Rockwell Automation**, **Siemens**, **Mitsubishi Electric**, **Cisco Meraki**, and **Hitachi Industrial**.
 - **Zero Status Limitations**: Preserves the manufacturer's exact official lifecycle milestone (*Phase-Out Product, Delivery Release, Announced Discontinuation, End of Sale, Last Date of Support, Classic, Limited, Obsolete, Active Mature, Stop Shipment, Discontinued, EOL*). No artificial whitelist or enum restriction.
 - **Strict Mandatory 4-Field Zero-Null Invariant**: Guarantees `vendor_name`, `model_name`, `status`, and `stage_date_utc` are 100% non-null. Missing row dates are hydrated from circular codes or crawl timestamps.
 - **Deep PDF & Pagination Ingestion**: Extracts discontinuation notices from `.pdf` documents (`pypdf`) and traverses paginated support tables (`?page=`, `rel="next"`).
@@ -86,7 +86,7 @@ graph LR
 
 | Strategy | Cost Impact | How It Works | Command Flag / Env |
 |---|---|---|---|
-| **Thinking Budget Capping** | **60–80% Output Token Savings** | Caps internal reasoning tokens to 0 on Flash models (`gemini-2.0-flash`, `gemini-2.5-flash`), eliminating costly chain-of-thought generation on simple schema extraction. | `--thinking-budget 0`<br/>`GEMINI_THINKING_BUDGET=0` |
+| **Thinking Budget Capping** | **60–80% Output Token Savings** | Caps internal reasoning tokens to 0 on Flash models (`gemini-3.5-flash-lite`, `gemini-3.5-flash`), eliminating costly chain-of-thought generation on simple schema extraction. | `--thinking-budget 0`<br/>`GEMINI_THINKING_BUDGET=0` |
 | **Native Prompt Caching** | **Up to 90% Input Token Discount** | Pre-caches invariant extraction schemas and prompts via `client.caches.create()` across repetitive site structures. | `--prompt-caching`<br/>`GEMINI_ENABLE_PROMPT_CACHING=true` |
 | **Asynchronous Batch API** | **50% Overall Token Discount** | Submits non-interactive crawls via `client.batches.create()` with `InlinedRequest`, cutting input and output pricing by half. | `--batch-mode`<br/>`GEMINI_BATCH_MODE=true` |
 | **Token-Efficient Trimming** | **15–30% Input Token Reduction** | Strips HTML comments, repetitive table dividers, and duplicate whitespaces before sending text to the LLM. | Built-in by default |
@@ -99,36 +99,24 @@ All scraper operations execute through 6 observable stages, logged in real-time 
 
 ```mermaid
 flowchart TD
-    S1["[STEP 1/6: DISCOVERY & CRAWLING]"] --> S2["[STEP 2/6: AI / APOLLO EXTRACTION]"]
-    S2 --> S3["[STEP 3/6: NORMALISATION]"]
-    S3 --> S4["[STEP 4/6: SANITISATION & SECURITY]"]
-    S4 --> S5["[STEP 5/6: DEDUPLICATION & MERGE]"]
-    S5 --> S6["[STEP 6/6: EXPORT & OBSERVABILITY]"]
-
-    subgraph Step 1: Discovery
+    subgraph S1 ["Stage 1: Discovery & Crawling"]
         A1["Fetch Base URL via Crawl4AI"]
         A2["Follow Intra-Domain EOL Links"]
         A3["Kernel SSRF & Domain Whitelist Guard"]
     end
-    S1 --- Step 1: Discovery
-
-    subgraph Step 2: Extraction
+    subgraph S2 ["Stage 2: AI / Apollo Extraction"]
         B1["Next.js Apollo Cache Ingestion"]
         B2["HTML DOM Table & Card Extraction"]
         B3["PDF Bulletin Text Parsing (pypdf)"]
         B4["Gemini Structured JSON Extraction"]
     end
-    S2 --- Step 2: Extraction
-
-    subgraph Step 3: Normalisation
+    subgraph S3 ["Stage 3: Normalisation"]
         C1["Unpack Model Suffixes & Ranges"]
         C2["Hydrate Bulletin Publication Dates"]
         C3["Normalize Dates to ISO 8601 UTC"]
         C4["Retain Exact Manufacturer Status"]
     end
-    S3 --- Step 3: Normalisation
-
-    subgraph Step 4: Sanitisation
+    subgraph S4 ["Stage 4: Sanitisation & Security"]
         D1["Enforce 4 Mandatory Non-Null Fields"]
         D2["Purge Cookie Banners & Nav Noise"]
         D3["Sanitize CSV Formulas (=, +, -, @)"]
@@ -156,7 +144,7 @@ flowchart TD
 
 ## 🚦 Enterprise Pre-Commit Gate (Ruff + Mypy)
 
-The repository includes a comprehensive 8-stage pre-commit quality gate ([`scripts/pre_commit_check.py`](file:///c:/Code/AI%20scraper/scripts/pre_commit_check.py)) integrated into Git hooks ([`scripts/install_hooks.py`](file:///c:/Code/AI%20scraper/scripts/install_hooks.py)).
+The repository includes a comprehensive 8-stage pre-commit quality gate ([`scripts/pre_commit_check.py`](scripts/pre_commit_check.py)) integrated into Git hooks ([`scripts/install_hooks.py`](scripts/install_hooks.py)).
 
 ```mermaid
 graph TD
@@ -167,10 +155,18 @@ graph TD
     Gate --> C4["4. Secret & SSRF Guard"]
     Gate --> C5["5. 140-Vendor Config Validation"]
     Gate --> C6["6. Database Zero-Null Invariant"]
-    Gate --> C7["7. 126 Automated Unit Tests"]
+    Gate --> C7["7. 142 Automated Unit Tests"]
     Gate --> C8["8. E2E Synthetic Flow Sandbox"]
 
-    C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 --> Decision{"All Checks Pass?"}
+    C1 --> Decision{"All Checks Pass?"}
+    C2 --> Decision
+    C3 --> Decision
+    C4 --> Decision
+    C5 --> Decision
+    C6 --> Decision
+    C7 --> Decision
+    C8 --> Decision
+
     Decision -- Yes --> Pass["Commit Approved (Exit Code 0)"]
     Decision -- No --> Fail["COMMIT REJECTED (Exit Code 1)<br/>Commit Aborted"]
 
@@ -197,7 +193,7 @@ python scripts/install_hooks.py
 
 ## 🏭 Top 140 Enterprise Vendors Registry
 
-[`configs/vendors.yaml`](file:///c:/Code/universal-lifecycle-scraper/configs/vendors.yaml) contains **140 verified global enterprise manufacturers** configured with strict SSRF domain boundaries:
+[`configs/vendors.yaml`](configs/vendors.yaml) contains **140 verified global enterprise manufacturers** configured with strict SSRF domain boundaries:
 
 | Sector | Count | Coverage Highlights | Interactive Directory |
 |---|:---:|---|:---:|
@@ -526,7 +522,7 @@ Open **`http://localhost:8000`** in any web browser to:
 
 ## 🧪 Automated Verification & Testing
 
-The repository contains **139+ automated unit, regression, edge-case, and end-to-end integration tests** across **20 test modules**:
+The repository contains **142 automated unit, regression, edge-case, and end-to-end integration tests** across **20 test modules**:
 
 ```bash
 # Run all tests with verbose output
@@ -539,15 +535,15 @@ python scripts/pre_commit_check.py
 ### Test Suite Structure
 | Test Module | Key Invariants Tested |
 |---|---|
-| [`tests/test_checkpoint.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_checkpoint.py) | Atomic checkpoint save/load, failure recovery state, pending URL queue preservation, clean clear. |
-| [`tests/test_dlq.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_dlq.py) | Dead letter queue failure recording, status code attribution, per-vendor failure filtering. |
-| [`tests/test_delta_cache.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_delta_cache.py) | Content SHA-256 hashing, unchanged page detection, ETag validation, token-saving skips. |
-| [`tests/test_models.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_models.py) | 10-column schema sync, OS/Software lifecycles (Windows 7/8, Ubuntu, RHEL), date clamping, non-null guards. |
-| [`tests/test_security.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_security.py) | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense. |
-| [`tests/test_storage.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_storage.py) | `MasterStorageManager`, incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap. |
-| [`tests/test_vendors.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_vendors.py) | Dynamic 140-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction. |
-| [`tests/test_framework_capability.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_framework_capability.py) | Loading of all 140 enterprise vendors (54 OT, 44 IoT, 42 IT), zero hardcoded config defaults, SSRF domain coverage. |
-| [`tests/test_e2e_pipeline.py`](file:///c:/Code/universal-lifecycle-scraper/tests/test_e2e_pipeline.py) | Complete synthetic 6-stage pipeline execution, schema compliance, formula sanitization, non-duplicating append. |
+| [`tests/test_checkpoint.py`](tests/test_checkpoint.py) | Atomic checkpoint save/load, failure recovery state, pending URL queue preservation, clean clear. |
+| [`tests/test_dlq.py`](tests/test_dlq.py) | Dead letter queue failure recording, status code attribution, per-vendor failure filtering. |
+| [`tests/test_delta_cache.py`](tests/test_delta_cache.py) | Content SHA-256 hashing, unchanged page detection, ETag validation, token-saving skips. |
+| [`tests/test_models.py`](tests/test_models.py) | 10-column schema sync, OS/Software lifecycles (Windows 7/8, Ubuntu, RHEL), date clamping, non-null guards. |
+| [`tests/test_security.py`](tests/test_security.py) | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense. |
+| [`tests/test_storage.py`](tests/test_storage.py) | `MasterStorageManager`, incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap. |
+| [`tests/test_vendors.py`](tests/test_vendors.py) | Dynamic 140-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction. |
+| [`tests/test_framework_capability.py`](tests/test_framework_capability.py) | Loading of all 140 enterprise vendors (54 OT, 44 IoT, 42 IT), zero hardcoded config defaults, SSRF domain coverage. |
+| [`tests/test_e2e_pipeline.py`](tests/test_e2e_pipeline.py) | Complete synthetic 6-stage pipeline execution, schema compliance, formula sanitization, non-duplicating append. |
 
 ---
 
@@ -555,10 +551,10 @@ python scripts/pre_commit_check.py
 
 The repository includes a complete AI Agent Harness enabling autonomous development, testing, and operation by AI coding assistants:
 
-- **Universal Agent Instructions**: [`AGENTS.md`](file:///c:/Code/universal-lifecycle-scraper/AGENTS.md) defines core constraints, 10-column database schema invariants, SSRF security guards, and standard workflows.
-- **Cognitive Runbook Skills ([`.agents/skills/`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/))**:
-  - [`pre-commit-gatekeeper`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/pre-commit-gatekeeper/SKILL.md): 8-stage pre-commit gatekeeper with Ruff, Mypy, and strict commit-abort policy.
-  - [`lifecycle-data-qa`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/lifecycle-data-qa/SKILL.md): Data QA runbook for the mandatory 4-field zero-null invariant and UTC ISO timestamps.
-  - [`vendor-onboarding`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/vendor-onboarding/SKILL.md): Onboarding runbook for adding new enterprise vendors across OT, IoT, and IT.
-  - [`crawler-pipeline-run`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/crawler-pipeline-run/SKILL.md): Operational guide for single-vendor, site-wide, and sector crawls.
-  - [`gemini-llm-tuning`](file:///c:/Code/universal-lifecycle-scraper/.agents/skills/gemini-llm-tuning/SKILL.md): Prompt tuning, candidate probing failovers, and cost optimization flags.
+- **Universal Agent Instructions**: [`AGENTS.md`](AGENTS.md) defines core constraints, 10-column database schema invariants, SSRF security guards, and standard workflows.
+- **Cognitive Runbook Skills ([`.agents/skills/`](.agents/skills/))**:
+  - [`pre-commit-gatekeeper`](.agents/skills/pre-commit-gatekeeper/SKILL.md): 8-stage pre-commit gatekeeper with Ruff, Mypy, and strict commit-abort policy.
+  - [`lifecycle-data-qa`](.agents/skills/lifecycle-data-qa/SKILL.md): Data QA runbook for the mandatory 4-field zero-null invariant and UTC ISO timestamps.
+  - [`vendor-onboarding`](.agents/skills/vendor-onboarding/SKILL.md): Onboarding runbook for adding new enterprise vendors across OT, IoT, and IT.
+  - [`crawler-pipeline-run`](.agents/skills/crawler-pipeline-run/SKILL.md): Operational guide for single-vendor, site-wide, and sector crawls.
+  - [`gemini-llm-tuning`](.agents/skills/gemini-llm-tuning/SKILL.md): Prompt tuning, candidate probing failovers, and cost optimization flags.

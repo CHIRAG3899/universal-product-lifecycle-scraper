@@ -67,7 +67,7 @@ This gate runs:
 
 ## ➕ Adding a New Vendor
 
-1. Open [`configs/vendors.yaml`](file:///c:/Code/universal-lifecycle-scraper/configs/vendors.yaml).
+1. Open [`configs/vendors.yaml`](configs/vendors.yaml).
 2. Append the vendor configuration with unique ID, sector (`OT`, `IoT`, or `IT`), domain whitelist, and top-level entry points:
    ```yaml
      acme_corp:
