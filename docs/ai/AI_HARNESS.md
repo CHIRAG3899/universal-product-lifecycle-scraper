@@ -27,7 +27,7 @@ graph TD
         Apollo --> ExtractBlock["Markdown Table Blocks"]
         HTMLTable --> ExtractBlock
         C4AI --> ExtractBlock
-        ExtractBlock -->|"Structured Prompt"| Extractor["UniversalAIExtractor (scraper/gemini_extractor.py)"]
+        ExtractBlock -->|"Structured Prompt"| Extractor["UniversalAIExtractor (scraper/ai_extractor.py)"]
         Extractor -->|"Multi-Provider Router"| Providers["Google Gemini / OpenAI / Claude / Azure / AWS / Ollama"]
         Providers -->|"On 404 / 429"| ModelFallback["Dynamic Failover & Exponential Backoff"]
         Providers -->|"On Markdown Fences"| StripFence["Code-Fence Stripper"]
@@ -149,7 +149,7 @@ When executing tasks autonomously, AI agents should reference these standardized
 4. Validate configuration via Check 5 of `scripts/pre_commit_check.py`.
 
 ### Playbook C: When Troubleshooting Gemini API Errors
-1. If the API returns `404 NOT_FOUND` for a model, check [`GeminiExtractor.test_connection`](../../scraper/gemini_extractor.py).
+1. If the API returns `404 NOT_FOUND` for a model, check [`UniversalAIExtractor.test_connection`](../../scraper/ai_extractor.py).
 2. Ensure the candidate probing list is active: `["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]`.
 3. Run `python setup_key.py` to test and persist the verified working model into `.env`.
 

@@ -64,12 +64,20 @@ async def main():
     parser.add_argument("--concurrency", type=int, default=None, help="Number of concurrent vendor crawl workers (defaults to MAX_CONCURRENT_VENDORS or 1)")
     parser.add_argument("--max-pages", type=int, default=0, help="Maximum number of website pages to crawl during site discovery (default: 0 = unlimited full site crawl)")
     parser.add_argument("--max-depth", type=int, default=0, help="Maximum link recursion depth for website network map crawling (default: 0 = unlimited depth)")
+    parser.add_argument("--vendor-terminology", "--standalone-terminology", dest="vendor_terminology", action="store_true", help="Display manufacturer-exact lifecycle terminology catalog standalone (runs without crawler framework)")
+    parser.add_argument("--status-registry", action="store_true", help="Display or query standalone vendor lifecycle status registry")
     parser.add_argument("--resume", action="store_true", help="Resume interrupted or failed crawl from the last saved checkpoint")
     parser.add_argument("--dlq", action="store_true", help="Inspect Dead Letter Queue (DLQ) forensic log of failed crawls")
     parser.add_argument("--clear-checkpoint", action="store_true", help="Discard saved checkpoint and start fresh")
     args = parser.parse_args()
 
     print_banner()
+
+    if args.vendor_terminology or args.status_registry:
+        from scripts.standalone_vendor_terminology import filter_terminology, print_terminal_table
+        filtered = filter_terminology(vendor_query=args.vendor, sector_query=args.sector)
+        print_terminal_table(filtered)
+        return
 
     if args.setup_key:
         import setup_key

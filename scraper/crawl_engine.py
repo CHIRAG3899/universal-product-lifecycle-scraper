@@ -13,8 +13,8 @@ from typing import Any, Dict, List, Optional
 from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 
+from scraper.ai_extractor import UniversalAIExtractor
 from scraper.config import HEADLESS_BROWSER, REQUEST_TIMEOUT_SEC, USER_AGENT
-from scraper.gemini_extractor import GeminiExtractor
 from scraper.models import ProductRecord
 from scraper.security import is_safe_url
 from scraper.vendors import detect_vendor_from_url_or_text
@@ -25,11 +25,16 @@ logger = logging.getLogger("ai_scraper.crawler")
 class UniversalAICrawler:
     """
     Universal AI Crawler coordinating Crawl4AI headless browser runs,
-    DOM/Apollo cache extraction, and Google Gemini AI multi-vendor processing.
+    DOM/Apollo cache extraction, and Multi-Provider AI multi-vendor processing.
     """
 
-    def __init__(self, gemini_extractor: Optional[GeminiExtractor] = None):
-        self.gemini = gemini_extractor or GeminiExtractor()
+    def __init__(
+        self,
+        extractor: Optional[UniversalAIExtractor] = None,
+        gemini_extractor: Optional[UniversalAIExtractor] = None,
+    ):
+        self.extractor = extractor or gemini_extractor or UniversalAIExtractor()
+        self.gemini = self.extractor  # Backward compatibility alias
         self._pdf_replacement_cache: Dict[str, Dict[str, str]] = {}
         self._crawl_cache: Dict[str, Dict[str, Any]] = {}
 

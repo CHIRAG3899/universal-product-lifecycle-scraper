@@ -102,6 +102,57 @@ class TestModels(unittest.TestCase):
         self.assertFalse(is_valid_product_model("---"))  # No alphanumeric
         self.assertFalse(is_valid_product_model("!@#$%^&*()"))
 
+    def test_reject_corrupt_symbols_and_uncommon_characters(self):
+        """Verifies rejection of corrupt characters, mojibake, emojis, and unnecessary symbols."""
+        corrupt_samples = [
+            "GT25-WLAN\ufffd",         # Replacement character
+            "Model\x00Name",            # Null byte
+            "PLC\u200bSeries",          # Zero-width space
+            "GT25-WLAN™",               # Trademark symbol
+            "PowerEdge® R740",          # Registered symbol
+            "Siemens © S7-1200",        # Copyright symbol
+            "Switch ★ Pro",             # Star icon
+            "Module • FX5",             # Bullet point
+            "Unit § 4",                 # Section symbol
+            "Model ~ 200",              # Tilde
+            "Item ^ 4",                 # Caret
+            "Price $500",               # Dollar sign
+            "Ratio 50%",                # Percent sign
+            "Product <Tag>",            # HTML brackets
+            "Sensor {123}",             # Curly braces
+            "Device; Series",           # Semicolon
+            "Unit | Secondary",         # Pipe
+            "Model \\ Rack",            # Backslash
+        ]
+        for item in corrupt_samples:
+            with self.subTest(item=item):
+                self.assertFalse(is_valid_product_model(item), f"Should reject corrupt/uncommon symbol string: {item}")
+
+    def test_clean_and_sanitize_identifier(self):
+        """Verifies that clean_and_sanitize_identifier scrubs corrupt symbols and retains clean identifiers."""
+        from scraper.security import clean_and_sanitize_identifier
+
+        # Pure valid strings are preserved
+        self.assertEqual(clean_and_sanitize_identifier("GT25-WLAN"), "GT25-WLAN")
+        self.assertEqual(clean_and_sanitize_identifier("IR1101/K9"), "IR1101/K9")
+        self.assertEqual(clean_and_sanitize_identifier("CPU:214-1AD23"), "CPU:214-1AD23")
+        self.assertEqual(clean_and_sanitize_identifier("6ES7511-1AK02-0AB0"), "6ES7511-1AK02-0AB0")
+        self.assertEqual(clean_and_sanitize_identifier("PowerEdge R740+"), "PowerEdge R740+")
+        self.assertEqual(clean_and_sanitize_identifier("Allen & Bradley (1756)"), "Allen & Bradley (1756)")
+        self.assertEqual(clean_and_sanitize_identifier("Part #1234"), "Part #1234")
+
+        # Corrupt and uncommon symbols are stripped
+        self.assertEqual(clean_and_sanitize_identifier("• GT25-WLAN™"), "GT25-WLAN")
+        self.assertEqual(clean_and_sanitize_identifier("PowerEdge® R740"), "PowerEdge R740")
+        self.assertEqual(clean_and_sanitize_identifier("★ S7-1500 § 2"), "S7-1500 2")
+        self.assertEqual(clean_and_sanitize_identifier("Model ~ FX5"), "Model FX5")
+
+        # Pure noise or pure symbols return None
+        self.assertIsNone(clean_and_sanitize_identifier("™®©★•"))
+        self.assertIsNone(clean_and_sanitize_identifier(None))
+        self.assertIsNone(clean_and_sanitize_identifier("n/a"))
+        self.assertIsNone(clean_and_sanitize_identifier("---"))
+
     # -------------------------------------------------------------------------
     # 2. parse_to_utc_iso tests (Dates & Edge Cases)
     # -------------------------------------------------------------------------

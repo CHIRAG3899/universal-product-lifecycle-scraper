@@ -12,9 +12,10 @@ from unittest.mock import MagicMock, patch
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.gemini_extractor import GeminiExtractor, LLMExtractor, UniversalAIExtractor
+from scraper.ai_extractor import GeminiExtractor, LLMExtractor, UniversalAIExtractor
 from scraper.models import ProductRecord
 from scraper.providers import (
+    call_llm_completion,
     detect_provider_from_model,
     normalize_provider_name,
     resolve_provider_and_model,
@@ -140,6 +141,49 @@ class TestMultiProvider(unittest.TestCase):
         self.assertEqual(records[0].status, "End of Life")
         self.assertEqual(records[0].stage_date_utc, "2025-12-31T00:00:00Z")
         self.assertEqual(records[0].replacement, "1756-L81E")
+
+    @patch("requests.post")
+    def test_direct_http_rest_completion_openai(self, mock_post):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "choices": [{"message": {"content": '{"products": []}'}}]
+        }
+        mock_post.return_value = mock_resp
+
+        # Force litellm failure to test HTTP REST fallback
+        with patch.dict("sys.modules", {"litellm": None}):
+            out = call_llm_completion(
+                provider="openai",
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": "test"}],
+                api_key="sk-test",
+            )
+            self.assertEqual(out, '{"products": []}')
+            mock_post.assert_called_once()
+            call_url = mock_post.call_args[0][0]
+            self.assertIn("api.openai.com", call_url)
+
+    @patch("requests.post")
+    def test_direct_http_rest_completion_anthropic(self, mock_post):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "content": [{"text": '{"vendor_name": "Siemens", "products": []}'}]
+        }
+        mock_post.return_value = mock_resp
+
+        with patch.dict("sys.modules", {"litellm": None}):
+            out = call_llm_completion(
+                provider="anthropic",
+                model="claude-3-5-haiku-20241022",
+                messages=[{"role": "user", "content": "test"}],
+                api_key="sk-ant-test",
+            )
+            self.assertEqual(out, '{"vendor_name": "Siemens", "products": []}')
+            mock_post.assert_called_once()
+            call_url = mock_post.call_args[0][0]
+            self.assertIn("api.anthropic.com", call_url)
 
 
 if __name__ == "__main__":

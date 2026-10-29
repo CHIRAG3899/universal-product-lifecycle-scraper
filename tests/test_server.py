@@ -112,7 +112,7 @@ class TestServerAPI(unittest.TestCase):
         self.assertFalse(payload["success"])
         self.assertIn("not configured", payload["message"].lower())
 
-    @patch("scraper.gemini_extractor.GeminiExtractor.test_connection")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
     def test_07_post_test_key_success(self, mock_test_conn):
         """Verifies POST /api/test-key reports success when key verifies."""
         mock_test_conn.return_value = (True, "API Key is active")

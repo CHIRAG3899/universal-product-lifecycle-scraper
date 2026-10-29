@@ -28,7 +28,7 @@ if sys.platform == "win32":
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.gemini_extractor import UniversalAIExtractor
+from scraper.ai_extractor import UniversalAIExtractor
 from scraper.providers import DEFAULT_MODELS, normalize_provider_name
 
 

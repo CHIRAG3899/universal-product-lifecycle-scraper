@@ -44,7 +44,7 @@ class TestSetupKey(unittest.TestCase):
         self.assertFalse(setup_key.test_and_save_key(""))
         self.assertFalse(setup_key.test_and_save_key("   "))
 
-    @patch("scraper.gemini_extractor.GeminiExtractor.test_connection")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
     def test_03_connection_failure_returns_false(self, mock_test_conn):
         """Verifies failed Gemini connection returns False and does not save .env."""
         mock_test_conn.return_value = (False, "API_KEY_INVALID")
@@ -52,7 +52,7 @@ class TestSetupKey(unittest.TestCase):
         self.assertFalse(result)
 
     @patch("setup_key.BASE_DIR")
-    @patch("scraper.gemini_extractor.GeminiExtractor.test_connection")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
     def test_04_connection_success_saves_env(self, mock_test_conn, mock_base_dir):
         """Verifies successful connection saves key to .env without corrupting existing variables."""
         mock_base_dir.__truediv__.return_value = self.mock_env

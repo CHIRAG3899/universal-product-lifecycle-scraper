@@ -17,8 +17,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
+from scraper.ai_extractor import GeminiExtractor
 from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler
-from scraper.gemini_extractor import GeminiExtractor
 from scraper.models import ProductRecord
 
 

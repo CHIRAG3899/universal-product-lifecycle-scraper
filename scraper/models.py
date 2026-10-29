@@ -67,18 +67,34 @@ EXACT_DISALLOWED_MODEL_TOKENS = {
 def is_valid_product_model(name: Optional[str]) -> bool:
     """
     Validates whether an extracted string represents a genuine industrial hardware/software model name.
-    Rejects web navigation strings, cookie consent headers, URLs, and generic phrases.
-    Allows genuine series identifiers (e.g. 'MELSEC-Q Series', 'Series 6000', 'Model 2400').
+    Strictly permits alphanumeric characters and sensible standard symbols (- / : . _ + & ( ) # space).
+    Rejects corrupt data, mojibake, control characters, decorative icons/emojis, web navigation strings,
+    cookie consent headers, URLs, and generic phrases.
     """
     if not name or not isinstance(name, str):
         return False
     cleaned = name.strip()
     if len(cleaned) < 2 or len(cleaned) > 120:
         return False
-    # Reject markdown links: [ Name ](url) or plain URLs
-    if cleaned.startswith("[") or "http://" in cleaned or "https://" in cleaned or "](" in cleaned:
+
+    # Check for formula injection prefix (e.g. '=Model or =Model)
+    check_str = cleaned
+    if check_str.startswith("'"):
+        check_str = check_str[1:]
+    if check_str.startswith(("=", "+", "-", "@")):
+        check_str = check_str[1:].strip()
+
+    if len(check_str) < 2:
         return False
-    c_lower = cleaned.lower()
+
+    # Reject corrupt characters, control characters, replacement glyphs, emojis, decorative symbols
+    if re.search(r'[\x00-\x1f\x7f-\x9f\ufeff\u200b\u200c\u200d\ufffd§©®™★•►✓✗▪▫◆▲▼※~^$%=|\\{}<>;"`\']', check_str):
+        return False
+
+    # Reject markdown links: [ Name ](url) or plain URLs
+    if check_str.startswith("[") or "http://" in check_str or "https://" in check_str or "](" in check_str:
+        return False
+    c_lower = check_str.lower()
     for sub in COOKIE_AND_POLICY_SUBSTRINGS:
         if sub in c_lower:
             return False
@@ -87,9 +103,15 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     # Reject strings that start with conversational / instructional text
     if any(c_lower.startswith(p) for p in ("consult ", "see ", "official ", "click ", "read ", "download ", "view ", "affects ")):
         return False
+
     # Must contain at least one alphanumeric character
-    if not re.search(r'[A-Za-z0-9]', cleaned):
+    if not re.search(r'[A-Za-z0-9]', check_str):
         return False
+
+    # Strictly enforce alphanumeric + standard sensible symbols: - / : . _ + & ( ) # space
+    if not re.match(r'^[A-Za-z0-9\-_/:.+&()# ]+$', check_str):
+        return False
+
     return True
 
 

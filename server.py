@@ -125,8 +125,8 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         model = payload.get("model") or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
         save_to_env = bool(payload.get("save", False))
 
-        from scraper.gemini_extractor import GeminiExtractor
-        extractor = GeminiExtractor(api_key=api_key, model_name=model)
+        from scraper.ai_extractor import UniversalAIExtractor
+        extractor = UniversalAIExtractor(api_key=api_key, model_name=model)
         success, message = extractor.test_connection()
 
         if success and save_to_env and api_key:

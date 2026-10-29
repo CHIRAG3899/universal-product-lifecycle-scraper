@@ -12,7 +12,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.gemini_extractor import GeminiExtractor
+from scraper.ai_extractor import GeminiExtractor
 
 
 class TestGeminiExtractor(unittest.TestCase):
@@ -306,7 +306,7 @@ class TestGeminiExtractor(unittest.TestCase):
 
     def test_extract_text_from_pdf_bytes_helper(self):
         """Verifies extract_text_from_pdf_bytes handles empty or corrupt PDF bytes gracefully."""
-        from scraper.gemini_extractor import extract_text_from_pdf_bytes
+        from scraper.ai_extractor import extract_text_from_pdf_bytes
         self.assertEqual(extract_text_from_pdf_bytes(b""), "")
         self.assertEqual(extract_text_from_pdf_bytes(b"not a valid pdf"), "")
 

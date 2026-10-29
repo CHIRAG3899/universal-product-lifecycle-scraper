@@ -72,7 +72,9 @@ graph LR
 
 ## 🔌 Universal Multi-Provider AI Architecture & Setup
 
-The framework is completely provider-agnostic. While **Google Gemini** offers a generous free tier with native prompt caching and 0-budget thinking capping, you can seamlessly plug and work with **any AI provider** (OpenAI, Anthropic Claude, Microsoft Azure OpenAI, Amazon AWS Bedrock, or local on-premise Ollama) with zero code rewrites.
+The framework is completely provider-agnostic. All structured extraction and intelligence logic is centralized in the generic module [`scraper/ai_extractor.py`](scraper/ai_extractor.py) (`UniversalAIExtractor`), with `scraper/gemini_extractor.py` maintained purely as a backward-compatibility re-export shim.
+
+All supported providers—**Google Gemini**, **OpenAI**, **Anthropic Claude**, **Microsoft Azure OpenAI**, **Amazon AWS Bedrock**, and **Local Ollama**—are fully usable out of the box. The engine provides automatic model fallback, token trimming, and native direct HTTP REST fallbacks (via standard `requests`) so extraction succeeds reliably across any configured backend.
 
 ### 🌐 Supported AI Providers Matrix
 
@@ -263,6 +265,26 @@ Industrial automation (OT), embedded semiconductor (IoT), and enterprise datacen
 > [!IMPORTANT]
 > ### 🛡️ Zero Dropped EOL Records Invariant
 > Products that have reached **End of Life (EOL)**, **Discontinued**, **Phase-Out**, or **Obsolete** status as per vendor circulars **always have a permanent entry in the dataset even when no date is present**. Missing dates will NEVER drop a record. The extractor tags undated records with `"missing_date": true` in metadata, guaranteeing 100% catalog coverage for asset management.
+
+### ⚡ Standalone Vendor Terminology (Zero Framework / Zero Crawler Execution)
+
+Vendor lifecycle terminology is maintained as an independent catalog. It **does NOT run on the crawler framework** and can be inspected, queried, and exported completely **standalone** without launching Playwright, Chromium, headless browsers, or network scrapers:
+
+```bash
+# 1. View standalone terminology for a specific vendor via CLI
+python cli.py --vendor-terminology --vendor rockwell
+python cli.py --vendor-terminology --vendor siemens
+python cli.py --vendor-terminology --vendor cisco
+
+# 2. Filter terminology standalone by sector (OT, IoT, IT)
+python cli.py --vendor-terminology --sector OT
+python cli.py --vendor-terminology --sector IoT
+
+# 3. Direct dedicated standalone tool execution
+python scripts/standalone_vendor_terminology.py --vendor schneider
+python scripts/standalone_vendor_terminology.py --sector IT --json
+python scripts/standalone_vendor_terminology.py --markdown
+```
 
 ### Key Lifecycle Phasing Models Across Major Manufacturers
 
@@ -601,6 +623,12 @@ graph TD
 1. **No Artificial Defaults**: Hardware items (such as a Toyopuc PLC, servo amplifier, or optic sensor) **do not run Windows 10 or Linux**. The framework never injects synthetic `default_os` or `default_firmware`. Fields remain empty string `""` (SQL `NULL`) unless explicitly documented by the manufacturer.
 2. **Preserving Genuine Status**: Official status terminology is captured verbatim from the vendor portal and recorded in `status`.
 3. **Discrete Milestone Records**: If a product lists multiple milestones (e.g. Last Time Buy in 2025, End of Life in 2026, End of Support in 2031), the pipeline emits **one distinct record per milestone**.
+4. **Strict Public Data Sanitization & Symbol Whitelisting**:
+   - Public web portals, technical bulletins, and tables frequently contain corrupt data, mojibake encoding errors, control characters, zero-width spaces, and arbitrary decorative glyphs.
+   - The pipeline enforces **strict character whitelisting** in Stage 4:
+     - **Permitted Characters**: Strictly alphanumeric (`[A-Za-z0-9]`) alongside sensible standard punctuation commonly present in genuine part numbers (`-`, `/`, `:`, `.`, `_`, `+`, `&`, `(`, `)`, `#`, space).
+     - **Corrupt & Uncommon Symbols Purged**: Unicode replacement characters (`\ufffd`), null bytes (`\x00`), zero-width spaces (`\u200b`, `\ufeff`), control codes (`[\x00-\x1f\x7f-\x9f]`), emojis, bullets (`•`, `►`, `✓`, `★`), legal marks (`™`, `®`, `©`, `§`), and uncommon symbols (`~`, `^`, `$`, `%`, `*`, `=`, `|`, `\`, `{`, `}`, `<`, `>`, `;`, `"`, `'`) are systematically scrubbed or rejected.
+     - **Non-Alphanumeric Noise Rejected**: Any extracted string lacking genuine alphanumeric characters is permanently purged.
 
 ---
 

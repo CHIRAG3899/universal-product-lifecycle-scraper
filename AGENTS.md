@@ -168,23 +168,27 @@ universal-lifecycle-scraper/
 │   ├── crawl_engine.py         # UniversalAICrawler (Crawl4AI + DOM/Apollo + HTTP fallback)
 │   ├── crawler_comparison.py   # Generic IDE vs Enterprise AI Crawler comparison engine
 │   ├── delta_cache.py          # DeltaCache for content hash and ETag skipping
-│   ├── dlq.py                  # DeadLetterQueue for forensic failure tracking
-│   ├── gemini_extractor.py     # GeminiExtractor with candidate probing & fallback
+│   ├── ai_extractor.py         # UniversalAIExtractor multi-provider intelligence
+│   ├── gemini_extractor.py     # Legacy backward-compatibility re-export shim
 │   ├── models.py               # Pydantic ProductRecord (OS/Software support, strict non-null)
 │   ├── observability.py        # PipelineMetricsCollector & AlertDispatcher
 │   ├── pipeline.py             # 6-stage visible LifecyclePipeline orchestrator
+│   ├── providers.py            # Multi-provider LLM abstraction (Gemini, OpenAI, Claude, Azure, AWS, Ollama)
 │   ├── security.py             # SSRF prevention & CSV formula injection defense
 │   ├── storage.py              # MasterStorageManager with atomic file swapping
 │   └── vendors.py              # 140-vendor resolution & multilingual stage translation
 ├── scripts/
 │   ├── pre_commit_check.py     # Automated 8-stage pre-commit quality gate (Ruff, Mypy, AST, Tests)
+│   ├── standalone_vendor_terminology.py # Standalone vendor lifecycle status query tool
+│   ├── generate_vendor_status_registry.py # Vendor lifecycle status catalog generator
+│   ├── generate_pr_metrics.py  # GitHub Actions PR metrics generator
 │   └── install_hooks.py        # Cross-platform Git hook installer
-├── tests/                      # Enterprise Automated Test Suite (126 tests)
+├── tests/                      # Enterprise Automated Test Suite (150+ tests)
 │   ├── test_models.py
 │   ├── test_security.py
 │   ├── test_storage.py
 │   ├── test_vendors.py
-│   ├── test_gemini_extractor.py
+│   ├── test_ai_extractor.py
 │   ├── test_crawl_engine.py
 │   ├── test_pipeline.py
 │   ├── test_e2e_pipeline.py

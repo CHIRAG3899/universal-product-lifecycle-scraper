@@ -15,13 +15,13 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
+from scraper.ai_extractor import UniversalAIExtractor
 from scraper.artifacts import RunArtifactManager
 from scraper.checkpoint import CheckpointManager
 from scraper.config import BASE_DIR
 from scraper.crawl_engine import UniversalAICrawler
 from scraper.delta_cache import DeltaCache
 from scraper.dlq import DeadLetterQueue
-from scraper.gemini_extractor import GeminiExtractor
 from scraper.models import (
     ProductRecord,
     ScrapedDataset,
@@ -29,7 +29,7 @@ from scraper.models import (
     is_well_known_os_or_software,
 )
 from scraper.observability import AlertDispatcher, PipelineMetricsCollector
-from scraper.security import is_safe_url
+from scraper.security import clean_and_sanitize_identifier, is_safe_url
 from scraper.storage import MasterStorageManager
 
 logger = logging.getLogger("ai_scraper.pipeline")
@@ -63,7 +63,7 @@ class LifecyclePipeline:
         self.artifacts_dir = BASE_DIR / storage_cfg.get("artifacts_dir", "artifacts/runs")
 
         # Core Components with Token & Cost Optimizations
-        self.gemini = GeminiExtractor(
+        self.extractor = UniversalAIExtractor(
             api_key=api_key,
             model_name=model,
             thinking_budget=thinking_budget,
@@ -72,7 +72,8 @@ class LifecyclePipeline:
             provider=provider,
             api_base=api_base,
         )
-        self.crawler = UniversalAICrawler(gemini_extractor=self.gemini)
+        self.gemini = self.extractor  # Backward compatibility alias
+        self.crawler = UniversalAICrawler(gemini_extractor=self.extractor)
         self.storage = MasterStorageManager(self.master_csv, self.output_dir)
         self.artifact_mgr = RunArtifactManager(self.artifacts_dir, run_id=run_id)
         self.checkpoint_mgr = CheckpointManager()
@@ -212,14 +213,29 @@ class LifecyclePipeline:
                 if not v_name or v_name.lower() in ("n/a", "none", "null", "nan"):
                     purged_noise_count += 1
                     continue
+                # Strict Public Source Ingestion Sanitization:
+                # Strip corrupt data, mojibake, control chars, uncommon symbols
+                # Enforce strictly alphanumeric + sensible standard symbols (- / : . _ + & ( ) # space)
                 if not is_sw:
-                    if not m_name or m_name.lower() in ("n/a", "none", "null", "nan") or not is_valid_product_model(m_name):
-                        purged_noise_count += 1
-                        continue
+                    clean_m = clean_and_sanitize_identifier(m_name)
+                    if not clean_m or not is_valid_product_model(clean_m):
+                        if not is_valid_product_model(m_name):
+                            purged_noise_count += 1
+                            continue
+                    else:
+                        if m_name.startswith(("=", "+", "-", "@")):
+                            p.model_name = m_name[0] + clean_m
+                        else:
+                            p.model_name = clean_m
+                            m_name = clean_m
                 else:
-                    if m_name and m_name.lower() not in ("n/a", "none", "null", "nan") and not is_valid_product_model(m_name):
-                        purged_noise_count += 1
-                        continue
+                    if m_name and m_name.lower() not in ("n/a", "none", "null", "nan"):
+                        clean_m = clean_and_sanitize_identifier(m_name)
+                        if clean_m and is_valid_product_model(clean_m):
+                            p.model_name = clean_m
+                        elif not is_valid_product_model(m_name):
+                            purged_noise_count += 1
+                            continue
                 if not st_val or st_val.lower() in ("n/a", "none", "null", "nan") or len(st_val) > 40:
                     purged_noise_count += 1
                     continue

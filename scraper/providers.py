@@ -11,7 +11,7 @@ Enables plug-and-play AI extraction across:
 
 import logging
 import os
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 logger = logging.getLogger("ai_scraper.providers")
 
@@ -165,3 +165,132 @@ def resolve_provider_and_model(
             final_key = os.getenv("AWS_ACCESS_KEY_ID", "")
 
     return req_provider, final_model, final_key
+
+
+def call_llm_completion(
+    provider: str,
+    model: str,
+    messages: list,
+    api_key: Optional[str] = None,
+    api_base: Optional[str] = None,
+    temperature: float = 0.1,
+    max_tokens: int = 4096,
+    json_mode: bool = True,
+    timeout: int = 45,
+) -> str:
+    """
+    Executes a chat completion across any supported LLM provider:
+    - First attempts LiteLLM if installed and functional
+    - Seamlessly falls back to native direct HTTP REST requests via standard requests
+    - Supports Google, OpenAI, Anthropic Claude, Azure OpenAI, Ollama / Local, OpenRouter, AWS Bedrock
+    Returns raw response text string.
+    """
+    prov = normalize_provider_name(provider)
+
+    # Strategy 1: Attempt LiteLLM if available
+    try:
+        import litellm
+        litellm.suppress_debug_info = True
+        call_kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "timeout": timeout,
+        }
+        if api_key:
+            call_kwargs["api_key"] = api_key
+        if api_base:
+            call_kwargs["api_base"] = api_base
+        if json_mode:
+            m_lower = model.lower()
+            if any(kw in m_lower for kw in ["gpt-", "o1", "o3", "claude-3-5", "llama"]):
+                call_kwargs["response_format"] = {"type": "json_object"}
+
+        resp = litellm.completion(**call_kwargs)
+        if resp and getattr(resp, "choices", None):
+            txt = getattr(resp.choices[0].message, "content", "") or ""
+            if txt:
+                return txt
+    except Exception as lite_err:
+        logger.debug(f"LiteLLM completion bypassed or failed ({lite_err}). Falling back to native HTTP REST.")
+
+    # Strategy 2: Direct Native HTTP REST via requests
+    import requests
+
+    headers = {"Content-Type": "application/json"}
+
+    if prov in ("openai", "openrouter"):
+        base = api_base.rstrip("/") if api_base else ("https://openrouter.ai/api/v1" if prov == "openrouter" else "https://api.openai.com/v1")
+        url = f"{base}/chat/completions"
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        body: Dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        if json_mode and "openrouter" not in prov:
+            body["response_format"] = {"type": "json_object"}
+        r = requests.post(url, headers=headers, json=body, timeout=timeout)
+        r.raise_for_status()
+        data = r.json()
+        return str(data.get("choices", [{}])[0].get("message", {}).get("content", ""))
+
+    elif prov in ("anthropic", "claude"):
+        base = api_base.rstrip("/") if api_base else "https://api.anthropic.com/v1"
+        url = f"{base}/messages"
+        if api_key:
+            headers["x-api-key"] = api_key
+        headers["anthropic-version"] = "2023-06-01"
+        system_content = next((m.get("content", "") for m in messages if m.get("role") == "system"), "")
+        user_msgs = [m for m in messages if m.get("role") != "system"]
+        body = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "messages": user_msgs,
+            "temperature": temperature,
+        }
+        if system_content:
+            body["system"] = system_content
+        r = requests.post(url, headers=headers, json=body, timeout=timeout)
+        r.raise_for_status()
+        data = r.json()
+        content_blocks = data.get("content", [])
+        if content_blocks and isinstance(content_blocks, list):
+            return str(content_blocks[0].get("text", ""))
+        return ""
+
+    elif prov in ("ollama", "local"):
+        base = api_base.rstrip("/") if api_base else "http://localhost:11434"
+        url = f"{base}/v1/chat/completions"
+        body = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "stream": False,
+        }
+        if json_mode:
+            body["response_format"] = {"type": "json_object"}
+        r = requests.post(url, headers=headers, json=body, timeout=timeout)
+        r.raise_for_status()
+        data = r.json()
+        return str(data.get("choices", [{}])[0].get("message", {}).get("content", ""))
+
+    elif prov == "azure":
+        base = (api_base or "").rstrip("/")
+        url = f"{base}/openai/deployments/{model}/chat/completions?api-version=2024-02-15-preview"
+        if api_key:
+            headers["api-key"] = api_key
+        body = {
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
+        r = requests.post(url, headers=headers, json=body, timeout=timeout)
+        r.raise_for_status()
+        data = r.json()
+        return str(data.get("choices", [{}])[0].get("message", {}).get("content", ""))
+
+    raise ValueError(f"Unsupported direct HTTP provider: '{provider}'")
+

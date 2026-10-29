@@ -128,11 +128,60 @@ def sanitize_db_string(text: Optional[str], max_len: int = 500) -> Optional[str]
 
     cleaned = str(text).replace("\x00", "").replace("\r", " ")
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
-    
+
     if not cleaned or cleaned.lower() in ("n/a", "none", "null", "undefined"):
         return None
 
     return cleaned[:max_len]
+
+
+# Allowed sensible characters in product model identifiers:
+# Alphanumeric [A-Za-z0-9] and sensible standard punctuation: - / : . _ + & ( ) # space
+ALLOWED_MODEL_CHARS_PATTERN = re.compile(r'^[A-Za-z0-9\-_/:.+&()# ]+$')
+DISALLOWED_CORRUPT_SYMBOLS_PATTERN = re.compile(r'[\x00-\x1f\x7f-\x9f\ufeff\u200b\u200c\u200d\ufffd§©®™★•►✓✗▪▫◆▲▼※~^$%=|\\{}<>;"`\'~]')
+
+
+def clean_and_sanitize_identifier(raw: Optional[str], max_len: int = 120) -> Optional[str]:
+    """
+    Strictly sanitizes extracted hardware and software model identifiers from public sources:
+    - Strips corrupt data, mojibake, zero-width chars, control characters, and HTML entities
+    - Filters out unnecessary or uncommon symbols (e.g. §, ©, ®, ™, ★, •, ~, ^, $, %, *, =, |, {}, <>, ;)
+    - Strictly enforces alphanumeric characters alongside only sensible standard symbols: - / : . _ + & ( ) # space
+    - Guarantees presence of genuine alphanumeric characters (rejects pure-symbol noise)
+    """
+    if not raw or not isinstance(raw, str):
+        return None
+
+    import html
+    s = html.unescape(raw.strip())
+    if not s or s.lower() in ("n/a", "none", "null", "nan", "unknown", "undefined"):
+        return None
+
+    # Strip corrupt characters, control codes, replacement chars, decorative bullets, and uncommon symbols
+    s = DISALLOWED_CORRUPT_SYMBOLS_PATTERN.sub(' ', s)
+
+    # Normalize internal whitespace
+    s = re.sub(r'\s+', ' ', s).strip()
+
+    # Strip extraneous leading/trailing punctuation noise like . , - : /
+    s = s.strip(" .,-:/_#")
+
+    if len(s) < 2 or len(s) > max_len:
+        return None
+
+    # Must contain at least one alphanumeric character
+    if not re.search(r'[A-Za-z0-9]', s):
+        return None
+
+    # Must match allowed alphanumeric + sensible symbols pattern
+    if not ALLOWED_MODEL_CHARS_PATTERN.match(s):
+        # Scrub any leftover non-whitelisted characters
+        s = re.sub(r'[^A-Za-z0-9\-_/:.+&()# ]', '', s).strip()
+        s = re.sub(r'\s+', ' ', s).strip()
+        if len(s) < 2 or not re.search(r'[A-Za-z0-9]', s):
+            return None
+
+    return s
 
 
 def safe_atomic_replace(temp_path: Path, dest_path: Path, max_retries: int = 4) -> None:

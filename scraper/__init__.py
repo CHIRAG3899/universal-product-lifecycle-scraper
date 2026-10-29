@@ -3,9 +3,13 @@ Universal Multi-Vendor Product Lifecycle Intelligence Scraper Package.
 Pluggable multi-provider architecture supporting headless crawling and structured AI extraction.
 """
 
-from scraper.ai_extractor import AIExtractor
+from scraper.ai_extractor import (
+    AIExtractor,
+    GeminiExtractor,
+    LLMExtractor,
+    UniversalAIExtractor,
+)
 from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler
-from scraper.gemini_extractor import GeminiExtractor, LLMExtractor, UniversalAIExtractor
 from scraper.models import ProductRecord, ScrapedDataset, parse_to_utc_iso
 from scraper.pipeline import LifecyclePipeline
 from scraper.providers import DEFAULT_MODELS, SUPPORTED_PROVIDERS, resolve_provider_and_model
