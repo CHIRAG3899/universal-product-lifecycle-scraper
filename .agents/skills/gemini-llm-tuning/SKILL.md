@@ -7,7 +7,7 @@ description: >-
 
 # Google Gemini LLM Tuning & Failover Runbook
 
-This skill outlines guidelines and troubleshooting steps for configuring, tuning, and handling errors when interacting with Google Gemini via the official `google-genai` SDK in [`scraper/gemini_extractor.py`](file:///c:/Code/AI%20scraper/scraper/gemini_extractor.py).
+This skill outlines guidelines and troubleshooting steps for configuring, tuning, and handling errors when interacting with Google Gemini via the official `google-genai` SDK in [`scraper/ai_extractor.py`](scraper/ai_extractor.py).
 
 ---
 
@@ -59,7 +59,7 @@ Always strip the surrounding code fences prior to `json.loads()` to avoid `JSOND
 
 ## 🎯 Extraction Prompt Invariants & 100% Coverage Rules
 
-The system prompt in [`scraper/gemini_extractor.py`](file:///c:/Code/AI%20scraper/scraper/gemini_extractor.py) (`EXTRACTION_SYSTEM_INSTRUCTION`) strictly enforces:
+The system prompt in [`scraper/ai_extractor.py`](scraper/ai_extractor.py) (`EXTRACTION_SYSTEM_INSTRUCTION`) strictly enforces:
 1. **Zero Status Limitations**: Vendors do NOT share a fixed status list. The extractor captures the exact vendor milestone (*Phase-Out Product, Delivery Release, Announced Discontinuation, Product Cancellation, End of Sale, Last Date of Support, Classic, Limited, Obsolete, Active Mature, Stop Shipment, Repair Termination*). Never force stages into an artificial 3-stage whitelist.
 2. **Strict Mandatory 4-Field Invariant**: `vendor_name`, `model_name`, `status`, and `stage_date_utc` must never be null. If a table or paragraph states a discontinuation notice without a row-level date, the crawler automatically hydrates the date from the circular publication date or crawl snapshot timestamp.
 3. **Model Suffix & Range Unpacking**: Pre-processing via `split_models()` expands:

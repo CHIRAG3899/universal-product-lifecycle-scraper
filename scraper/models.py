@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from scraper.security import inspect_security_threats
+
 
 def normalize_firmware_version(raw_firmware: Optional[str]) -> Optional[str]:
     """
@@ -73,6 +75,11 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     """
     if not name or not isinstance(name, str):
         return False
+    # Enterprise Security Incident Check: Reject SQLi, XSS, Path Traversal, Command Injection
+    is_th, _, _ = inspect_security_threats(name, field_name="model_name")
+    if is_th:
+        return False
+
     cleaned = name.strip()
     if len(cleaned) < 2 or len(cleaned) > 120:
         return False
@@ -425,6 +432,7 @@ class ProductRecord(BaseModel):
     def validate_vendor_name(cls, v):
         if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan"):
             raise ValueError("vendor_name is mandatory and cannot be null or empty")
+        inspect_security_threats(v, field_name="vendor_name", raise_error=True)
         return v.strip()
 
     @field_validator("model_name", mode="before")
@@ -439,6 +447,7 @@ class ProductRecord(BaseModel):
             return ""
         if cleaned.lower() in ("n/a", "none", "null", "nan"):
             raise ValueError("model_name cannot be 'n/a', 'none', or 'null'")
+        inspect_security_threats(cleaned, field_name="model_name", raise_error=True)
         if not is_valid_product_model(cleaned):
             raise ValueError(f"Disallowed or invalid model name: '{cleaned}'")
         return cleaned
@@ -447,6 +456,7 @@ class ProductRecord(BaseModel):
     def validate_status(cls, v):
         if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan"):
             raise ValueError("status is mandatory and cannot be null or empty")
+        inspect_security_threats(v, field_name="status", raise_error=True)
         return v.strip()
 
     @field_validator("firmware", mode="before")

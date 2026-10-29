@@ -1,7 +1,7 @@
 # 🚀 Automated Product Lifecycle Dataset Update & Health Metrics
 
 **Execution Timestamp**: `2026-10-29 22:15:14 UTC`  
-**Master Dataset Path**: [`output/all_vendors_lifecycle.csv`](file:///c:/Code/universal-lifecycle-scraper/output/all_vendors_lifecycle.csv)  
+**Master Dataset Path**: [`output/all_vendors_lifecycle.csv`](output/all_vendors_lifecycle.csv)  
 **Total Verified Products in Master Dataset**: **0**  
 
 <p align='left'>

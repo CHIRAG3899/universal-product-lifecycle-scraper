@@ -7,7 +7,7 @@ description: >-
 
 # Pre-Commit Quality Gatekeeper Runbook
 
-This skill outlines the operation, execution, and troubleshooting procedures for the repository's **8-stage enterprise pre-commit quality gate** ([`scripts/pre_commit_check.py`](file:///c:/Code/AI%20scraper/scripts/pre_commit_check.py)) and Git hook ([`scripts/install_hooks.py`](file:///c:/Code/AI%20scraper/scripts/install_hooks.py)).
+This skill outlines the operation, execution, and troubleshooting procedures for the repository's **8-stage enterprise pre-commit quality gate** ([`scripts/pre_commit_check.py`](scripts/pre_commit_check.py)) and Git hook ([`scripts/install_hooks.py`](scripts/install_hooks.py)).
 
 > [!IMPORTANT]
 > **Strict Commit Blocking ("Don't commit if they don't pass")**:

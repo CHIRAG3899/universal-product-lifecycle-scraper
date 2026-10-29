@@ -24,7 +24,7 @@ This skill outlines data audit procedures for verifying that scraped lifecycle d
 ## 🎯 Verification Criteria
 
 ### 1. Column Schema Verification
-The master CSV ([`output/all_vendors_lifecycle.csv`](file:///c:/Code/AI%20scraper/output/all_vendors_lifecycle.csv)) must contain exactly these 10 snake_case columns in this specific order:
+The master CSV ([`output/all_vendors_lifecycle.csv`](output/all_vendors_lifecycle.csv)) must contain exactly these 10 snake_case columns in this specific order:
 1. `vendor_name` *(Mandatory - No nulls allowed)*
 2. `model_name` *(Mandatory - No nulls allowed)*
 3. `status` *(Mandatory - No nulls allowed)*

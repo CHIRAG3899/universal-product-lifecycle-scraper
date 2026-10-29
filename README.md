@@ -30,18 +30,20 @@ The platform natively supports **140 global enterprise vendors** across **Operat
 ## 📋 Table of Contents
 1. [Key Architecture & Highlights](#-key-architecture--highlights)
 2. [Universal Multi-Provider AI Architecture & Setup](#-universal-multi-provider-ai-architecture--setup)
-3. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
-4. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
-5. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
-6. [Top 140 Enterprise Vendors Registry](#-top-140-enterprise-vendors-registry)
-7. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
-8. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
-9. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
-10. [Zero-Defaults Policy & Dynamic Terminology](#-zero-defaults-policy--dynamic-terminology)
-11. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
-12. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
-13. [Automated Verification & Testing](#-automated-verification--testing)
-14. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
+3. [Framework Pluggability & Adapter Integration](#-framework-pluggability--adapter-integration)
+4. [Enterprise Security Layer & Threat Incident Prevention Shield](#-enterprise-security-layer--threat-incident-prevention-shield)
+5. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
+6. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
+7. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
+8. [Top 140 Enterprise Vendors Registry](#-top-140-enterprise-vendors-registry)
+9. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
+10. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
+11. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
+12. [Zero-Defaults Policy & Dynamic Terminology](#-zero-defaults-policy--dynamic-terminology)
+13. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
+14. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
+15. [Automated Verification & Testing](#-automated-verification--testing)
+16. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
 
 ---
 
@@ -177,6 +179,163 @@ extractor_ollama = UniversalAIExtractor(
 | **Native Prompt Caching** | **Up to 90% Input Token Discount** | Pre-caches invariant extraction schemas and prompts via `client.caches.create()` across repetitive site structures. | `--prompt-caching`<br/>`GEMINI_ENABLE_PROMPT_CACHING=true` |
 | **Asynchronous Batch API** | **50% Overall Token Discount** | Submits non-interactive crawls via `client.batches.create()` with `InlinedRequest`, cutting input and output pricing by half. | `--batch-mode`<br/>`GEMINI_BATCH_MODE=true` |
 | **Token-Efficient Trimming** | **15–30% Input Token Reduction** | Strips HTML comments, repetitive table dividers, and duplicate whitespaces before sending text to any LLM. | Built-in by default |
+
+---
+
+## 🧩 Framework Pluggability & Adapter Integration
+
+The platform is engineered to effortlessly plug into existing enterprise data pipelines, autonomous AI agents, ETL workflow schedulers, and REST APIs with zero glue code. Universal adapters are exposed directly from [`scraper/adapters.py`](scraper/adapters.py):
+
+```mermaid
+graph TD
+    A["Universal Lifecycle Scraper Engine"] --> B["FrameworkAdapter / LifecyclePlugin"]
+    B --> C["LangChain / LlamaIndex<br/>(AI Agent Structured Tools)"]
+    B --> D["Apache Airflow / Celery<br/>(Scheduled Workflow Operators)"]
+    B --> E["FastAPI / Flask / Django<br/>(Enterprise Microservice APIs)"]
+    B --> F["Pandas / PyArrow / Polars<br/>(Data Science & Feature Engineering)"]
+
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    style B fill:#ede7f6,stroke:#512da8,stroke-width:2px;
+    style C fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    style D fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    style E fill:#fce4ec,stroke:#c2185b,stroke-width:2px;
+    style F fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
+```
+
+### 1. LangChain & LlamaIndex Agent Integration
+Plug lifecycle and terminology lookup tools directly into conversational or autonomous agentic workflows. Every tool invocation automatically checks query arguments for SQL injection and security threats:
+
+```python
+from scraper import LangChainToolAdapter
+
+# Bind tools to LangChain Agent
+tool_adapter = LangChainToolAdapter()
+tools = tool_adapter.as_langchain_tools()
+# tools: [query_product_lifecycle, get_vendor_lifecycle_terminology]
+
+# Direct tool query example:
+result = tool_adapter.query_product_lifecycle(
+    vendor_name="Siemens",
+    model_name="6ES7511",
+    status="Phase-Out"
+)
+print(result)
+```
+
+### 2. Apache Airflow, Prefect & Celery ETL Integration
+Use `LifecyclePlugin` as a task callable in scheduled ingestion DAGs:
+
+```python
+from scraper import LifecyclePlugin
+
+def run_nightly_lifecycle_ingestion():
+    plugin = LifecyclePlugin()
+    # Runs async pipeline synchronously with thread-safe loop isolation
+    records = plugin.extract_sync(
+        vendor_ids=["siemens", "mitsubishi", "cisco_systems"],
+        provider="gemini",
+        max_workers=5
+    )
+    # Convert directly to Pandas DataFrame for data warehouse loading
+    df = plugin.to_dataframe(records)
+    # df.to_sql("dim_hardware_lifecycle", con=db_engine, if_exists="append", index=False)
+```
+
+### 3. FastAPI & REST Microservice Endpoints
+Mount query and terminology lookups into web APIs with built-in input sanitization:
+
+```python
+from fastapi import FastAPI, HTTPException, Query
+from scraper import FrameworkAdapter, SecurityThreatError
+
+app = FastAPI(title="Hardware Lifecycle API")
+adapter = FrameworkAdapter()
+
+@app.get("/api/v1/lifecycle")
+def get_lifecycle(
+    vendor: str = Query(None),
+    model: str = Query(None),
+    status: str = Query(None)
+):
+    try:
+        records = adapter.query_records(vendor_name=vendor, model_name=model, status=status)
+        return adapter.to_dicts(records)
+    except SecurityThreatError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Security Incident Blocked: {e.threat_type} - {e.detail}"
+        )
+```
+
+### 4. Memory-Efficient Streaming & Batch Exports
+Process high-volume catalogues without memory overhead:
+
+```python
+from scraper import FrameworkAdapter
+
+adapter = FrameworkAdapter()
+
+# Stream records one by one
+for record in adapter.stream_records(vendor_ids=["rockwell_automation"]):
+    print(f"Ingesting: {record.model_name} -> {record.stage_date_utc}")
+```
+
+---
+
+## 🛡️ Enterprise Security Layer & Threat Incident Prevention Shield
+
+The scraper implements a multi-tier defense architecture in [`scraper/security.py`](scraper/security.py) to actively detect and block security threats from both untrusted public web sources and external caller arguments, preventing severe security incidents:
+
+```mermaid
+graph LR
+    Input["Public Web Scraping & External API Input"] --> Shield["Enterprise Threat Shield (scraper/security.py)"]
+    Shield --> S1["SQL Injection (SQLi)<br/>Tautologies, UNION, Stacked Queries"]
+    Shield --> S2["Cross-Site Scripting (XSS)<br/>Script Tags, DOM Hijacking, Events"]
+    Shield --> S3["Path Traversal (LFI)<br/>Directory Climbing, OS System Files"]
+    Shield --> S4["Command Injection (RCE)<br/>Shell Metachars, Piping, Exec"]
+    Shield --> S5["Server-Side Request Forgery<br/>RFC-1918 Private IPs, Cloud Metadata"]
+    Shield --> S6["CSV Formula Injection<br/>Spreadsheet Payload Neutralization"]
+
+    style Input fill:#ffebee,stroke:#c62828,stroke-width:2px;
+    style Shield fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+```
+
+### 1. SQL Injection (SQLi) Defense
+Guards against malicious data injected into model names, vendor names, or search parameters that could compromise relational databases:
+- **Tautologies & Boolean Injections**: Blocks `' OR '1'='1`, `' OR 1=1 --`, `" OR "a"="a`.
+- **UNION SELECT Attacks**: Blocks `UNION SELECT`, `UNION ALL SELECT`.
+- **Stacked Query Execution**: Blocks `; DROP TABLE`, `; DELETE FROM`, `; TRUNCATE TABLE`.
+- **Time-Based Blind Injections**: Blocks `WAITFOR DELAY`, `pg_sleep()`, `benchmark()`, `sleep()`.
+- **Stored Procedure / System Commands**: Blocks `xp_cmdshell`, `sp_executesql`, `into outfile`.
+- **Zero False Positives**: Thoroughly validated against genuine industrial part numbers containing hyphens, slashes, and colons (`GT25-WLAN`, `IR1101/K9`, `CPU:214-1AD23`, `6ES7511-1AK02-0AB0`).
+
+### 2. Cross-Site Scripting (XSS) Defense
+Prevents DOM manipulation, stored script payloads, and HTML injection:
+- Blocks `<script>` tags, inline event handlers (`onload=`, `onerror=`, `onclick=`).
+- Blocks pseudo-protocols (`javascript:`, `vbscript:`, `data:text/html`).
+- Neutralizes HTML tags before downstream storage and web rendering.
+
+### 3. Path Traversal & Local File Inclusion (LFI)
+Prevents file climbing and unauthorized system configuration read attempts:
+- Blocks `../`, `..\`, URL-encoded `%2e%2e%2f` patterns.
+- Blocks access attempts targeting `/etc/passwd`, `/etc/shadow`, `boot.ini`, `win.ini`.
+
+### 4. Command Injection & Remote Code Execution (RCE)
+Prevents chained shell executions and command substitutions:
+- Blocks shell metacharacters and chained commands (`; cat`, `&& whoami`, `| dir`, `$(curl ...)`).
+- Blocks invocation of shell binaries (`powershell.exe`, `cmd.exe`, `/bin/sh`).
+
+### 5. Server-Side Request Forgery (SSRF) Protection
+Enforces strict kernel-level IP network boundaries in [`scraper/security.py`](scraper/security.py):
+- Blocks all RFC-1918 private IPv4 subnets (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`).
+- Blocks loopback addresses (`127.0.0.0/8`, `::1/128`).
+- Blocks Cloud Metadata endpoints (`169.254.169.254` on AWS, Azure, GCP).
+- Prevents hex/decimal encoded IP evasion (`0x7f000001`, `2130706433`).
+- Strictly enforces authorized domain whitelists configured in [`configs/vendors.yaml`](configs/vendors.yaml).
+
+### 6. CSV Formula Injection Defense (CWE-1236)
+Pre-emptively sanitizes cells beginning with spreadsheet execution triggers (`=`, `+`, `-`, `@`, `\t`, `\r`):
+- Prepends a single quote (`'`) to defang dynamic formulas before master CSV export.
 
 ---
 

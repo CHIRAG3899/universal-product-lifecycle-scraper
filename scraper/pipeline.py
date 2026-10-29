@@ -29,7 +29,7 @@ from scraper.models import (
     is_well_known_os_or_software,
 )
 from scraper.observability import AlertDispatcher, PipelineMetricsCollector
-from scraper.security import clean_and_sanitize_identifier, is_safe_url
+from scraper.security import clean_and_sanitize_identifier, inspect_security_threats, is_safe_url
 from scraper.storage import MasterStorageManager
 
 logger = logging.getLogger("ai_scraper.pipeline")
@@ -200,6 +200,7 @@ class LifecyclePipeline:
             print("[STEP 4/6: SANITISATION & SECURITY] Applying enterprise sanity guards:")
             sanitized_products: List[ProductRecord] = []
             purged_noise_count = 0
+            blocked_threats_count = 0
 
             for p in vendor_products:
                 v_name = (p.vendor_name or "").strip()
@@ -213,6 +214,19 @@ class LifecyclePipeline:
                 if not v_name or v_name.lower() in ("n/a", "none", "null", "nan"):
                     purged_noise_count += 1
                     continue
+
+                # Enterprise Threat Prevention Shield (SQLi, XSS, Path Traversal, Command Injection)
+                is_th, th_type, th_reason = inspect_security_threats(m_name, field_name="model_name")
+                if not is_th:
+                    is_th, th_type, th_reason = inspect_security_threats(v_name, field_name="vendor_name")
+                if not is_th:
+                    is_th, th_type, th_reason = inspect_security_threats(st_val, field_name="status")
+                if is_th:
+                    logger.warning(f"Security threat blocked ({th_type}): {th_reason} in record for {v_name}")
+                    blocked_threats_count += 1
+                    purged_noise_count += 1
+                    continue
+
                 # Strict Public Source Ingestion Sanitization:
                 # Strip corrupt data, mojibake, control chars, uncommon symbols
                 # Enforce strictly alphanumeric + sensible standard symbols (- / : . _ + & ( ) # space)
@@ -246,6 +260,7 @@ class LifecyclePipeline:
                         p.metadata["missing_date"] = True
                 sanitized_products.append(p)
 
+            print(f"  -> Threat Prevention Layer: Blocked {blocked_threats_count} active security attacks (SQLi, XSS, Path Traversal, Command Injection)")
             print(f"  -> Field & Model Validator: Purged {purged_noise_count} invalid noise elements. Retained {len(sanitized_products)} clean products (including undated EOL models).")
             print("  -> CSV Formula Injection Shield: Sanitized formula trigger characters (=, +, -, @)")
             print(f"  -> SSRF Protection: Verified private IP restrictions across {len(allowed_domains)} allowed domains")

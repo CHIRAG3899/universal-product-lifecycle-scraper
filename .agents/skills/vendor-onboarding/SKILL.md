@@ -14,7 +14,7 @@ This skill guides the onboarding of new enterprise vendors (OT, IoT, IT) into th
 ## 📋 Onboarding Steps
 
 ### Step 1: Open and Edit `configs/vendors.yaml`
-Add a new vendor entry under the `vendors:` mapping in [`configs/vendors.yaml`](file:///c:/Code/AI%20scraper/configs/vendors.yaml):
+Add a new vendor entry under the `vendors:` mapping in [`configs/vendors.yaml`](configs/vendors.yaml):
 
 ```yaml
   toyoda:
