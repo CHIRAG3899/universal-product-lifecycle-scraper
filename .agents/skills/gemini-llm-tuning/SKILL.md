@@ -16,10 +16,10 @@ This skill outlines guidelines and troubleshooting steps for configuring, tuning
 Google AI Studio periodically updates available models and may return `404 NOT_FOUND` for older or deprecated models on newer accounts.
 
 ### Prioritized Probing Order:
-1. `gemini-1.5-flash` (Universal default, fast, generous free quota)
-2. `gemini-2.0-flash` (Next-gen reasoning)
-3. `gemini-3.8-flash` (Interactions API recommendation)
-4. `gemini-1.5-pro` (High-capacity fallback)
+1. `gemini-3.5-flash-lite` (Universal production default, fast, prompt caching enabled)
+2. `gemini-flash-lite-latest` (Rolling production flash-lite endpoint)
+3. `gemini-3.5-flash` (Standard production flash)
+4. `gemini-flash-latest` (Rolling production standard flash)
 
 If a model returns 404, the extractor automatically cycles through candidates and updates `.env`.
 

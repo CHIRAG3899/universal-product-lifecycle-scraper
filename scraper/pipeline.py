@@ -334,11 +334,25 @@ class LifecyclePipeline:
                         return res
 
                 results = await asyncio.gather(*[_worker(vk, vc) for vk, vc in target_vendors], return_exceptions=True)
+                failed_exceptions = []
                 for r in results:
                     if isinstance(r, list):
                         all_harvested_products.extend(r)
                     elif isinstance(r, Exception):
                         logger.error(f"Worker task error: {r}")
+                        failed_exceptions.append(r)
+
+                if failed_exceptions:
+                    pending_keys = [tv[0] for tv in target_vendors if tv[0] not in completed_vendor_keys]
+                    self.checkpoint_mgr.save_checkpoint(
+                        vendor_id=pending_keys[0] if pending_keys else "concurrent_worker",
+                        run_id=self.artifact_mgr.run_id,
+                        status="failed",
+                        error_message=str(failed_exceptions[0]),
+                        completed_vendors=completed_vendor_keys,
+                        pending_vendors=pending_keys,
+                        harvested_records_count=len(all_harvested_products)
+                    )
             else:
                 for v_key, v_cfg in target_vendors:
                     try:

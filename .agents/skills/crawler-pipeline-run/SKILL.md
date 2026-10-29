@@ -23,13 +23,19 @@ python cli.py --vendor mitsubishi
 python cli.py --vendor toyoda
 
 # Siemens with explicit Gemini model
-python cli.py --vendor siemens --model gemini-1.5-flash
+python cli.py --vendor siemens --model gemini-3.5-flash-lite
 ```
 
 ### Mode 2: Site-Wide Domain Discovery Crawl
-To execute a deep website crawl discovering all support sub-portals, catalogs, and bulletins:
+Full-site discovery with unlimited pages (`max_pages=0`) and depth (`max_depth=0`) is enabled by default:
 ```bash
-python cli.py --vendor mitsubishi --site-crawl
+python cli.py --vendor mitsubishi
+
+# To crawl entry-point URLs only (without domain recursion):
+python cli.py --vendor mitsubishi --no-site-crawl
+
+# Crawl ALL 140 enterprise vendors with 3 parallel workers:
+python cli.py --all-vendors --concurrency 3
 ```
 
 ### Mode 3: Sector-Specific Batch Crawl

@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from scraper.security import safe_atomic_replace
+
 logger = logging.getLogger("ai_scraper.delta_cache")
 
 
@@ -47,7 +49,7 @@ class DeltaCache:
         try:
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(self._entries, f, indent=2, ensure_ascii=False)
-            temp_file.replace(self.cache_file)
+            safe_atomic_replace(temp_file, self.cache_file)
         except Exception as e:
             logger.error(f"[DELTA_CACHE] Error writing delta cache: {e}")
             if temp_file.exists():

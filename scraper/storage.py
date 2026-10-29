@@ -19,36 +19,11 @@ from scraper.models import (
     is_well_known_os_or_software,
     parse_to_utc_iso,
 )
-from scraper.security import sanitize_csv_cell
+from scraper.security import safe_atomic_replace, sanitize_csv_cell
 
 logger = logging.getLogger("ai_scraper.storage")
 
-
-def _safe_atomic_replace(temp_path: Path, dest_path: Path, max_retries: int = 4) -> None:
-    """Performs atomic file replacement with retry logic to withstand Windows file locking, ensuring temp file deletion."""
-    import time
-    try:
-        for attempt in range(max_retries):
-            try:
-                temp_path.replace(dest_path)
-                return
-            except (PermissionError, OSError) as e:
-                if attempt == max_retries - 1:
-                    try:
-                        if dest_path.exists():
-                            dest_path.unlink()
-                        temp_path.rename(dest_path)
-                        return
-                    except Exception:
-                        raise e
-                time.sleep(0.05 * (2 ** attempt))
-    finally:
-        # Guarantee no orphaned .tmp files remain on disk
-        if temp_path.exists():
-            try:
-                temp_path.unlink()
-            except Exception:
-                pass
+_safe_atomic_replace = safe_atomic_replace
 
 
 class MasterStorageManager:
@@ -176,8 +151,13 @@ class MasterStorageManager:
             # MANDATORY 4-FIELD GUARD: NO NULL / EMPTY ALLOWED
             if not v_name or v_name.lower() in ("n/a", "none", "null", "nan"):
                 continue
-            if not m_name or m_name.lower() in ("n/a", "none", "null", "nan") or not is_valid_product_model(m_name):
-                continue
+            is_sw_os = is_well_known_os_or_software(category=p.category, os_name=p.os, model_name=m_name)
+            if not is_sw_os:
+                if not m_name or m_name.lower() in ("n/a", "none", "null", "nan") or not is_valid_product_model(m_name):
+                    continue
+            else:
+                if m_name and m_name.lower() not in ("n/a", "none", "null", "nan") and not is_valid_product_model(m_name):
+                    continue
             if not status_val or status_val.lower() in ("n/a", "none", "null", "nan") or len(status_val) > 40:
                 continue
             if not d_utc or d_utc.lower() in ("n/a", "none", "null", "nan"):
@@ -188,7 +168,8 @@ class MasterStorageManager:
                     continue
                 d_utc = parsed
 
-            fp = str(p.fingerprint or hashlib.sha256(f"{v_name}|{m_name}|{status_val}|{d_utc}".encode("utf-8")).hexdigest()[:16])
+            model_part = (m_name or p.os or "").strip().upper()
+            fp = str(p.fingerprint or hashlib.sha256(f"{v_name}|{model_part}|{status_val}|{d_utc}".encode("utf-8")).hexdigest()[:16])
             meta = dict(p.metadata or {})
 
             # Consolidate all secondary attributes cleanly into metadata dictionary
@@ -201,7 +182,7 @@ class MasterStorageManager:
 
             source_url = p.source_url or meta.get("source_url", "")
             raw_repl = p.replacement or meta.get("replacement") or ""
-            if any(kw in str(raw_repl).lower() for kw in ["consult", "representative", "official sales", "contact your"]):
+            if not raw_repl or str(raw_repl).strip().lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown") or any(kw in str(raw_repl).lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
                 replacement = ""
             else:
                 replacement = str(raw_repl).strip()
@@ -266,11 +247,24 @@ class MasterStorageManager:
         if export_df.empty:
             export_df = pd.DataFrame(columns=desired_columns)
         else:
-            # Strict database readiness filter: drop any row where any of the 4 mandatory fields are null or empty
-            for col in ["vendor_name", "model_name", "status", "stage_date_utc"]:
+            # Strict database readiness filter: drop any row where mandatory fields are null or empty
+            for col in ["vendor_name", "status", "stage_date_utc"]:
                 if col in export_df.columns:
                     export_df = export_df.dropna(subset=[col])
                     export_df = export_df[~export_df[col].astype(str).str.strip().str.lower().isin(["", "nan", "none", "null", "n/a"])]
+
+            # model_name must be non-empty unless software/well-known OS
+            if "model_name" in export_df.columns:
+                def _is_valid_row_model(r):
+                    m = str(r.get("model_name") or "").strip()
+                    c = str(r.get("category") or "").strip()
+                    o = str(r.get("os") or "").strip()
+                    if is_well_known_os_or_software(category=c, os_name=o, model_name=m):
+                        return True if not m else (m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m))
+                    return bool(m and m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m))
+
+                valid_mask = export_df.apply(_is_valid_row_model, axis=1)
+                export_df = export_df[valid_mask]
 
             ordered_cols = [c for c in desired_columns if c in export_df.columns]
             export_df = export_df[ordered_cols]

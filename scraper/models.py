@@ -25,8 +25,8 @@ def normalize_firmware_version(raw_firmware: Optional[str]) -> Optional[str]:
     if not cleaned or cleaned.lower() in ("n/a", "none", "null", "all", "all revisions", "all firmware revisions", "unknown", "hardware", "hardware revision"):
         return None
 
-    # Pattern 1: Semantic 3-part version: 1.2.3 or v1.2.3
-    m_semver = re.search(r'\b[vV]?(\d+\.\d+\.\d+)\b', cleaned)
+    # Pattern 1: Semantic 3 or 4-part version: 1.2.3 or 1.2.3.4 or v1.2.3
+    m_semver = re.search(r'\b[vV]?(\d+\.\d+\.\d+(?:\.\d+)?)\b', cleaned)
     if m_semver:
         return m_semver.group(1)
 
@@ -48,12 +48,16 @@ def normalize_firmware_version(raw_firmware: Optional[str]) -> Optional[str]:
     return None
 
 
-DISALLOWED_MODEL_TERMS = {
+COOKIE_AND_POLICY_SUBSTRINGS = {
     "performance cookies", "cookie notice", "manage consent preferences", "consent preferences",
-    "strictly necessary cookies", "functional cookies", "targeting cookies", "cookies", "cookie policy",
+    "strictly necessary cookies", "functional cookies", "targeting cookies", "cookies settings",
+    "cookie policy", "cookie", "privacy policy", "terms of use", "terms and conditions",
+    "all rights reserved"
+}
+
+EXACT_DISALLOWED_MODEL_TOKENS = {
     "global", "americas", "asia-pacific", "europe", "europe, cis, middle east & africa",
-    "follow us", "about", "sustainability", "news", "contact us", "privacy policy",
-    "terms of use", "site map", "disclaimer", "copyright", "all rights reserved",
+    "follow us", "about", "sustainability", "news", "contact us", "site map", "disclaimer", "copyright",
     "search", "home", "products", "solutions", "support", "downloads", "training",
     "main series", "complete series", "expansion units", "all models", "n/a", "none",
     "series", "model", "models", "part number", "part numbers", "product", "item", "description"
@@ -64,19 +68,22 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     """
     Validates whether an extracted string represents a genuine industrial hardware/software model name.
     Rejects web navigation strings, cookie consent headers, URLs, and generic phrases.
+    Allows genuine series identifiers (e.g. 'MELSEC-Q Series', 'Series 6000', 'Model 2400').
     """
     if not name or not isinstance(name, str):
         return False
     cleaned = name.strip()
-    if len(cleaned) < 2 or len(cleaned) > 90:
+    if len(cleaned) < 2 or len(cleaned) > 120:
         return False
     # Reject markdown links: [ Name ](url) or plain URLs
     if cleaned.startswith("[") or "http://" in cleaned or "https://" in cleaned or "](" in cleaned:
         return False
     c_lower = cleaned.lower()
-    for term in DISALLOWED_MODEL_TERMS:
-        if c_lower == term or term in c_lower:
+    for sub in COOKIE_AND_POLICY_SUBSTRINGS:
+        if sub in c_lower:
             return False
+    if c_lower in EXACT_DISALLOWED_MODEL_TOKENS:
+        return False
     # Reject strings that start with conversational / instructional text
     if any(c_lower.startswith(p) for p in ("consult ", "see ", "official ", "click ", "read ", "download ", "view ", "affects ")):
         return False
@@ -150,6 +157,11 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
     cleaned = re.sub(r'\b(?:de|del|le|du)\b', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
 
+    # Normalize commas in dates (e.g. "September, 2024" -> "September 2024")
+    cleaned = re.sub(r'([A-Za-z]+),\s*(\d{2,4})', r'\1 \2', cleaned)
+    cleaned = re.sub(r'(\d{1,2})\s+([A-Za-z]+),\s*(\d{2,4})', r'\1 \2 \3', cleaned)
+    cleaned = re.sub(r'([A-Za-z]+)\s+(\d{1,2}),\s*(\d{2,4})', r'\1 \2 \3', cleaned)
+
     # Normalize German, French, Spanish, Italian month names to English
     intl_months = {
         # German
@@ -193,20 +205,22 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
     for pat, e_month in intl_months.items():
         cleaned = re.sub(pat, e_month, cleaned, flags=re.IGNORECASE)
 
-    # Pattern: Quarter milestones (e.g. Q1 2025, 2025-Q3, 4Q2026, Q2/2024)
-    m_q1 = re.search(r'\b(?:Q([1-4])[\s\/-]*(\d{4})|(\d{4})[\s\/-]*Q([1-4])|([1-4])Q[\s\/-]*(\d{4}))\b', cleaned, re.IGNORECASE)
+    # Pattern: Quarter milestones (e.g. Q1 2025, 2025-Q3, 4Q2026, Q2/2024, Q3/25, FY25 Q3, Q1 FY26)
+    m_q1 = re.search(r'\b(?:Q([1-4])[\s\/-]*(?:FY|CY)?\s*(\d{2,4})|(?:FY|CY)?\s*(\d{2,4})[\s\/-]*Q([1-4])|([1-4])Q[\s\/-]*(?:FY|CY)?\s*(\d{2,4}))\b', cleaned, re.IGNORECASE)
     if m_q1:
         q = int(m_q1.group(1) or m_q1.group(4) or m_q1.group(5))
-        y = int(m_q1.group(2) or m_q1.group(3) or m_q1.group(6))
+        raw_y = int(m_q1.group(2) or m_q1.group(3) or m_q1.group(6))
+        y = (2000 + raw_y) if raw_y < 100 else raw_y
         q_month_day = {1: (3, 31), 2: (6, 30), 3: (9, 30), 4: (12, 31)}
         m, d = q_month_day[q]
         return _safe_make_utc(y, m, d)
 
-    # Pattern: Half-year milestones (e.g. H1 2026, 2H2025, 2026-H2)
-    m_h = re.search(r'\b(?:H([1-2])[\s\/-]*(\d{4})|(\d{4})[\s\/-]*H([1-2])|([1-2])H[\s\/-]*(\d{4}))\b', cleaned, re.IGNORECASE)
+    # Pattern: Half-year milestones (e.g. H1 2026, 2H2025, 2026-H2, H2/25)
+    m_h = re.search(r'\b(?:H([1-2])[\s\/-]*(?:FY|CY)?\s*(\d{2,4})|(?:FY|CY)?\s*(\d{2,4})[\s\/-]*H([1-2])|([1-2])H[\s\/-]*(?:FY|CY)?\s*(\d{2,4}))\b', cleaned, re.IGNORECASE)
     if m_h:
         h = int(m_h.group(1) or m_h.group(4) or m_h.group(5))
-        y = int(m_h.group(2) or m_h.group(3) or m_h.group(6))
+        raw_y = int(m_h.group(2) or m_h.group(3) or m_h.group(6))
+        y = (2000 + raw_y) if raw_y < 100 else raw_y
         m, d = (6, 30) if h == 1 else (12, 31)
         return _safe_make_utc(y, m, d)
 
@@ -254,16 +268,23 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
         except Exception:
             continue
 
-    # Month and Year only (e.g. September 2000, Jun 2002, 09/2000, 2024-09) -> clamp to end of month
-    for m_fmt in ("%B %Y", "%b %Y", "%m/%Y", "%Y-%m", "%Y/%m"):
+    # Month and Year only (e.g. September 2000, Jun 2002, 09/2000, 2024-09, September, 2024) -> clamp to end of month
+    for m_fmt in ("%B %Y", "%b %Y", "%B, %Y", "%b, %Y", "%m/%Y", "%Y-%m", "%Y/%m"):
         try:
             dt = datetime.strptime(cleaned, m_fmt)
             return _safe_make_utc(dt.year, dt.month, 31)
         except Exception:
             continue
 
-    # Standalone Year (e.g. 2026, CY2027, FY2025) -> clamp to end of year
-    m_yr = re.search(r'\b(?:CY|FY)?\s*(20\d{2}|19\d{2})\b', cleaned, re.IGNORECASE)
+    # Standalone Fiscal Year (e.g. FY25, FY26, CY24, FY2025) -> clamp to end of year
+    m_fy = re.search(r'\b(?:CY|FY)\s*(\d{2,4})\b', cleaned, re.IGNORECASE)
+    if m_fy:
+        raw_y = int(m_fy.group(1))
+        y = (2000 + raw_y) if raw_y < 100 else raw_y
+        return _safe_make_utc(y, 12, 31)
+
+    # Standalone 4-digit Calendar Year (e.g. 2026, 1999) -> clamp to end of year
+    m_yr = re.search(r'\b(20\d{2}|19\d{2})\b', cleaned)
     if m_yr:
         y = int(m_yr.group(1))
         return _safe_make_utc(y, 12, 31)
@@ -417,6 +438,17 @@ class ProductRecord(BaseModel):
             raise ValueError(f"stage_date_utc is mandatory and could not be parsed to valid UTC ISO 8601 date: '{v}'")
         return parsed
 
+    @field_validator("replacement", mode="before")
+    def clean_replacement(cls, v):
+        if not v:
+            return None
+        s = str(v).strip()
+        if not s or s.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown"):
+            return None
+        if any(kw in s.lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
+            return None
+        return s
+
     @model_validator(mode="after")
     def compute_fingerprint_and_defaults(self):
         # Strict validation: model_name must not be empty unless software/application or well-known OS
@@ -439,13 +471,21 @@ class ProductRecord(BaseModel):
 
         if not self.source_url:
             self.source_url = (self.metadata or {}).get("source_url", "")
-        if not self.replacement:
+        
+        # Rigorous replacement cleaning: reject N/A, None, -, and conversational filler
+        candidate_repl = self.replacement
+        if not candidate_repl:
             meta_repl = (self.metadata or {}).get("replacement")
-            if meta_repl and not any(kw in str(meta_repl).lower() for kw in ["consult", "representative", "official sales", "contact your"]):
-                self.replacement = str(meta_repl).strip()
-            else:
+            if meta_repl:
+                candidate_repl = str(meta_repl).strip()
+
+        if candidate_repl:
+            c_str = str(candidate_repl).strip()
+            if c_str.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown") or any(kw in c_str.lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
                 self.replacement = None
-        elif any(kw in str(self.replacement).lower() for kw in ["consult", "representative", "official sales", "contact your"]):
+            else:
+                self.replacement = c_str
+        else:
             self.replacement = None
 
         # Generate deterministic fingerprint: SHA-256(vendor|model/os|status|date)

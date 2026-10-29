@@ -31,7 +31,10 @@ class TestModels(unittest.TestCase):
             "MR-J4-40B",
             "6ES7511-1AK02-0AB0",
             "TM221CE16R",
-            "1756-L83E"
+            "1756-L83E",
+            "MELSEC-Q Series",
+            "Series 6000",
+            "Model 6001"
         ]
         for model in genuine_models:
             with self.subTest(model=model):
@@ -67,7 +70,9 @@ class TestModels(unittest.TestCase):
             "Home",
             "Products",
             "Support",
-            "Downloads"
+            "Downloads",
+            "Series",
+            "Model"
         ]
         for term in nav_terms:
             with self.subTest(term=term):
@@ -93,7 +98,7 @@ class TestModels(unittest.TestCase):
         self.assertFalse(is_valid_product_model(""))
         self.assertFalse(is_valid_product_model("   "))
         self.assertFalse(is_valid_product_model("A"))  # Too short (< 2 chars)
-        self.assertFalse(is_valid_product_model("A" * 95))  # Too long (> 90 chars)
+        self.assertFalse(is_valid_product_model("A" * 125))  # Too long (> 120 chars)
         self.assertFalse(is_valid_product_model("---"))  # No alphanumeric
         self.assertFalse(is_valid_product_model("!@#$%^&*()"))
 
@@ -128,6 +133,7 @@ class TestModels(unittest.TestCase):
         self.assertEqual(parse_to_utc_iso("2025-Q2"), "2025-06-30T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("3Q 2026"), "2026-09-30T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("Q4 2026"), "2026-12-31T00:00:00Z")
+        self.assertEqual(parse_to_utc_iso("Q3/25"), "2025-09-30T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("H1 2025"), "2025-06-30T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("2H 2026"), "2026-12-31T00:00:00Z")
 
@@ -136,7 +142,9 @@ class TestModels(unittest.TestCase):
         self.assertEqual(parse_to_utc_iso("31. März 2026"), "2026-03-31T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("15. Oktober 2025"), "2025-10-15T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("Februar 2024"), "2024-02-29T00:00:00Z")
+        self.assertEqual(parse_to_utc_iso("September, 2024"), "2024-09-30T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("2026"), "2026-12-31T00:00:00Z")
+        self.assertEqual(parse_to_utc_iso("FY25"), "2025-12-31T00:00:00Z")
         self.assertEqual(parse_to_utc_iso("FY2027"), "2027-12-31T00:00:00Z")
 
     def test_parse_international_french_spanish_asian_dates(self):
@@ -172,6 +180,7 @@ class TestModels(unittest.TestCase):
     # -------------------------------------------------------------------------
     def test_normalize_firmware(self):
         self.assertEqual(normalize_firmware_version("v1.2.3"), "1.2.3")
+        self.assertEqual(normalize_firmware_version("1.2.3.4"), "1.2.3.4")
         self.assertEqual(normalize_firmware_version("2.1.0"), "2.1.0")
         self.assertEqual(normalize_firmware_version("3.0"), "3.0.0")
         self.assertEqual(normalize_firmware_version("Rev 4.5.1"), "4.5.1")
@@ -199,6 +208,16 @@ class TestModels(unittest.TestCase):
         self.assertEqual(record.source_url, "https://example.com/portal")
         self.assertIsNotNone(record.fingerprint)
         self.assertEqual(len(record.fingerprint or ""), 16)
+
+        # Test replacement filler phrase normalization to None
+        record_repl = ProductRecord(
+            vendor_name="Mitsubishi Electric",
+            model_name="GT25-WLAN",
+            stage="End of Life",
+            stage_date_utc="FY25",
+            replacement="Consult your official sales representative"
+        )
+        self.assertIsNone(record_repl.replacement)
 
     def test_product_record_rejects_invalid_model(self):
         with self.assertRaises(ValueError):

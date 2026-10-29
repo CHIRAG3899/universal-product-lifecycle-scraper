@@ -7,6 +7,7 @@ and input sanitization to ensure safe execution in enterprise environments.
 import ipaddress
 import re
 import urllib.parse
+from pathlib import Path
 from typing import Any, List, Optional
 
 # Disallowed internal network ranges for SSRF prevention
@@ -132,3 +133,31 @@ def sanitize_db_string(text: Optional[str], max_len: int = 500) -> Optional[str]
         return None
 
     return cleaned[:max_len]
+
+
+def safe_atomic_replace(temp_path: Path, dest_path: Path, max_retries: int = 4) -> None:
+    """Performs atomic file replacement with retry logic to withstand Windows file locking, ensuring temp file deletion."""
+    import time
+    try:
+        for attempt in range(max_retries):
+            try:
+                temp_path.replace(dest_path)
+                return
+            except (PermissionError, OSError) as e:
+                if attempt == max_retries - 1:
+                    try:
+                        if dest_path.exists():
+                            dest_path.unlink()
+                        temp_path.rename(dest_path)
+                        return
+                    except Exception:
+                        raise e
+                time.sleep(0.05 * (2 ** attempt))
+    finally:
+        # Guarantee no orphaned .tmp files remain on disk
+        if temp_path.exists():
+            try:
+                temp_path.unlink()
+            except Exception:
+                pass
+

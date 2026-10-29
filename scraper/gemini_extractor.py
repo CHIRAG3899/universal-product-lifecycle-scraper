@@ -1008,10 +1008,12 @@ class GeminiExtractor:
                         model_col = table_headers[0]
 
                     # Locate replacement column
-                    repl_val = "N/A"
+                    repl_val = None
                     for h in table_headers:
                         if any(kw in h for kw in ["replace", "successor", "alternative", "migration"]):
-                            repl_val = header_map[h]
+                            cand = (header_map[h] or "").strip()
+                            if cand and cand.lower() not in ("-", "--", "n/a", "none", "null", "nan") and not any(kw in cand.lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
+                                repl_val = cand
                             break
 
                     # Locate series column

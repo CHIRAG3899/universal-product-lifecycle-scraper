@@ -35,7 +35,7 @@ def print_banner():
   ENTERPRISE MULTI-VENDOR LIFECYCLE & OBSOLESCENCE AI SCRAPER
   Framework: 140 Top Vendors (OT / IoT / IT) | Config-Driven | Zero Defaults | Append & Deduplicate
   Stages: [1] Discovery -> [2] Extraction -> [3] Normalisation -> [4] Sanitisation -> [5] Deduplication -> [6] Export
-  Engine: Crawl4AI + Google Gemini (gemini-1.5-flash / 2.0-flash / 3.8-flash via google-genai)
+  Engine: Crawl4AI + Google Gemini (gemini-3.5-flash-lite / gemini-3.5-flash via google-genai)
 ===================================================================================================
 """
     print(banner)

@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from scraper.security import safe_atomic_replace
+
 logger = logging.getLogger("ai_scraper.checkpoint")
 
 
@@ -102,7 +104,7 @@ class CheckpointManager:
         try:
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump(state.to_dict(), f, indent=2, ensure_ascii=False)
-            temp_file.replace(self.checkpoint_file)
+            safe_atomic_replace(temp_file, self.checkpoint_file)
             logger.info(
                 f"[CHECKPOINT] Saved checkpoint for vendor '{vendor_id}' (status={status}, "
                 f"failed_url={failed_url}, pending={len(state.pending_urls)})"

@@ -32,7 +32,7 @@ def print_banner():
     print("  1. Crawl4AI: Headless Chromium browser that renders pages, bypasses")
     print("     anti-bot/cookie banners, and extracts raw markdown & DOM structures.")
     print("     Note: Crawl4AI itself DOES NOT include an inbuilt AI model.")
-    print("  2. Google Gemini (gemini-1.5-flash / 2.0-flash / 3.8-flash): The AI brain that parses")
+    print("  2. Google Gemini (gemini-3.5-flash-lite / gemini-3.5-flash): The AI brain that parses")
     print("     unstructured tables, translates multi-lingual text to English,")
     print("     and maps vendor lifecycle stages into normalized UTC schemas.\n")
     print("[HOW TO GET A FREE GEMINI API KEY]")
@@ -43,7 +43,7 @@ def print_banner():
     print("-" * 72)
 
 
-def test_and_save_key(api_key: str, model_name: str = "gemini-3.5-flash") -> bool:
+def test_and_save_key(api_key: str, model_name: str = "gemini-3.5-flash-lite") -> bool:
     api_key = api_key.strip()
     if not api_key:
         print("\n[ERROR] Key cannot be empty.")
@@ -105,7 +105,7 @@ def main():
     # Check for CLI args
     if len(sys.argv) > 1 and sys.argv[1].startswith("--key="):
         key = sys.argv[1].split("=", 1)[1]
-        model = "gemini-3.5-flash"
+        model = "gemini-3.5-flash-lite"
         if len(sys.argv) > 2 and sys.argv[2].startswith("--model="):
             model = sys.argv[2].split("=", 1)[1]
         test_and_save_key(key, model)

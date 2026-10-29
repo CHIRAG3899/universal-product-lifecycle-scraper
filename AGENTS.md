@@ -29,7 +29,7 @@ It provides native out-of-the-box support for **140 top enterprise vendors** acr
 | **Static Type Checking** | [Mypy](https://mypy-lang.org/) | Strict static typing and annotation validation across all 33+ modules |
 | **Web Crawling** | [Crawl4AI](https://crawl4ai.com) | Asynchronous headless Chromium, DOM rendering, overlay/cookie banner removal |
 | **HTTP Fallback** | `urllib` + `BeautifulSoup4` | Resilient fallback crawler with rotating Chrome headers when Chromium is unavailable |
-| **AI Extraction Engine** | [Google Gemini](https://ai.google.dev) | Official `google-genai` SDK (`gemini-1.5-flash`, `gemini-2.0-flash`, `gemini-3.8-flash`) |
+| **AI Extraction Engine** | [Google Gemini](https://ai.google.dev) | Official `google-genai` SDK (`gemini-3.5-flash-lite`, `gemini-3.5-flash`, `gemini-flash-latest`) |
 | **Data Schema & Validation** | [Pydantic v2](https://docs.pydantic.dev) | `ProductRecord`, `GeminiExtractionBatch`, `ScrapedDataset` |
 | **Persistence & Merging** | Pandas & Standard Lib | Atomic swapping (`.tmp` + rename), SHA-256 deduplication, non-overwriting incremental append |
 | **Web Interface** | Vanilla HTML / CSS / JS | Zero-dependency multi-threaded Python HTTP server (`server.py`), responsive dashboard |
@@ -101,9 +101,9 @@ vendor_name, model_name, status, stage_date_utc, source_url, os, firmware, categ
 <details>
 <summary><b>Invariant 7: Google Gemini Model Probing & Fallback Protocol</b> (Click to expand)</summary>
 
-- When interacting with the Gemini API, default to `gemini-1.5-flash`.
+- When interacting with the Gemini API, default to `gemini-3.5-flash-lite`.
 - If Google AI Studio returns `404 NOT_FOUND` (account-specific model deprecation), the code must automatically probe candidate models in order:
-  `["gemini-1.5-flash", "gemini-2.0-flash", "gemini-3.8-flash", "gemini-1.5-pro"]`.
+  `["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]`.
 - Always strip markdown code fences (` ```json ... ``` `) before calling `json.loads` on LLM responses.
 </details>
 
@@ -129,7 +129,7 @@ vendor_name, model_name, status, stage_date_utc, source_url, os, firmware, categ
 
 - **Sitemap & robots.txt Discovery**: The crawler autonomously checks `robots.txt` for `Sitemap:` directives and standard paths (`/sitemap.xml`, `/sitemap_index.xml`) to map the entire site architecture.
 - **Unrestricted Category Traversal**: Link discovery MUST NOT be restricted to URLs containing "lifecycle". It traverses the full hierarchy of industrial product categories (controllers, drives, switches, sensors, optics, power, systems) across all OT, IoT, and IT sectors without category bias.
-- **Multi-Depth Queue (BFS)**: Uses a priority-ordered queue up to `--max-depth` (default: 2) and `--max-pages` (default: 25) with deterministic priority sorting (urgent notices first, product category trees second, pagination links third).
+- **Unlimited Full-Site Crawl by Default**: Domain-level discovery (`--site-crawl`) is active by default with unlimited page budget (`--max-pages 0`) and unlimited depth (`--max-depth 0`). Custom limits can still be passed (e.g. `--max-pages 50 --max-depth 2`). Uses deterministic priority sorting (urgent notices first, product category trees second, pagination links third).
 - **URL Normalization**: Strips fragments, lowercases scheme/host, and trims non-root trailing slashes to guarantee zero loop cycles.
 </details>
 

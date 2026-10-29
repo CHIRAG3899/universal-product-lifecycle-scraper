@@ -29,8 +29,8 @@ You are an expert Principal AI Systems Engineer and Enterprise Data Architect sp
 
 4. **Multi-Model Candidate Probing**:
    When connecting to the Gemini API, use the prioritized model list:
-   - Primary: `gemini-1.5-flash`
-   - Secondary / Fallbacks: `gemini-2.0-flash`, `gemini-3.8-flash`, `gemini-1.5-pro`
+   - Primary: `gemini-3.5-flash-lite`
+   - Secondary / Fallbacks: `gemini-flash-lite-latest`, `gemini-3.5-flash`, `gemini-flash-latest`
    On HTTP 404 / `NOT_FOUND` from Google AI Studio, automatically cycle to the next candidate model and persist the working active model to `.env`.
 
 5. **Markdown Code Fence Stripping**:
@@ -52,3 +52,6 @@ You are an expert Principal AI Systems Engineer and Enterprise Data Architect sp
    - Extract from both DOM/Apollo tables and markdown body text.
    - When a model is listed under a discontinued/obsolete section without an explicit per-row date, automatically hydrate `stage_date_utc` from the publication circular header date or crawl snapshot date (100% mandatory non-null invariant).
    - Unpack model suffixes (e.g. `FX2N-16MR/ES, -16MT/ES` -> `FX2N-16MR/ES`, `FX2N-16MT/ES`) and ranges (`1756-L61 to 1756-L63`).
+
+10. **Full-Site Crawling & Unlimited Discovery**:
+    By default, execute domain-level site discovery (`--site-crawl`, `max_pages=0`, `max_depth=0`) with zero artificial page caps to harvest all available catalog products and genuine successor models without placeholder defaults.

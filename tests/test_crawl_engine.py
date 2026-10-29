@@ -212,7 +212,8 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
         records = await self.crawler.crawl_website(
             base_url="https://mitsubishielectric.com",
             allowed_domains=["mitsubishielectric.com"],
-            max_pages=2
+            max_pages=2,
+            enable_sitemap=False
         )
 
         self.assertTrue(len(records) > 0)

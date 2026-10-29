@@ -31,6 +31,7 @@ class UniversalAICrawler:
     def __init__(self, gemini_extractor: Optional[GeminiExtractor] = None):
         self.gemini = gemini_extractor or GeminiExtractor()
         self._pdf_replacement_cache: Dict[str, Dict[str, str]] = {}
+        self._crawl_cache: Dict[str, Dict[str, Any]] = {}
 
     def extract_replacement_map_from_pdf_url(self, pdf_url: str) -> Dict[str, str]:
         """
@@ -96,6 +97,9 @@ class UniversalAICrawler:
         Executes a headless browser crawl using Crawl4AI.
         Returns markdown, cleaned html, and raw metadata.
         """
+        if target_url in self._crawl_cache:
+            return self._crawl_cache[target_url]
+
         logger.info(f"Initiating Crawl4AI crawl on: {target_url}")
         page_timeout = int(REQUEST_TIMEOUT_SEC * 1000)
         
@@ -117,6 +121,12 @@ class UniversalAICrawler:
             excluded_selector='#onetrust-consent-sdk, .onetrust-pc-dark-filter, #onetrust-banner-sdk, .cookie-notice, footer, header, nav, .site-footer, .global-header, .ot-sdk-container, .cookie-banner, .ot-floating-button'
         )
 
+        def _remember(data_dict: Dict[str, Any]) -> Dict[str, Any]:
+            if len(self._crawl_cache) > 50:
+                self._crawl_cache.pop(next(iter(self._crawl_cache)))
+            self._crawl_cache[target_url] = data_dict
+            return data_dict
+
         try:
             async with AsyncWebCrawler(config=browser_config) as crawler:
                 result = await crawler.arun(url=target_url, config=run_config)
@@ -125,33 +135,33 @@ class UniversalAICrawler:
                     logger.warning(f"Crawl4AI failed to fetch {target_url}: {result.error_message}. Attempting resilient HTTP fallback...")
                     fallback_data = self.fetch_http_fallback(target_url)
                     if fallback_data.get("status_code", 500) < 400 and fallback_data.get("markdown"):
-                        return fallback_data
+                        return _remember(fallback_data)
                     raise RuntimeError(f"Crawl4AI failed to fetch {target_url}: {result.error_message}")
 
                 if result.status_code and result.status_code >= 400:
                     logger.warning(f"URL {target_url} returned HTTP {result.status_code}. Skipping non-200 page.")
-                    return {
+                    return _remember({
                         "url": target_url,
                         "markdown": "",
                         "html": "",
                         "status_code": result.status_code,
                         "extracted_content": None
-                    }
+                    })
 
                 logger.info(f"Crawl4AI succeeded! Extracted {len(result.markdown)} characters of clean markdown.")
-                return {
+                return _remember({
                     "url": target_url,
                     "markdown": result.markdown,
                     "html": result.html,
                     "status_code": result.status_code,
                     "extracted_content": getattr(result, "extracted_content", None)
-                }
+                })
         except Exception as e:
             if not isinstance(e, RuntimeError):
                 logger.warning(f"Crawl4AI exception on {target_url}: {e}. Attempting resilient HTTP fallback...")
                 fallback_data = self.fetch_http_fallback(target_url)
                 if fallback_data.get("status_code", 500) < 400 and fallback_data.get("markdown"):
-                    return fallback_data
+                    return _remember(fallback_data)
             raise
 
     def fetch_http_fallback(self, target_url: str) -> Dict[str, Any]:

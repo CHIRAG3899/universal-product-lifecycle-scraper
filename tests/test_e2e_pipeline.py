@@ -170,12 +170,11 @@ vendors:
                         metadata={"series": "PowerEdge 14G"}
                     )
                 ]
-            return []
-
         self.pipeline.crawler.run = AsyncMock(side_effect=mock_crawler_run)
+        self.pipeline.crawler.crawl_website = AsyncMock(side_effect=lambda url, **kw: mock_crawler_run(url))
 
         # 1. Execute entire pipeline across all configured vendors
-        dataset = await self.pipeline.execute()
+        dataset = await self.pipeline.execute(site_crawl=False)
 
         # ---------------------------------------------------------------------
         # VERIFICATION 1: In-memory Dataset & Sanitization
@@ -299,7 +298,8 @@ vendors:
             source_url="https://mitsubishielectric.com/fa/support/eol"
         )
         self.pipeline.crawler.run = AsyncMock(return_value=[first_record])
-        dataset_1 = await self.pipeline.execute(vendor_filter="mitsubishi")
+        self.pipeline.crawler.crawl_website = AsyncMock(return_value=[first_record])
+        dataset_1 = await self.pipeline.execute(vendor_filter="mitsubishi", site_crawl=False)
         self.assertEqual(dataset_1.total_products, 1)
 
         # Second Run: Ingest identical GT25-WLAN EOL + 1 NEW model MI3321G-W
@@ -311,6 +311,7 @@ vendors:
             source_url="https://mitsubishielectric.com/fa/support/eol"
         )
         self.pipeline.crawler.run = AsyncMock(return_value=[first_record, novel_record])
+        self.pipeline.crawler.crawl_website = AsyncMock(return_value=[first_record, novel_record])
 
         # Create new pipeline run for run 2
         pipeline_run2 = LifecyclePipeline(
@@ -318,7 +319,8 @@ vendors:
             run_id="test_run_e2e_beta"
         )
         pipeline_run2.crawler.run = AsyncMock(return_value=[first_record, novel_record])
-        dataset_2 = await pipeline_run2.execute(vendor_filter="mitsubishi")
+        pipeline_run2.crawler.crawl_website = AsyncMock(return_value=[first_record, novel_record])
+        dataset_2 = await pipeline_run2.execute(vendor_filter="mitsubishi", site_crawl=False)
 
         # Total products should now be 2, NOT 3 (no duplication)
         self.assertEqual(dataset_2.total_products, 2)

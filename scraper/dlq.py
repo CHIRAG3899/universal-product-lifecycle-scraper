@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from scraper.security import safe_atomic_replace
+
 logger = logging.getLogger("ai_scraper.dlq")
 
 
@@ -88,7 +90,7 @@ class DeadLetterQueue:
         try:
             with open(temp_file, "w", encoding="utf-8") as f:
                 json.dump([it.to_dict() for it in items], f, indent=2, ensure_ascii=False)
-            temp_file.replace(self.dlq_file)
+            safe_atomic_replace(temp_file, self.dlq_file)
             logger.warning(
                 f"[DLQ] Logged unrecoverable failure for {url} ({error_type}: {message})"
             )
