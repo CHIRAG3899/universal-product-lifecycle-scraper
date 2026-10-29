@@ -1,0 +1,1928 @@
+pipeline:
+  max_retries: 3
+  timeout_seconds: 30
+  rate_limit_delay_seconds: 1.5
+  enable_ssrf_protection: true
+  enable_csv_sanitization: true
+  max_site_crawl_pages: 5
+storage:
+  master_csv_path: output/all_vendors_lifecycle.csv
+  per_vendor_json_dir: output
+  artifacts_dir: artifacts/runs
+observability:
+  enable_alerts: true
+  alert_ltb_threshold_days: 90
+  webhook_url: ''
+  alert_on_zero_records: true
+  alert_on_errors: true
+vendors:
+  mitsubishi:
+    id: mitsubishi
+    name: Mitsubishi Electric
+    sector: OT
+    website: https://www.mitsubishielectric.com
+    allowed_domains:
+    - mitsubishielectric.com
+    - contentstack.com
+    - mitsubishielectricfa.com
+    entry_points:
+    - name: Europe_FA_EOL
+      url: https://se-fa.mitsubishielectric.com/fa/se_en/support/product-life-cycle-stage-eol
+      region: Europe
+      crawler_type: nextjs_apollo
+    - name: Nordic_FA_EOL
+      url: https://no-fa.mitsubishielectric.com/fa/no_en/support/Product-Life-Cycle-Information
+      region: Nordic
+      crawler_type: nextjs_apollo
+    - name: Americas_FA_Support
+      url: https://us.mitsubishielectric.com/fa/en/support/technical-bulletins
+      region: Americas
+      crawler_type: dom_table
+    sectors:
+    - OT
+    - IoT
+  siemens:
+    id: siemens
+    name: Siemens
+    sector: OT
+    website: https://www.siemens.com
+    allowed_domains:
+    - siemens.com
+    - sieportal.siemens.com
+    - industry.siemens.com
+    entry_points:
+    - name: SiePortal_Lifecycle
+      url: https://sieportal.siemens.com/en-ww/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - OT
+    - IT
+    - IoT
+  schneider_electric:
+    id: schneider_electric
+    name: Schneider Electric
+    sector: OT
+    sectors:
+    - OT
+    - IT
+    - IoT
+    website: https://www.se.com
+    allowed_domains:
+    - se.com
+    - schneider-electric.com
+    - apc.com
+    entry_points:
+    - name: Schneider_Lifecycle_Services
+      url: https://www.se.com/ww/en/work/services/field-services/industrial-automation/modernization-and-upgrades/
+      region: Global
+      crawler_type: dom_table
+    - name: APC_Product_Support
+      url: https://www.apc.com/shop/us/en/support/
+      region: Global
+      crawler_type: dom_table
+  rockwell_automation:
+    id: rockwell_automation
+    name: Rockwell Automation (Allen-Bradley)
+    sector: OT
+    website: https://www.rockwellautomation.com
+    allowed_domains:
+    - rockwellautomation.com
+    - ab.com
+    entry_points:
+    - name: Rockwell_Lifecycle_Status
+      url: https://www.rockwellautomation.com/en-us/support/documentation/lifecycle-status.html
+      region: Global
+      crawler_type: dom_table
+  omron:
+    id: omron
+    name: Omron Corporation
+    sector: OT
+    website: https://www.ia.omron.com
+    allowed_domains:
+    - omron.com
+    - ia.omron.com
+    entry_points:
+    - name: Omron_Discontinued
+      url: https://www.ia.omron.com/support/discontinued/
+      region: Global
+      crawler_type: dom_table
+  abb:
+    id: abb
+    name: ABB
+    sector: OT
+    website: https://new.abb.com
+    allowed_domains:
+    - abb.com
+    entry_points:
+    - name: ABB_PLC_Lifecycle
+      url: https://new.abb.com/plc/support/product-life-cycle
+      region: Global
+      crawler_type: dom_table
+  yokogawa:
+    id: yokogawa
+    name: Yokogawa Electric
+    sector: OT
+    website: https://www.yokogawa.com
+    allowed_domains:
+    - yokogawa.com
+    entry_points:
+    - name: Yokogawa_Lifecycle
+      url: https://www.yokogawa.com/solutions/services/lifecycle-maintenance/
+      region: Global
+      crawler_type: dom_table
+  emerson:
+    id: emerson
+    name: Emerson Electric
+    sector: OT
+    website: https://www.emerson.com
+    allowed_domains:
+    - emerson.com
+    entry_points:
+    - name: Emerson_Lifecycle
+      url: https://www.emerson.com/en-us/support/lifecycle-services
+      region: Global
+      crawler_type: dom_table
+  beckhoff:
+    id: beckhoff
+    name: Beckhoff Automation
+    sector: OT
+    website: https://www.beckhoff.com
+    allowed_domains:
+    - beckhoff.com
+    entry_points:
+    - name: Beckhoff_Discontinued
+      url: https://www.beckhoff.com/en-en/products/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+  phoenix_contact:
+    id: phoenix_contact
+    name: Phoenix Contact
+    sector: OT
+    website: https://www.phoenixcontact.com
+    allowed_domains:
+    - phoenixcontact.com
+    entry_points:
+    - name: Phoenix_Discontinued
+      url: https://www.phoenixcontact.com/en-us/products/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  eaton:
+    id: eaton
+    name: Eaton Electrical
+    sector: OT
+    website: https://www.eaton.com
+    allowed_domains:
+    - eaton.com
+    entry_points:
+    - name: Eaton_Lifecycle
+      url: https://www.eaton.com/us/en-us/support/end-of-life.html
+      region: Global
+      crawler_type: dom_table
+  fanuc:
+    id: fanuc
+    name: FANUC Corporation
+    sector: OT
+    website: https://www.fanuc.com
+    allowed_domains:
+    - fanuc.com
+    - fanucamerica.com
+    entry_points:
+    - name: FANUC_Support
+      url: https://www.fanucamerica.com/support
+      region: Global
+      crawler_type: dom_table
+  yaskawa:
+    id: yaskawa
+    name: Yaskawa Electric
+    sector: OT
+    website: https://www.yaskawa.com
+    allowed_domains:
+    - yaskawa.com
+    entry_points:
+    - name: Yaskawa_Legacy
+      url: https://www.yaskawa.com/products/legacy-products
+      region: Global
+      crawler_type: dom_table
+  advantech:
+    id: advantech
+    name: Advantech
+    sector: OT
+    website: https://www.advantech.com
+    allowed_domains:
+    - advantech.com
+    entry_points:
+    - name: Advantech_EOL
+      url: https://www.advantech.com/en/support/eol-products
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - OT
+    - IoT
+  moxa:
+    id: moxa
+    name: Moxa Technologies
+    sector: OT
+    website: https://www.moxa.com
+    allowed_domains:
+    - moxa.com
+    entry_points:
+    - name: Moxa_Discontinued
+      url: https://www.moxa.com/en/support/product-support/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  wago:
+    id: wago
+    name: WAGO Kontakttechnik
+    sector: OT
+    website: https://www.wago.com
+    allowed_domains:
+    - wago.com
+    entry_points:
+    - name: WAGO_Discontinued
+      url: https://www.wago.com/us/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  keyence:
+    id: keyence
+    name: Keyence Corporation
+    sector: OT
+    website: https://www.keyence.com
+    allowed_domains:
+    - keyence.com
+    - keyence.co.jp
+    entry_points:
+    - name: Keyence_Discontinued
+      url: https://www.keyence.com/support/discontinued/
+      region: Global
+      crawler_type: dom_table
+    - name: Keyence_KV_PLC_Controls
+      url: https://www.keyence.com/products/controls/
+      region: Global
+      crawler_type: dom_table
+    - name: Keyence_Lifecycle_Support
+      url: https://www.keyence.com/support/user/
+      region: Global
+      crawler_type: dom_table
+  danfoss:
+    id: danfoss
+    name: Danfoss Drives
+    sector: OT
+    website: https://www.danfoss.com
+    allowed_domains:
+    - danfoss.com
+    - vacon.com
+    entry_points:
+    - name: Danfoss_Lifecycle
+      url: https://www.danfoss.com/en/service-and-support/drives-lifecycle-management/
+      region: Global
+      crawler_type: dom_table
+    - name: Danfoss_Products_Catalog
+      url: https://www.danfoss.com/en/products/
+      region: Global
+      crawler_type: dom_table
+    - name: Danfoss_Service_Lifecycle
+      url: https://www.danfoss.com/en/service-and-support/
+      region: Global
+      crawler_type: dom_table
+  endress_hauser:
+    id: endress_hauser
+    name: Endress+Hauser
+    sector: OT
+    website: https://www.endress.com
+    allowed_domains:
+    - endress.com
+    entry_points:
+    - name: EH_Discontinued
+      url: https://www.endress.com/en/field-instruments-overview/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  br_automation:
+    id: br_automation
+    name: B&R Industrial Automation
+    sector: OT
+    website: https://www.br-automation.com
+    allowed_domains:
+    - br-automation.com
+    entry_points:
+    - name: BR_Discontinued
+      url: https://www.br-automation.com/en/support/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+  kuka:
+    id: kuka
+    name: Kuka Robotics
+    sector: OT
+    website: https://www.kuka.com
+    allowed_domains:
+    - kuka.com
+    entry_points:
+    - name: Kuka_Lifecycle
+      url: https://www.kuka.com/en-us/services/kuka-customer-support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+  turck:
+    id: turck
+    name: Hans Turck GmbH
+    sector: OT
+    website: https://www.turck.com
+    allowed_domains:
+    - turck.com
+    - turck.de
+    entry_points:
+    - name: Turck_Discontinued
+      url: https://www.turck.de/en/discontinued-products-4422.php
+      region: Global
+      crawler_type: dom_table
+  festo:
+    id: festo
+    name: Festo SE & Co. KG
+    sector: OT
+    website: https://www.festo.com
+    allowed_domains:
+    - festo.com
+    entry_points:
+    - name: Festo_Discontinued
+      url: https://www.festo.com/us/en/e/support/discontinued-products-id_342/
+      region: Global
+      crawler_type: dom_table
+  hirschmann:
+    id: hirschmann
+    name: Hirschmann (Belden)
+    sector: OT
+    website: https://www.belden.com
+    allowed_domains:
+    - belden.com
+    - hirschmann.com
+    entry_points:
+    - name: Hirschmann_EOL
+      url: https://www.belden.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+  red_lion:
+    id: red_lion
+    name: Red Lion Controls
+    sector: OT
+    website: https://www.redlion.net
+    allowed_domains:
+    - redlion.net
+    entry_points:
+    - name: RedLion_EOL
+      url: https://www.redlion.net/support/product-bulletins-eol
+      region: Global
+      crawler_type: dom_table
+  weidmuller:
+    id: weidmuller
+    name: Weidmuller Interface
+    sector: OT
+    website: https://www.weidmuller.com
+    allowed_domains:
+    - weidmuller.com
+    entry_points:
+    - name: Weidmuller_Discontinued
+      url: https://www.weidmuller.com/en/support/product_discontinuation.jsp
+      region: Global
+      crawler_type: dom_table
+  delta_electronics:
+    id: delta_electronics
+    name: Delta Electronics
+    sector: OT
+    website: https://www.deltaww.com
+    allowed_domains:
+    - deltaww.com
+    - delta-emea.com
+    - delta-americas.com
+    entry_points:
+    - name: Delta_IA_Discontinued
+      url: https://www.deltaww.com/en-US/products/Industrial-Automation/discontinued
+      region: Global
+      crawler_type: dom_table
+    - name: Delta_Industrial_Automation
+      url: https://www.deltaww.com/en-US/products/Industrial-Automation/
+      region: Global
+      crawler_type: dom_table
+    - name: Delta_Lifecycle_Downloads
+      url: https://www.deltaww.com/en-US/support/download-center/
+      region: Global
+      crawler_type: dom_table
+  hms_networks:
+    id: hms_networks
+    name: HMS Networks
+    sector: OT
+    website: https://www.hms-networks.com
+    allowed_domains:
+    - hms-networks.com
+    - anybus.com
+    entry_points:
+    - name: HMS_Product_Lifecycle
+      url: https://www.hms-networks.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+  pro_face:
+    id: pro_face
+    name: Pro-face
+    sector: OT
+    website: https://www.proface.com
+    allowed_domains:
+    - proface.com
+    entry_points:
+    - name: ProFace_Repair_Period
+      url: https://www.proface.com/en/support/repair/period
+      region: Global
+      crawler_type: dom_table
+  cognex:
+    id: cognex
+    name: Cognex Corporation
+    sector: IoT
+    website: https://www.cognex.com
+    allowed_domains:
+    - cognex.com
+    - support.cognex.com
+    entry_points:
+    - name: Cognex_Discontinued
+      url: https://support.cognex.com/en/discontinued-products
+      region: Global
+      crawler_type: dom_table
+    - name: Cognex_Vision_Support
+      url: https://www.cognex.com/support
+      region: Global
+      crawler_type: dom_table
+    - name: Cognex_Machine_Vision_Systems
+      url: https://www.cognex.com/products/machine-vision
+      region: Global
+      crawler_type: dom_table
+  sick:
+    id: sick
+    name: SICK Sensor Intelligence
+    sector: OT
+    website: https://www.sick.com
+    allowed_domains:
+    - sick.com
+    entry_points:
+    - name: SICK_Discontinued
+      url: https://www.sick.com/ag/en/discontinued-products/c/discontinued
+      region: Global
+      crawler_type: dom_table
+  pepperl_fuchs:
+    id: pepperl_fuchs
+    name: Pepperl+Fuchs
+    sector: OT
+    website: https://www.pepperl-fuchs.com
+    allowed_domains:
+    - pepperl-fuchs.com
+    entry_points:
+    - name: PF_Discontinued
+      url: https://www.pepperl-fuchs.com/global/en/discontinued-products.htm
+      region: Global
+      crawler_type: dom_table
+  ifm_electronic:
+    id: ifm_electronic
+    name: ifm electronic
+    sector: OT
+    website: https://www.ifm.com
+    allowed_domains:
+    - ifm.com
+    entry_points:
+    - name: IFM_Discontinued
+      url: https://www.ifm.com/us/en/category/discontinued-articles
+      region: Global
+      crawler_type: dom_table
+  pilz:
+    id: pilz
+    name: Pilz Automation Safety
+    sector: OT
+    website: https://www.pilz.com
+    allowed_domains:
+    - pilz.com
+    entry_points:
+    - name: Pilz_Discontinued
+      url: https://www.pilz.com/en-INT/support/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  ge_digital:
+    id: ge_digital
+    name: GE Vernova / GE Digital
+    sector: OT
+    website: https://www.ge.com
+    allowed_domains:
+    - ge.com
+    - gevernova.com
+    entry_points:
+    - name: GEDigital_Lifecycle
+      url: https://www.ge.com/digital/support/lifecycle
+      region: Global
+      crawler_type: dom_table
+  banner_engineering:
+    id: banner_engineering
+    name: Banner Engineering
+    sector: OT
+    website: https://www.bannerengineering.com
+    allowed_domains:
+    - bannerengineering.com
+    entry_points:
+    - name: Banner_Discontinued
+      url: https://www.bannerengineering.com/us/en/products/discontinued-products.html
+      region: Global
+      crawler_type: dom_table
+  smc:
+    id: smc
+    name: SMC Corporation
+    sector: OT
+    website: https://www.smcworld.com
+    allowed_domains:
+    - smcworld.com
+    entry_points:
+    - name: SMC_Discontinued
+      url: https://www.smcworld.com/discontinued/en/
+      region: Global
+      crawler_type: dom_table
+  valmet:
+    id: valmet
+    name: Valmet Automation
+    sector: OT
+    website: https://www.valmet.com
+    allowed_domains:
+    - valmet.com
+    entry_points:
+    - name: Valmet_Lifecycle
+      url: https://www.valmet.com/automation/services/lifecycle-management/
+      region: Global
+      crawler_type: dom_table
+  intel:
+    id: intel
+    name: Intel Corporation
+    sector: IoT
+    website: https://www.intel.com
+    allowed_domains:
+    - intel.com
+    entry_points:
+    - name: Intel_Product_Lifecycle
+      url: https://www.intel.com/content/www/us/en/support/topics/product-lifecycle.html
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IT
+    - IoT
+  qualcomm:
+    id: qualcomm
+    name: Qualcomm
+    sector: IoT
+    website: https://www.qualcomm.com
+    allowed_domains:
+    - qualcomm.com
+    entry_points:
+    - name: Qualcomm_Product_Support
+      url: https://www.qualcomm.com/products/internet-of-things
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IoT
+    - IT
+  texas_instruments:
+    id: texas_instruments
+    name: Texas Instruments
+    sector: IoT
+    website: https://www.ti.com
+    allowed_domains:
+    - ti.com
+    entry_points:
+    - name: TI_Product_Life_Cycle
+      url: https://www.ti.com/support-quality/quality-policies-procedures/product-life-cycle.html
+      region: Global
+      crawler_type: dom_table
+  nxp:
+    id: nxp
+    name: NXP Semiconductors
+    sector: IoT
+    website: https://www.nxp.com
+    allowed_domains:
+    - nxp.com
+    entry_points:
+    - name: NXP_Longevity
+      url: https://www.nxp.com/products/product-information/product-longevity:PRDCT_LONGEVITY_HM
+      region: Global
+      crawler_type: dom_table
+  stmicroelectronics:
+    id: stmicroelectronics
+    name: STMicroelectronics
+    sector: IoT
+    website: https://www.st.com
+    allowed_domains:
+    - st.com
+    entry_points:
+    - name: ST_Longevity
+      url: https://www.st.com/content/st_com/en/about/quality-and-reliability/product-longevity.html
+      region: Global
+      crawler_type: dom_table
+  microchip:
+    id: microchip
+    name: Microchip Technology
+    sector: IoT
+    website: https://www.microchip.com
+    allowed_domains:
+    - microchip.com
+    entry_points:
+    - name: Microchip_EOL
+      url: https://www.microchip.com/en-us/support/product-change-notification
+      region: Global
+      crawler_type: dom_table
+  espressif:
+    id: espressif
+    name: Espressif Systems
+    sector: IoT
+    website: https://www.espressif.com
+    allowed_domains:
+    - espressif.com
+    entry_points:
+    - name: Espressif_Longevity
+      url: https://www.espressif.com/en/products/longevity-commitment
+      region: Global
+      crawler_type: dom_table
+  silicon_labs:
+    id: silicon_labs
+    name: Silicon Laboratories
+    sector: IoT
+    website: https://www.silabs.com
+    allowed_domains:
+    - silabs.com
+    entry_points:
+    - name: SiliconLabs_EOL
+      url: https://www.silabs.com/support/resources.p-wireless
+      region: Global
+      crawler_type: dom_table
+  telit:
+    id: telit
+    name: Telit Cinterion
+    sector: IoT
+    website: https://www.telit.com
+    allowed_domains:
+    - telit.com
+    entry_points:
+    - name: Telit_EOL_Notices
+      url: https://www.telit.com/support/product-lifecycle-management/
+      region: Global
+      crawler_type: dom_table
+  quectel:
+    id: quectel
+    name: Quectel Wireless Solutions
+    sector: IoT
+    website: https://www.quectel.com
+    allowed_domains:
+    - quectel.com
+    entry_points:
+    - name: Quectel_Lifecycle
+      url: https://www.quectel.com/support/product-lifecycle-management
+      region: Global
+      crawler_type: dom_table
+  nordic_semi:
+    id: nordic_semi
+    name: Nordic Semiconductor
+    sector: IoT
+    website: https://www.nordicsemi.com
+    allowed_domains:
+    - nordicsemi.com
+    entry_points:
+    - name: Nordic_Notices
+      url: https://www.nordicsemi.com/Products/Product-Change-Notices
+      region: Global
+      crawler_type: dom_table
+  particle:
+    id: particle
+    name: Particle Industries
+    sector: IoT
+    website: https://www.particle.io
+    allowed_domains:
+    - particle.io
+    entry_points:
+    - name: Particle_Lifecycle
+      url: https://docs.particle.io/datasheets/asset-tracking/hardware-lifecycle-policy/
+      region: Global
+      crawler_type: dom_table
+  arduino:
+    id: arduino
+    name: Arduino Pro & IoT
+    sector: IoT
+    website: https://www.arduino.cc
+    allowed_domains:
+    - arduino.cc
+    entry_points:
+    - name: Arduino_Discontinued
+      url: https://www.arduino.cc/en/Main/Products#retired
+      region: Global
+      crawler_type: dom_table
+  raspberry_pi:
+    id: raspberry_pi
+    name: Raspberry Pi Ltd
+    sector: IoT
+    website: https://www.raspberrypi.com
+    allowed_domains:
+    - raspberrypi.com
+    entry_points:
+    - name: RaspberryPi_Obsolescence
+      url: https://www.raspberrypi.com/products/compute-module-4/#obsolescence-statement
+      region: Global
+      crawler_type: dom_table
+  digi_intl:
+    id: digi_intl
+    name: Digi International
+    sector: IoT
+    website: https://www.digi.com
+    allowed_domains:
+    - digi.com
+    entry_points:
+    - name: Digi_EOL
+      url: https://www.digi.com/support/lifecycle
+      region: Global
+      crawler_type: dom_table
+  eurotech:
+    id: eurotech
+    name: Eurotech Edge Gateway
+    sector: IoT
+    website: https://www.eurotech.com
+    allowed_domains:
+    - eurotech.com
+    entry_points:
+    - name: Eurotech_Lifecycle
+      url: https://www.eurotech.com/en-us/products/hardware/lifecycle
+      region: Global
+      crawler_type: dom_table
+  multitech:
+    id: multitech
+    name: MultiTech Systems
+    sector: IoT
+    website: https://www.multitech.com
+    allowed_domains:
+    - multitech.com
+    entry_points:
+    - name: MultiTech_EOL
+      url: https://www.multitech.com/support/product-lifecycle-notices
+      region: Global
+      crawler_type: dom_table
+  teltonika:
+    id: teltonika
+    name: Teltonika Networks
+    sector: IoT
+    website: https://teltonika-networks.com
+    allowed_domains:
+    - teltonika-networks.com
+    entry_points:
+    - name: Teltonika_EOL
+      url: https://teltonika-networks.com/support/end-of-life
+      region: Global
+      crawler_type: dom_table
+  kerlink:
+    id: kerlink
+    name: Kerlink LoRaWAN
+    sector: IoT
+    website: https://www.kerlink.com
+    allowed_domains:
+    - kerlink.com
+    entry_points:
+    - name: Kerlink_Support
+      url: https://www.kerlink.com/support/
+      region: Global
+      crawler_type: dom_table
+  libelium:
+    id: libelium
+    name: Libelium IoT
+    sector: IoT
+    website: https://www.libelium.com
+    allowed_domains:
+    - libelium.com
+    entry_points:
+    - name: Libelium_Support
+      url: https://www.libelium.com/support/
+      region: Global
+      crawler_type: dom_table
+  seeed_studio:
+    id: seeed_studio
+    name: Seeed Studio Industrial
+    sector: IoT
+    website: https://www.seeedstudio.com
+    allowed_domains:
+    - seeedstudio.com
+    entry_points:
+    - name: Seeed_Discontinued
+      url: https://www.seeedstudio.com/depot/discontinued
+      region: Global
+      crawler_type: dom_table
+  laird_connect:
+    id: laird_connect
+    name: Laird Connectivity
+    sector: IoT
+    website: https://www.lairdconnect.com
+    allowed_domains:
+    - lairdconnect.com
+    entry_points:
+    - name: Laird_PCN_EOL
+      url: https://www.lairdconnect.com/support/product-change-notifications
+      region: Global
+      crawler_type: dom_table
+  ublox:
+    id: ublox
+    name: u-blox
+    sector: IoT
+    website: https://www.u-blox.com
+    allowed_domains:
+    - u-blox.com
+    entry_points:
+    - name: Ublox_PCN
+      url: https://www.u-blox.com/en/product-resources/product-change-notifications
+      region: Global
+      crawler_type: dom_table
+  semtech:
+    id: semtech
+    name: Semtech
+    sector: IoT
+    sectors:
+    - IoT
+    website: https://www.semtech.com
+    allowed_domains:
+    - semtech.com
+    - sierrawireless.com
+    entry_points:
+    - name: Semtech_Products
+      url: https://www.semtech.com/products
+      region: Global
+      crawler_type: dom_table
+    - name: Sierra_Wireless_EOL
+      url: https://source.sierrawireless.com/hardware-lifecycle/
+      region: Global
+      crawler_type: dom_table
+  sensirion:
+    id: sensirion
+    name: Sensirion Environmental
+    sector: IoT
+    website: https://sensirion.com
+    allowed_domains:
+    - sensirion.com
+    entry_points:
+    - name: Sensirion_EOL
+      url: https://sensirion.com/products/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+  murata:
+    id: murata
+    name: Murata Manufacturing
+    sector: IoT
+    website: https://www.murata.com
+    allowed_domains:
+    - murata.com
+    entry_points:
+    - name: Murata_Discontinued
+      url: https://www.murata.com/en-global/support/discontinued
+      region: Global
+      crawler_type: dom_table
+  kontron:
+    id: kontron
+    name: Kontron Embedded
+    sector: IoT
+    website: https://www.kontron.com
+    allowed_domains:
+    - kontron.com
+    entry_points:
+    - name: Kontron_EOL
+      url: https://www.kontron.com/en/support/product-life-cycle
+      region: Global
+      crawler_type: dom_table
+  dragino:
+    id: dragino
+    name: Dragino Technology
+    sector: IoT
+    website: https://www.dragino.com
+    allowed_domains:
+    - dragino.com
+    entry_points:
+    - name: Dragino_Support
+      url: https://www.dragino.com/support.html
+      region: Global
+      crawler_type: dom_table
+  hpe:
+    id: hpe
+    name: Hewlett Packard Enterprise
+    sector: IT
+    sectors:
+    - IT
+    - IoT
+    website: https://www.hpe.com
+    allowed_domains:
+    - hpe.com
+    - arubanetworks.com
+    entry_points:
+    - name: HPE_Product_Lifecycle
+      url: https://www.hpe.com/us/en/support.html
+      region: Global
+      crawler_type: dom_table
+    - name: Aruba_EOS_EOL
+      url: https://www.arubanetworks.com/support-services/end-of-life/
+      region: Global
+      crawler_type: dom_table
+  dell:
+    id: dell
+    name: Dell Technologies
+    sector: IT
+    website: https://www.dell.com
+    allowed_domains:
+    - dell.com
+    entry_points:
+    - name: Dell_EOL_Policy
+      url: https://www.dell.com/support/kbdoc/en-us/000185736/end-of-service-life-eosl
+      region: Global
+      crawler_type: dom_table
+  ibm:
+    id: ibm
+    name: IBM Systems
+    sector: IT
+    website: https://www.ibm.com
+    allowed_domains:
+    - ibm.com
+    entry_points:
+    - name: IBM_Lifecycle
+      url: https://www.ibm.com/support/pages/lifecycle/
+      region: Global
+      crawler_type: dom_table
+  juniper:
+    id: juniper
+    name: Juniper Networks
+    sector: IT
+    website: https://www.juniper.net
+    allowed_domains:
+    - juniper.net
+    entry_points:
+    - name: Juniper_EOL
+      url: https://support.juniper.net/support/eol/
+      region: Global
+      crawler_type: dom_table
+  arista:
+    id: arista
+    name: Arista Networks
+    sector: IT
+    website: https://www.arista.com
+    allowed_domains:
+    - arista.com
+    entry_points:
+    - name: Arista_EOL
+      url: https://www.arista.com/en/support/product-end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+  fortinet:
+    id: fortinet
+    name: Fortinet
+    sector: IT
+    website: https://www.fortinet.com
+    allowed_domains:
+    - fortinet.com
+    entry_points:
+    - name: Fortinet_Product_Life_Cycle
+      url: https://support.fortinet.com/Information/ProductLifeCycle.aspx
+      region: Global
+      crawler_type: dom_table
+  palo_alto:
+    id: palo_alto
+    name: Palo Alto Networks
+    sector: IT
+    website: https://www.paloaltonetworks.com
+    allowed_domains:
+    - paloaltonetworks.com
+    entry_points:
+    - name: PANW_EOL
+      url: https://www.paloaltonetworks.com/services/support/end-of-life-summary
+      region: Global
+      crawler_type: dom_table
+  check_point:
+    id: check_point
+    name: Check Point Software
+    sector: IT
+    website: https://www.checkpoint.com
+    allowed_domains:
+    - checkpoint.com
+    entry_points:
+    - name: CheckPoint_EOL
+      url: https://www.checkpoint.com/support-services/support-life-cycle-policy/
+      region: Global
+      crawler_type: dom_table
+  f5_networks:
+    id: f5_networks
+    name: F5 Networks
+    sector: IT
+    website: https://www.f5.com
+    allowed_domains:
+    - f5.com
+    entry_points:
+    - name: F5_Platform_Lifecycle
+      url: https://my.f5.com/manage/s/article/K4309
+      region: Global
+      crawler_type: dom_table
+  netapp:
+    id: netapp
+    name: NetApp Storage Systems
+    sector: IT
+    website: https://www.netapp.com
+    allowed_domains:
+    - netapp.com
+    entry_points:
+    - name: NetApp_EOSL
+      url: https://mysupport.netapp.com/info/communications/ECMLP2849887.html
+      region: Global
+      crawler_type: dom_table
+  pure_storage:
+    id: pure_storage
+    name: Pure Storage
+    sector: IT
+    website: https://www.purestorage.com
+    allowed_domains:
+    - purestorage.com
+    entry_points:
+    - name: PureStorage_Lifecycle
+      url: https://support.purestorage.com/FlashArray/Getting_Started/Pure_Storage_End_of_Life_Policy
+      region: Global
+      crawler_type: dom_table
+  lenovo:
+    id: lenovo
+    name: Lenovo
+    sector: IT
+    website: https://www.lenovo.com
+    allowed_domains:
+    - lenovo.com
+    entry_points:
+    - name: Lenovo_EOSL
+      url: https://datacentersupport.lenovo.com/us/en/solutions/end-of-service-list
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IT
+    - IoT
+  supermicro:
+    id: supermicro
+    name: Supermicro
+    sector: IT
+    sectors:
+    - IT
+    - IoT
+    website: https://www.supermicro.com
+    allowed_domains:
+    - supermicro.com
+    entry_points:
+    - name: Supermicro_Products
+      url: https://www.supermicro.com/en/products
+      region: Global
+      crawler_type: dom_table
+  oracle:
+    id: oracle
+    name: Oracle
+    sector: IT
+    website: https://www.oracle.com
+    allowed_domains:
+    - oracle.com
+    entry_points:
+    - name: Oracle_Hardware_Support
+      url: https://www.oracle.com/support/lifetime-support/hardware-systems.html
+      region: Global
+      crawler_type: dom_table
+  vmware:
+    id: vmware
+    name: VMware
+    sector: IT
+    website: https://www.vmware.com
+    allowed_domains:
+    - vmware.com
+    - broadcom.com
+    entry_points:
+    - name: VMware_Lifecycle
+      url: https://lifecycle.vmware.com/
+      region: Global
+      crawler_type: dom_table
+  red_hat:
+    id: red_hat
+    name: Red Hat Enterprise
+    sector: IT
+    website: https://www.redhat.com
+    allowed_domains:
+    - redhat.com
+    entry_points:
+    - name: RHEL_Life_Cycle
+      url: https://access.redhat.com/support/policy/updates/errata
+      region: Global
+      crawler_type: dom_table
+  microsoft:
+    id: microsoft
+    name: Microsoft
+    sector: IT
+    website: https://www.microsoft.com
+    allowed_domains:
+    - microsoft.com
+    entry_points:
+    - name: Microsoft_Lifecycle_Search
+      url: https://learn.microsoft.com/en-us/lifecycle/products/
+      region: Global
+      crawler_type: dom_table
+  canonical:
+    id: canonical
+    name: Canonical
+    sector: IT
+    website: https://canonical.com
+    allowed_domains:
+    - canonical.com
+    - ubuntu.com
+    entry_points:
+    - name: Ubuntu_Releases
+      url: https://ubuntu.com/about/release-cycle
+      region: Global
+      crawler_type: dom_table
+  suse:
+    id: suse
+    name: SUSE Linux Enterprise
+    sector: IT
+    website: https://www.suse.com
+    allowed_domains:
+    - suse.com
+    entry_points:
+    - name: SUSE_Lifecycle
+      url: https://www.suse.com/lifecycle/
+      region: Global
+      crawler_type: dom_table
+  extreme_networks:
+    id: extreme_networks
+    name: Extreme Networks
+    sector: IT
+    website: https://www.extremenetworks.com
+    allowed_domains:
+    - extremenetworks.com
+    entry_points:
+    - name: Extreme_EOS_Policy
+      url: https://www.extremenetworks.com/support/end-of-sale-and-end-of-service-policy/
+      region: Global
+      crawler_type: dom_table
+  synology:
+    id: synology
+    name: Synology NAS & Enterprise
+    sector: IT
+    website: https://www.synology.com
+    allowed_domains:
+    - synology.com
+    entry_points:
+    - name: Synology_Status
+      url: https://www.synology.com/en-us/products/status
+      region: Global
+      crawler_type: dom_table
+  qnap:
+    id: qnap
+    name: QNAP Systems
+    sector: IT
+    website: https://www.qnap.com
+    allowed_domains:
+    - qnap.com
+    entry_points:
+    - name: QNAP_Product_Status
+      url: https://www.qnap.com/en/product/status
+      region: Global
+      crawler_type: dom_table
+  ubiquiti:
+    id: ubiquiti
+    name: Ubiquiti Inc.
+    sector: IT
+    website: https://www.ui.com
+    allowed_domains:
+    - ui.com
+    entry_points:
+    - name: Ubiquiti_Vintage
+      url: https://help.ui.com/hc/en-us/articles/1500001268521-Ubiquiti-s-Vintage-and-Legacy-Products
+      region: Global
+      crawler_type: dom_table
+  sonicwall:
+    id: sonicwall
+    name: SonicWall Security
+    sector: IT
+    website: https://www.sonicwall.com
+    allowed_domains:
+    - sonicwall.com
+    entry_points:
+    - name: SonicWall_Product_Lifecycle
+      url: https://www.sonicwall.com/support/product-lifecycle-tables/
+      region: Global
+      crawler_type: dom_table
+  sophos:
+    id: sophos
+    name: Sophos Cybersecurity
+    sector: IT
+    website: https://www.sophos.com
+    allowed_domains:
+    - sophos.com
+    entry_points:
+    - name: Sophos_Retirement_Calendar
+      url: https://support.sophos.com/support/s/article/KB-000035279
+      region: Global
+      crawler_type: dom_table
+  watchguard:
+    id: watchguard
+    name: WatchGuard Technologies
+    sector: IT
+    website: https://www.watchguard.com
+    allowed_domains:
+    - watchguard.com
+    entry_points:
+    - name: WatchGuard_EOL
+      url: https://www.watchguard.com/wgrd-resource-center/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+  nutanix:
+    id: nutanix
+    name: Nutanix HCI
+    sector: IT
+    website: https://www.nutanix.com
+    allowed_domains:
+    - nutanix.com
+    entry_points:
+    - name: Nutanix_EOL
+      url: https://www.nutanix.com/support-services/product-support/lifecycle-policy
+      region: Global
+      crawler_type: dom_table
+  zebra:
+    id: zebra
+    name: Zebra Technologies
+    sector: IoT
+    sectors:
+    - IoT
+    - IT
+    website: https://www.zebra.com
+    allowed_domains:
+    - zebra.com
+    entry_points:
+    - name: Zebra_Product_Lifecycle
+      url: https://www.zebra.com/us/en/support-downloads/lifecycle-information.html
+      region: Global
+      crawler_type: dom_table
+  parker_hannifin:
+    id: parker_hannifin
+    name: Parker Hannifin
+    sector: OT
+    website: https://www.parker.com
+    allowed_domains:
+    - parker.com
+    entry_points:
+    - name: Parker_Discontinued
+      url: https://www.parker.com/us/en/support/discontinued-products.html
+      region: Americas
+      crawler_type: dom_table
+  lenze:
+    id: lenze
+    name: Lenze
+    sector: OT
+    website: https://www.lenze.com
+    allowed_domains:
+    - lenze.com
+    entry_points:
+    - name: Lenze_Lifecycle
+      url: https://www.lenze.com/en-us/service/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
+  fuji_electric:
+    id: fuji_electric
+    name: Fuji Electric
+    sector: OT
+    website: https://www.fujielectric.com
+    allowed_domains:
+    - fujielectric.com
+    entry_points:
+    - name: Fuji_Discontinued
+      url: https://www.fujielectric.com/products/automation/discontinued/
+      region: Global
+      crawler_type: dom_table
+  idec:
+    id: idec
+    name: IDEC Corporation
+    sector: OT
+    website: https://www.idec.com
+    allowed_domains:
+    - idec.com
+    entry_points:
+    - name: IDEC_Discontinued
+      url: https://www.idec.com/home/support/discontinued/
+      region: Global
+      crawler_type: dom_table
+  national_instruments:
+    id: national_instruments
+    name: National Instruments
+    sector: OT
+    website: https://www.ni.com
+    allowed_domains:
+    - ni.com
+    entry_points:
+    - name: NI_Lifecycle
+      url: https://www.ni.com/en/support/documentation/lifecycle.html
+      region: Global
+      crawler_type: dom_table
+  unitronics:
+    id: unitronics
+    name: Unitronics
+    sector: OT
+    website: https://www.unitronicsplc.com
+    allowed_domains:
+    - unitronicsplc.com
+    entry_points:
+    - name: Unitronics_Discontinued
+      url: https://www.unitronicsplc.com/support-discontinued-products/
+      region: Global
+      crawler_type: dom_table
+  baumuller:
+    id: baumuller
+    name: Baumuller
+    sector: OT
+    website: https://www.baumueller.com
+    allowed_domains:
+    - baumueller.com
+    entry_points:
+    - name: Baumuller_Lifecycle
+      url: https://www.baumueller.com/en/service/lifecycle-management
+      region: Europe
+      crawler_type: dom_table
+  moog:
+    id: moog
+    name: Moog Industrial
+    sector: OT
+    website: https://www.moog.com
+    allowed_domains:
+    - moog.com
+    entry_points:
+    - name: Moog_Lifecycle
+      url: https://www.moog.com/products/servovalves-servo-proportional-valves/lifecycle.html
+      region: Global
+      crawler_type: dom_table
+  nidec_control_techniques:
+    id: nidec_control_techniques
+    name: Nidec Control Techniques
+    sector: OT
+    website: https://www.controltechniques.com
+    allowed_domains:
+    - controltechniques.com
+    - nidec.com
+    entry_points:
+    - name: ControlTechniques_Legacy
+      url: https://www.controltechniques.com/support/legacy-products/
+      region: Global
+      crawler_type: dom_table
+  axis_communications:
+    id: axis_communications
+    name: Axis Communications
+    sector: IoT
+    website: https://www.axis.com
+    allowed_domains:
+    - axis.com
+    entry_points:
+    - name: Axis_Camera_Lifecycle
+      url: https://www.axis.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+  hikvision:
+    id: hikvision
+    name: Hikvision Digital Technology
+    sector: IoT
+    website: https://www.hikvision.com
+    allowed_domains:
+    - hikvision.com
+    entry_points:
+    - name: Hikvision_Lifecycle
+      url: https://www.hikvision.com/en/support/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
+  dahua:
+    id: dahua
+    name: Dahua Technology
+    sector: IoT
+    website: https://www.dahuasecurity.com
+    allowed_domains:
+    - dahuasecurity.com
+    entry_points:
+    - name: Dahua_Discontinued
+      url: https://www.dahuasecurity.com/support/announcement/discontinued-products
+      region: Global
+      crawler_type: dom_table
+  hanwha_vision:
+    id: hanwha_vision
+    name: Hanwha Vision
+    sector: IoT
+    website: https://www.hanwhavision.com
+    allowed_domains:
+    - hanwhavision.com
+    - hanwhasecurity.com
+    entry_points:
+    - name: Hanwha_Discontinued
+      url: https://www.hanwhavision.com/en/support/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+  flir:
+    id: flir
+    name: Teledyne FLIR
+    sector: IoT
+    sectors:
+    - IoT
+    website: https://www.flir.com
+    allowed_domains:
+    - flir.com
+    entry_points:
+    - name: FLIR_Products_Portal
+      url: https://www.flir.com/products/
+      region: Global
+      crawler_type: dom_table
+  basler:
+    id: basler
+    name: Basler AG
+    sector: IoT
+    website: https://www.baslerweb.com
+    allowed_domains:
+    - baslerweb.com
+    entry_points:
+    - name: Basler_Camera_Lifecycle
+      url: https://www.baslerweb.com/en/services/product-life-cycle/
+      region: Global
+      crawler_type: dom_table
+  mobotix:
+    id: mobotix
+    name: Mobotix AG
+    sector: IoT
+    website: https://www.mobotix.com
+    allowed_domains:
+    - mobotix.com
+    entry_points:
+    - name: Mobotix_EOL
+      url: https://www.mobotix.com/en/support/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+  avigilon:
+    id: avigilon
+    name: Avigilon (Motorola Solutions)
+    sector: IoT
+    website: https://www.avigilon.com
+    allowed_domains:
+    - avigilon.com
+    - motorolasolutions.com
+    entry_points:
+    - name: Avigilon_EOL
+      url: https://www.avigilon.com/support/warranty/end-of-life
+      region: Global
+      crawler_type: dom_table
+  uniview:
+    id: uniview
+    name: Uniview Technologies
+    sector: IoT
+    website: https://www.uniview.com
+    allowed_domains:
+    - uniview.com
+    entry_points:
+    - name: Uniview_Discontinued
+      url: https://www.uniview.com/Support/Download_Center/Discontinued_Products/
+      region: Global
+      crawler_type: dom_table
+  allied_telesis:
+    id: allied_telesis
+    name: Allied Telesis
+    sector: IT
+    website: https://www.alliedtelesis.com
+    allowed_domains:
+    - alliedtelesis.com
+    entry_points:
+    - name: AlliedTelesis_Switch_EOL
+      url: https://www.alliedtelesis.com/en/services/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+  dlink:
+    id: dlink
+    name: D-Link
+    sector: IT
+    website: https://www.dlink.com
+    allowed_domains:
+    - dlink.com
+    entry_points:
+    - name: DLink_Switch_EOL
+      url: https://www.dlink.com/en/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IT
+    - IoT
+  netgear_business:
+    id: netgear_business
+    name: NETGEAR Business
+    sector: IT
+    website: https://www.netgear.com
+    allowed_domains:
+    - netgear.com
+    entry_points:
+    - name: Netgear_Switch_EOS
+      url: https://www.netgear.com/about/eos/
+      region: Global
+      crawler_type: dom_table
+  tplink:
+    id: tplink
+    name: TP-Link
+    sector: IT
+    website: https://www.tp-link.com
+    allowed_domains:
+    - tp-link.com
+    entry_points:
+    - name: TPLink_Omada_EOL
+      url: https://www.tp-link.com/en/support/replacement-identity/
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IT
+    - IoT
+  zyxel_networks:
+    id: zyxel_networks
+    name: Zyxel Networks
+    sector: IT
+    website: https://www.zyxel.com
+    allowed_domains:
+    - zyxel.com
+    entry_points:
+    - name: Zyxel_Switch_Lifecycle
+      url: https://www.zyxel.com/global/en/support/lifecycle-policy
+      region: Global
+      crawler_type: dom_table
+  westermo:
+    id: westermo
+    name: Westermo Network Technologies
+    sector: IT
+    website: https://www.westermo.com
+    allowed_domains:
+    - westermo.com
+    entry_points:
+    - name: Westermo_Switch_Lifecycle
+      url: https://www.westermo.com/support/product-life-cycle
+      region: Global
+      crawler_type: dom_table
+  alcatel_lucent_enterprise:
+    id: alcatel_lucent_enterprise
+    name: Alcatel-Lucent Enterprise
+    sector: IT
+    website: https://www.al-enterprise.com
+    allowed_domains:
+    - al-enterprise.com
+    entry_points:
+    - name: ALE_OmniSwitch_EOL
+      url: https://www.al-enterprise.com/en/support/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
+  ruckus_networks:
+    id: ruckus_networks
+    name: Ruckus Networks (CommScope)
+    sector: IT
+    website: https://www.commscope.com
+    allowed_domains:
+    - commscope.com
+    - ruckuswireless.com
+    entry_points:
+    - name: Ruckus_ICX_EOL
+      url: https://support.ruckuswireless.com/documents?filter=end-of-life
+      region: Global
+      crawler_type: dom_table
+  huawei:
+    id: huawei
+    name: Huawei
+    sector: IT
+    website: https://e.huawei.com
+    allowed_domains:
+    - huawei.com
+    entry_points:
+    - name: Huawei_Switch_Lifecycle
+      url: https://e.huawei.com/en/services/lifecycle-policy
+      region: Global
+      crawler_type: dom_table
+    sectors:
+    - IT
+    - IoT
+    - OT
+  toyoda:
+    id: toyoda
+    name: JTEKT Toyoda
+    sector: OT
+    website: https://www.jtekt.co.jp
+    allowed_domains:
+    - jtekt.co.jp
+    - toyoda-americas.com
+    entry_points:
+    - name: Toyoda_Toyopuc_PLC_Support
+      url: https://www.jtekt.co.jp/e/products/electronics/support/
+      region: Global
+      crawler_type: dom_table
+    - name: Toyoda_Americas_Lifecycle
+      url: https://www.toyoda-americas.com/support/parts-service/
+      region: Americas
+      crawler_type: dom_table
+  verkada:
+    id: verkada
+    name: Verkada
+    sector: IoT
+    website: https://www.verkada.com
+    allowed_domains:
+    - verkada.com
+    entry_points:
+    - name: Verkada_Products_Portal
+      url: https://www.verkada.com/products/
+      region: Global
+      crawler_type: dom_table
+    - name: Verkada_Support_Lifecycle
+      url: https://support.verkada.com/en/
+      region: Global
+      crawler_type: dom_table
+  shibaura_machine:
+    id: shibaura_machine
+    name: Shibaura Machine (Toshiba Machine)
+    sector: OT
+    website: https://www.shibaura-machine.co.jp
+    allowed_domains:
+    - shibaura-machine.co.jp
+    - toshiba-machine.com
+    entry_points:
+    - name: Shibaura_Products_Portal
+      url: https://www.shibaura-machine.co.jp/en/product/
+      region: Global
+      crawler_type: dom_table
+    - name: Shibaura_Support_Portal
+      url: https://www.shibaura-machine.co.jp/en/support/
+      region: Global
+      crawler_type: dom_table
+  dragos:
+    id: dragos
+    name: Dragos Industrial Cybersecurity
+    sector: OT
+    website: https://www.dragos.com
+    allowed_domains:
+    - dragos.com
+    entry_points:
+    - name: Dragos_Platform_Appliance
+      url: https://www.dragos.com/platform/
+      region: Global
+      crawler_type: dom_table
+    - name: Dragos_Resources_Lifecycle
+      url: https://www.dragos.com/resources/
+      region: Global
+      crawler_type: dom_table
+  nozomi_networks:
+    id: nozomi_networks
+    name: Nozomi Networks
+    sector: IoT
+    website: https://www.nozomi-networks.com
+    allowed_domains:
+    - nozomi-networks.com
+    entry_points:
+    - name: Nozomi_Guardian_Appliances
+      url: https://www.nozomi-networks.com/products/guardian/
+      region: Global
+      crawler_type: dom_table
+    - name: Nozomi_Support_Lifecycle
+      url: https://www.nozomi-networks.com/support/
+      region: Global
+      crawler_type: dom_table
+  barracuda_networks:
+    id: barracuda_networks
+    name: Barracuda Networks
+    sector: IT
+    website: https://www.barracuda.com
+    allowed_domains:
+    - barracuda.com
+    entry_points:
+    - name: Barracuda_Hardware_EOL
+      url: https://www.barracuda.com/support/eol
+      region: Global
+      crawler_type: dom_table
+    - name: Barracuda_Security_Products
+      url: https://www.barracuda.com/products
+      region: Global
+      crawler_type: dom_table
+  fluke_networks:
+    id: fluke_networks
+    name: Fluke Networks
+    sector: IT
+    website: https://www.flukenetworks.com
+    allowed_domains:
+    - flukenetworks.com
+    - fluke.com
+    entry_points:
+    - name: Fluke_Product_Lifecycle
+      url: https://www.flukenetworks.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Fluke_Network_Testers
+      url: https://www.flukenetworks.com/products
+      region: Global
+      crawler_type: dom_table
+  cisco:
+    id: cisco
+    name: Cisco Systems
+    sector: IT
+    sectors:
+    - IT
+    - IoT
+    - OT
+    website: https://www.cisco.com
+    allowed_domains:
+    - cisco.com
+    - meraki.cisco.com
+    entry_points:
+    - name: Cisco_Products_Catalog
+      url: https://www.cisco.com/c/en/us/products/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_EOL_Listing
+      url: https://www.cisco.com/c/en/us/products/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Meraki_EOL_Hub
+      url: https://documentation.meraki.com/General_Administration/Other_Topics/Meraki_End-of-Life_(EOL)_Policy_and_Dates
+      region: Global
+      crawler_type: dom_table
+  honeywell:
+    id: honeywell
+    name: Honeywell
+    sector: OT
+    sectors:
+    - OT
+    - IoT
+    website: https://www.honeywell.com
+    allowed_domains:
+    - honeywell.com
+    - process.honeywell.com
+    entry_points:
+    - name: Honeywell_Process_Lifecycle
+      url: https://process.honeywell.com/us/en/support
+      region: Global
+      crawler_type: dom_table
+    - name: Honeywell_Product_Catalog
+      url: https://www.honeywell.com/us/en/products
+      region: Global
+      crawler_type: dom_table
+  bosch:
+    id: bosch
+    name: Bosch
+    sector: OT
+    sectors:
+    - OT
+    - IoT
+    website: https://www.bosch.com
+    allowed_domains:
+    - bosch.com
+    - boschrexroth.com
+    - boschsecurity.com
+    entry_points:
+    - name: Bosch_Rexroth_Service
+      url: https://www.boschrexroth.com/en/xc/service/
+      region: Global
+      crawler_type: dom_table
+    - name: Bosch_Security_Lifecycle
+      url: https://www.boschsecurity.com/xc/en/support/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
+  panasonic:
+    id: panasonic
+    name: Panasonic
+    sector: OT
+    sectors:
+    - OT
+    - IoT
+    website: https://industry.panasonic.eu
+    allowed_domains:
+    - industry.panasonic.eu
+    - panasonic.com
+    - industrial.panasonic.com
+    entry_points:
+    - name: Panasonic_Industry_Portal
+      url: https://industry.panasonic.eu
+      region: Global
+      crawler_type: dom_table
+    - name: Panasonic_Products_Hub
+      url: https://industrial.panasonic.com/ww/products/pt
+      region: Global
+      crawler_type: dom_table
+  yamaha:
+    id: yamaha
+    name: Yamaha Motor Robotics
+    sector: OT
+    sectors:
+    - OT
+    website: https://www.yamaha-motor-robotics.com
+    allowed_domains:
+    - yamaha-motor-robotics.com
+    - yamaha-motor.com
+    entry_points:
+    - name: Yamaha_Robotics_Lifecycle
+      url: https://www.yamaha-motor-robotics.com/service-support
+      region: Global
+      crawler_type: dom_table
+  sony:
+    id: sony
+    name: Sony Professional
+    sector: IoT
+    sectors:
+    - IoT
+    website: https://pro.sony
+    allowed_domains:
+    - pro.sony
+    - sony.com
+    entry_points:
+    - name: Sony_Pro_Products
+      url: https://pro.sony/en_US/products
+      region: Global
+      crawler_type: dom_table
+  kyocera:
+    id: kyocera
+    name: Kyocera AVX
+    sector: IoT
+    sectors:
+    - IoT
+    - OT
+    website: https://www.kyocera-avx.com
+    allowed_domains:
+    - kyocera-avx.com
+    - kyocera.com
+    entry_points:
+    - name: Kyocera_Products
+      url: https://www.kyocera-avx.com/products/
+      region: Global
+      crawler_type: dom_table
+  hitachi:
+    id: hitachi
+    name: Hitachi
+    sector: OT
+    sectors:
+    - OT
+    - IT
+    - IoT
+    website: https://www.hitachi.com
+    allowed_domains:
+    - hitachi.com
+    - hitachi-ies.co.jp
+    - hitachivantara.com
+    entry_points:
+    - name: Hitachi_Global_Products
+      url: https://www.hitachi.com/products/
+      region: Global
+      crawler_type: dom_table
+    - name: Hitachi_Industrial_Equipment
+      url: https://www.hitachi-ies.co.jp/english/products/
+      region: Global
+      crawler_type: dom_table
+  milesight:
+    id: milesight
+    name: Milesight
+    sector: IoT
+    sectors:
+    - IoT
+    website: https://www.milesight.com
+    allowed_domains:
+    - milesight.com
+    entry_points:
+    - name: Milesight_IoT_Products
+      url: https://www.milesight.com/iot/products
+      region: Global
+      crawler_type: dom_table
+  citrix:
+    id: citrix
+    name: Citrix Systems
+    sector: IT
+    sectors:
+    - IT
+    website: https://www.citrix.com
+    allowed_domains:
+    - citrix.com
+    entry_points:
+    - name: Citrix_Products_Catalog
+      url: https://www.citrix.com/products/
+      region: Global
+      crawler_type: dom_table
+    - name: Citrix_Product_Matrix
+      url: https://support.citrix.com/s/lifecycle
+      region: Global
+      crawler_type: dom_table
+  trend_micro:
+    id: trend_micro
+    name: Trend Micro
+    sector: IT
+    sectors:
+    - IT
+    website: https://www.trendmicro.com
+    allowed_domains:
+    - trendmicro.com
+    entry_points:
+    - name: Trend_Micro_Products
+      url: https://www.trendmicro.com/en_us/business/products.html
+      region: Global
+      crawler_type: dom_table
+    - name: Trend_Micro_Lifecycle_Policy
+      url: https://success.trendmicro.com/en-US/lifecycle
+      region: Global
+      crawler_type: dom_table
+  commvault:
+    id: commvault
+    name: Commvault
+    sector: IT
+    sectors:
+    - IT
+    website: https://www.commvault.com
+    allowed_domains:
+    - commvault.com
+    entry_points:
+    - name: Commvault_Platform
+      url: https://www.commvault.com/platform
+      region: Global
+      crawler_type: dom_table

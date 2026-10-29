@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "universal-lifecycle-scraper"
+version = "2.0.0"
+description = "Universal Multi-Vendor EOL & Lifecycle AI Scraper"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-genai>=2.30.0",
+    "pydantic>=2.10.0",
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "crawl4ai>=0.4.0",
+    "pyyaml>=6.0",
+    "pypdf>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.9.0",
+    "mypy>=1.14.0",
+    "types-PyYAML>=6.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [
+    ".git",
+    ".agents",
+    "artifacts",
+    "output",
+    "build",
+    "dist",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+]
+ignore = [
+    "E501",  # line too long (handled by line-length and formatter)
+    "E402",  # module level import not at top of file
+    "W291",  # trailing whitespace
+    "W293",  # blank line contains whitespace
+]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+follow_imports = "silent"
+check_untyped_defs = true
+disallow_incomplete_defs = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+exclude = [
+    "artifacts",
+    "output",
+    ".agents",
+    "build",
+    "dist",
+]
+
+[[tool.mypy.overrides]]
+module = ["tests", "tests.*"]
+ignore_errors = true

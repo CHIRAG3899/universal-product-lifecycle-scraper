@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Multi-Vendor EOL & Lifecycle AI Scraper</title>
+  <meta name="description" content="AI-powered multi-vendor crawler and structured lifecycle intelligence engine supporting Mitsubishi, Siemens, Schneider, Rockwell and any industrial vendor with Crawl4AI and Google Gemini.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- Background Glow Accents -->
+  <div class="bg-glow-orb orb-1"></div>
+  <div class="bg-glow-orb orb-2"></div>
+
+  <div class="app-layout">
+    <!-- Navigation Header -->
+    <header class="app-header">
+      <div class="brand-container">
+        <div class="brand-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 22 22 22" fill="url(#brandGrad)" stroke="none"/>
+            <polygon points="12 7 6 19 18 19" fill="#0b0f19" stroke="none"/>
+            <defs>
+              <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#818cf8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span class="gradient-text">MULTI-VENDOR</span> LIFECYCLE AI
+            <span class="badge badge-poc">UNIVERSAL POC</span>
+          </div>
+          <div class="brand-subtitle">AI-Driven Obsolescence & End-of-Life Intelligence &bull; 1 Record Per Stage &bull; UTC Normalized</div>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <div class="status-pill" id="crawlerStatusPill">
+          <span class="status-dot"></span>
+          <span class="status-text">Crawl4AI Engine: Active</span>
+        </div>
+        <div class="status-pill ai-pill" id="geminiStatusPill">
+          <span class="ai-icon">✦</span>
+          <span class="status-text" id="geminiModelLabel">Gemini 2.5 Flash</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="openComparisonBtn" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-cyan);">
+          ⚡ Generic vs AI Comparison
+        </button>
+        <button class="btn btn-primary" id="triggerCrawlBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          Run AI Crawler
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- AI Crawler Control Console -->
+      <section class="control-panel glass-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-icon">⚙</span>
+            <h3>Universal Crawler & Multi-Vendor Configuration (100 Vendors Supported)</h3>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="toggleConfigBtn">Show Options</button>
+        </div>
+
+        <div class="config-grid" id="configGrid">
+          <div class="form-group">
+            <label for="vendorPresetSelect">Enterprise Vendor Preset</label>
+            <div class="sector-filter-group" id="sectorFilterGroup">
+              <button class="sector-pill active" data-sector="ALL">All (100)</button>
+              <button class="sector-pill" data-sector="OT">OT (40)</button>
+              <button class="sector-pill" data-sector="IoT">IoT (30)</button>
+              <button class="sector-pill" data-sector="IT">IT (30)</button>
+            </div>
+            <select id="vendorPresetSelect" class="form-select" style="margin-top: 0.4rem;">
+              <option value="">Loading 100 enterprise vendors...</option>
+            </select>
+            <label class="site-crawl-toggle">
+              <input type="checkbox" id="siteCrawlCheckbox">
+              <span>🌐 Crawl full website (explore support & lifecycle subdomains)</span>
+            </label>
+          </div>
+
+          <div class="form-group" style="grid-column: span 2;">
+            <label for="targetUrlInput">Target Portal URL (Any Vendor / Localized Language)</label>
+            <input type="url" id="targetUrlInput" class="form-input" value="https://se-fa.mitsubishielectric.com/fa/se_en/support/product-life-cycle-stage-eol" placeholder="Enter any vendor URL...">
+          </div>
+
+          <div class="form-group">
+            <label for="geminiApiKeyInput">
+              Google Gemini API Key
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="helper-link">Get Free Key ↗</a>
+            </label>
+            <div class="input-with-action">
+              <input type="password" id="geminiApiKeyInput" class="form-input" placeholder="Paste GEMINI_API_KEY (optional, fallback active)...">
+              <button class="btn-input-action" id="toggleApiKeyVisibility" title="Toggle visibility">👁</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="testKeyBtn" style="padding: 0.3rem 0.6rem; font-size: 0.72rem; flex-shrink: 0;">Test</button>
+            </div>
+            <div id="keyValidationStatus" style="font-size: 0.75rem; margin-top: 0.35rem; display: none;"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="geminiModelSelect">Gemini Model</label>
+            <select id="geminiModelSelect" class="form-select">
+              <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Production Default - Recommended)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Fast)</option>
+              <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Multilingual Reasoning)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Crawler Progress Live Banner & 6-Stage Stepper -->
+        <div class="crawler-progress-bar" id="crawlerProgressContainer" style="display: none; flex-direction: column; gap: 0.75rem;">
+          <div class="progress-info">
+            <div class="spinner"></div>
+            <span id="crawlerProgressText">Initializing Crawl4AI headless browser...</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="crawlerProgressFill"></div>
+          </div>
+          <!-- 6-Stage Workflow Stepper -->
+          <div class="workflow-stepper" id="workflowStepper">
+            <div class="step-item" id="stepDiscovery"><span class="step-num">1</span> Discovery</div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="stepExtraction"><span class="step-num">2</span> Extraction</div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="stepNormalisation"><span class="step-num">3</span> Normalisation</div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="stepSanitisation"><span class="step-num">4</span> Sanitisation</div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="stepDeduplication"><span class="step-num">5</span> Deduplication</div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="stepExport"><span class="step-num">6</span> Export</div>
+          </div>
+        </div>
+      </section>/section>
+
+      <!-- Key Metrics Row (Reflecting 1 Record Per Stage) -->
+      <section class="metrics-grid">
+        <div class="metric-card glass-panel">
+          <div class="metric-icon metric-blue">📊</div>
+          <div class="metric-data">
+            <div class="metric-value" id="metricTotal">0</div>
+            <div class="metric-label">Total Stage Records (1 per Status)</div>
+          </div>
+        </div>
+
+        <div class="metric-card glass-panel">
+          <div class="metric-icon metric-amber">⏳</div>
+          <div class="metric-data">
+            <div class="metric-value" id="metricLtb">0</div>
+            <div class="metric-label">Last Time Buy (LTB) Records</div>
+          </div>
+        </div>
+
+        <div class="metric-card glass-panel">
+          <div class="metric-icon metric-rose">🛑</div>
+          <div class="metric-data">
+            <div class="metric-value" id="metricEol">0</div>
+            <div class="metric-label">End of Life (EOL) Records</div>
+          </div>
+        </div>
+
+        <div class="metric-card glass-panel">
+          <div class="metric-icon metric-slate">🔧</div>
+          <div class="metric-data">
+            <div class="metric-value" id="metricEos">0</div>
+            <div class="metric-label">End of Service (EOS) Records</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scraped Data Table Section -->
+      <section class="data-section glass-panel">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search models, vendor, OS, firmware, stage, UTC date, metadata...">
+            <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">✕</button>
+          </div>
+
+          <div class="toolbar-actions">
+            <!-- Stage Filter Pills -->
+            <div class="filter-pills" id="stagePillContainer">
+              <button class="pill active" data-stage="ALL">All Stages</button>
+              <button class="pill" data-stage="LTB">Last Time Buy</button>
+              <button class="pill" data-stage="EOL">End of Life</button>
+              <button class="pill" data-stage="EOS">End of Service</button>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div class="filter-pills" id="categoryPillContainer">
+              <button class="pill active" data-category="ALL">All Categories</button>
+              <button class="pill" data-category="PLC">PLC</button>
+              <button class="pill" data-category="MELIPC">Industrial PC</button>
+              <button class="pill" data-category="HMI">HMI</button>
+              <button class="pill" data-category="Inverter">Inverters</button>
+              <button class="pill" data-category="Motion">Motion/Servo</button>
+              <button class="pill" data-category="Robot">Robotics</button>
+              <button class="pill" data-category="Software">Software</button>
+            </div>
+
+            <div class="export-btn-group">
+              <button class="btn btn-secondary btn-sm" id="exportCsvBtn" title="Export as CSV spreadsheet with Metadata column">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                Export CSV
+              </button>
+              <button class="btn btn-secondary btn-sm" id="exportJsonBtn" title="Export raw JSON dataset with Metadata dictionaries">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/>
+                </svg>
+                Export JSON
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Count Subtitle & Rules Banner -->
+        <div class="table-meta-bar">
+          <div>
+            <span id="resultsCount">Showing 0 records</span>
+            <span class="meta-tag-pill">Rule: 1 Record Per Stage &bull; UTC Standard</span>
+          </div>
+          <div class="stage-legend">
+            <span class="legend-item"><span class="legend-dot dot-ltb"></span> Last Time Buy (LTB)</span>
+            <span class="legend-item"><span class="legend-dot dot-eol"></span> End of Life (EOL)</span>
+            <span class="legend-item"><span class="legend-dot dot-eos"></span> End of Service (EOS)</span>
+          </div>
+        </div>
+
+        <!-- Main Product Table -->
+        <div class="table-responsive">
+          <table class="products-table" id="productsTable">
+            <thead>
+              <tr>
+                <th data-sort="vendor_name">vendor_name</th>
+                <th data-sort="model_name">model_name</th>
+                <th data-sort="status">status</th>
+                <th data-sort="stage_date_utc" class="sorted-asc">stage_date_utc</th>
+                <th>source_url</th>
+                <th data-sort="category">category</th>
+                <th data-sort="replacement">replacement</th>
+                <th data-sort="os">os</th>
+                <th data-sort="firmware">firmware</th>
+                <th>metadata</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Dynamically Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-icon">🔍</div>
+          <h4>No matching records found</h4>
+          <p>Try clearing your search query or switching categories/stages.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Detail & Metadata Modal Drawer -->
+    <div class="modal-backdrop" id="detailModal">
+      <div class="modal-card glass-panel">
+        <div class="modal-header">
+          <div>
+            <div class="modal-subtitle" id="modalVendor">Vendor Name</div>
+            <h2 class="modal-title" id="modalTitle">Model Name</h2>
+          </div>
+          <button class="modal-close-btn" id="closeModalBtn">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Dynamic detail view & Metadata inspection -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Generic IDE Crawler vs AI Crawler Comparison Modal -->
+    <div class="modal-backdrop" id="comparisonModal">
+      <div class="modal-card glass-panel comparison-modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-subtitle">Architectural & Capability Assessment</div>
+            <h2 class="modal-title">Generic IDE Crawler vs. Enterprise AI Crawler</h2>
+          </div>
+          <button class="modal-close-btn" id="closeComparisonBtn">✕</button>
+        </div>
+        <div class="modal-body" id="comparisonModalBody">
+          <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+            Comparative analysis of traditional static crawlers (Scrapy, BeautifulSoup, fixed CSS/XPath) versus an Enterprise AI Crawler (Crawl4AI headless Chromium + Google Gemini 2.5 Flash) for heterogeneous OT/IoT/IT lifecycle intelligence.
+          </p>
+          <div id="comparisonTableContainer">
+            <div class="spinner"></div> Loading comparison matrix...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div>Universal Multi-Vendor Industrial Lifecycle Intelligence POC &bull; Built with Crawl4AI & Google Gemini</div>
+      <div class="footer-meta">Autonomous Agentic Web Scraper POC &bull; 2026</div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
