@@ -39,6 +39,7 @@ artifacts/cache/
 *.log
 
 # Operating System & Browser Cache
+.cache/
 .DS_Store
 Thumbs.db
 *.tmp

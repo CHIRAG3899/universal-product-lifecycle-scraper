@@ -23,6 +23,39 @@ from scraper.security import safe_atomic_replace, sanitize_csv_cell
 
 logger = logging.getLogger("ai_scraper.storage")
 
+
+def is_genuine_lifecycle_record(data: Dict[str, Any]) -> bool:
+    """Strict lifecycle data integrity filter rejecting sitemaps, noise, services, and home appliances."""
+    def _s(v: Any) -> str:
+        if v is None:
+            return ""
+        if isinstance(v, float):
+            import math
+            if math.isnan(v):
+                return ""
+        return str(v).strip().lower()
+
+    m_name = _s(data.get("model_name"))
+    st_val = _s(data.get("status") or data.get("stage") or data.get("vendor_status"))
+    cat = _s(data.get("category") or data.get("product_category"))
+    src = _s(data.get("source_url"))
+
+    disallowed_statuses = {
+        "active", "active sitemaps record", "support video published",
+        "consulting services", "flexible credits", "operations offerings",
+        "service program", "battery recall program", "available order"
+    }
+    if st_val in disallowed_statuses or "video" in st_val or "sitemap" in st_val:
+        return False
+    if any(kw in src for kw in ("sitemap", "videos", "newsroom", "professional-services")):
+        return False
+    if any(kw in cat for kw in ("topic", "consulting", "support services", "fan", "refrigerator")):
+        return False
+    if any(kw in m_name for kw in ("onecare", "battery maintenance", "commissioning service", "electric fan", "ventilation fan", "battery recall")):
+        return False
+
+    return True
+
 _safe_atomic_replace = safe_atomic_replace
 
 
@@ -117,6 +150,9 @@ class MasterStorageManager:
                     fp = hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
                     row_dict["Fingerprint"] = fp
 
+                if not is_genuine_lifecycle_record(row_dict):
+                    continue
+
                 records[fp] = row_dict
 
             logger.info(f"Loaded {len(records)} verified clean records from master CSV for upsert matching.")
@@ -141,6 +177,8 @@ class MasterStorageManager:
         merged_map: Dict[str, Dict[str, Any]] = dict(existing_records)
 
         for p in new_products:
+            if not is_genuine_lifecycle_record(p.model_dump()):
+                continue
             v_name = (p.vendor_name or "").strip()
             m_name = (p.model_name or "").strip()
             status_val = (p.status or p.vendor_status or p.stage or "").strip()
@@ -169,7 +207,8 @@ class MasterStorageManager:
                 d_utc = ""
 
             model_part = (m_name or p.os or "").strip().upper()
-            fp = str(p.fingerprint or hashlib.sha256(f"{v_name}|{model_part}|{status_val}|{d_utc}".encode("utf-8")).hexdigest()[:16])
+            fp_key = f"{v_name.strip().upper()}|{model_part}|{status_val.strip().upper()}|{d_utc.strip()}"
+            fp = str(p.fingerprint or hashlib.sha256(fp_key.encode("utf-8")).hexdigest()[:16])
             meta = dict(p.metadata or {})
 
             # Consolidate all secondary attributes cleanly into metadata dictionary
@@ -303,10 +342,25 @@ class MasterStorageManager:
                 except Exception:
                     pass
 
-            # Merge vendor products by fingerprint
-            v_map = {item.get("fingerprint"): item for item in existing_v_list if isinstance(item, dict) and item.get("fingerprint")}
+            # Merge vendor products by fingerprint, enforcing genuine lifecycle filter
+            v_map = {
+                item.get("fingerprint"): item
+                for item in existing_v_list
+                if isinstance(item, dict) and item.get("fingerprint") and is_genuine_lifecycle_record(item)
+            }
             for p in v_products:
-                v_map[p.fingerprint] = p.model_dump()
+                p_dump = p.model_dump()
+                if is_genuine_lifecycle_record(p_dump):
+                    v_map[p.fingerprint] = p_dump
+
+            # Only persist vendor JSON if genuine records exist
+            if not v_map:
+                if vendor_json_path.exists():
+                    try:
+                        vendor_json_path.unlink()
+                    except Exception:
+                        pass
+                continue
 
             vendor_dataset = {
                 "vendor_id": v_key,

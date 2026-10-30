@@ -163,7 +163,7 @@ def resolve_provider_and_model(
 
     # Step 5: Resolve API key for the chosen provider
     final_key = api_key
-    if not final_key:
+    if final_key is None:
         if req_provider == "gemini":
             final_key = os.getenv("GEMINI_API_KEY", "")
         elif req_provider == "openai":

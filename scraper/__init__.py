@@ -3,6 +3,12 @@ Universal Multi-Vendor Product Lifecycle Intelligence Scraper Package.
 Pluggable multi-provider architecture supporting headless crawling and structured AI extraction.
 """
 
+import os
+from pathlib import Path
+
+# Ensure Crawl4AI stores cache/db inside workspace (prevents PermissionError on Windows/sandbox)
+os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(Path(__file__).resolve().parent.parent / ".cache"))
+
 from scraper.adapters import (
     FrameworkAdapter,
     LangChainToolAdapter,

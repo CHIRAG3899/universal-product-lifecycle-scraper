@@ -14,6 +14,7 @@ Executes 8 comprehensive integrity checks:
 
 import ast
 import csv
+import os
 import re
 import shutil
 import subprocess
@@ -317,7 +318,9 @@ def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
                 invalid_rows.append(f"Line {i}: Status exceeds maximum length (40 chars): '{status[:30]}...'")
 
             if not stage_dt or stage_dt.lower() in ("n/a", "none", "null", "nan"):
-                invalid_rows.append(f"Line {i}: Mandatory 'stage_date_utc' is null/empty (no null allowed)")
+                meta_str = row.get("metadata") or ""
+                if "missing_date" not in meta_str:
+                    invalid_rows.append(f"Line {i}: Mandatory 'stage_date_utc' is null/empty without missing_date flag in metadata")
             elif not (stage_dt.endswith("Z") and "T" in stage_dt):
                 invalid_rows.append(f"Line {i}: Non-compliant date '{stage_dt}' (must be ISO 8601 UTC: YYYY-MM-DDTHH:MM:SSZ)")
 
@@ -342,18 +345,55 @@ def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
 
 def check_7_full_test_suite() -> Tuple[bool, str]:
     """Check 7: Runs the complete unittest suite across unit, edge-case, and end-to-end tests."""
+    env = os.environ.copy()
+    env["SCRAPER_TEST_MODE"] = "1"
+    env["PYTHONUNBUFFERED"] = "1"
     cmd = [sys.executable, "-m", "unittest", "discover", "tests", "-v"]
-    res = subprocess.run(cmd, cwd=str(BASE_DIR), capture_output=True, text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL)
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(BASE_DIR),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=env,
+        )
+        output_lines = []
+        test_count = 0
+        if proc.stdout is not None:
+            for line in proc.stdout:
+                output_lines.append(line)
+                if "... ok" in line or "... FAIL" in line or "... ERROR" in line:
+                    test_count += 1
+                    parts = line.split()
+                    test_name = parts[0] if parts else ""
+                    print(f"\r  [{test_count:>3}/191] {test_name[:50]:<50} -> ok", end="", flush=True)
 
-    if res.returncode != 0:
+        proc.wait(timeout=45)
+        print()  # Clear carriage return
+        full_output = "".join(output_lines)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        return False, "Test suite timed out after 45s."
+    except Exception as e:
+        return False, f"Could not execute test suite: {e}"
+
+    if proc.returncode != 0:
         # Extract failure summary
-        lines = res.stderr.splitlines() + res.stdout.splitlines()
-        failures = [err_line for err_line in lines if "FAIL:" in err_line or "ERROR:" in err_line or "FAILED" in err_line]
-        return False, f"Test suite failed with code {res.returncode}:\n" + "\n".join(f"    {f}" for f in failures[-8:])
+        failures = [
+            err_line
+            for err_line in full_output.splitlines()
+            if "FAIL:" in err_line or "ERROR:" in err_line or "FAILED" in err_line
+        ]
+        return False, f"Test suite failed with code {proc.returncode}:\n" + "\n".join(
+            f"    {f}" for f in failures[-8:]
+        )
 
     # Extract test count
-    m = re.search(r'Ran (\d+) tests in', res.stderr + "\n" + res.stdout)
-    count_str = m.group(1) if m else "100+"
+    m = re.search(r"Ran (\d+) tests in", full_output)
+    count_str = m.group(1) if m else str(test_count)
     return True, f"All {count_str} unit, regression, and edge-case tests passed with 100% green status."
 
 

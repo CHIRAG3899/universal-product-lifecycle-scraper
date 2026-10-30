@@ -13,6 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = BASE_DIR / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Ensure Crawl4AI stores cache/db inside workspace (prevents PermissionError on Windows/sandbox)
+os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(BASE_DIR / ".cache"))
+
 # Load .env if present
 load_dotenv(BASE_DIR / ".env")
 

@@ -48,7 +48,7 @@ class TestServerAPI(unittest.TestCase):
 
     def _get(self, path: str):
         req = urllib.request.Request(f"{self.base_url}{path}")
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=3.0) as resp:
             data = resp.read()
             return resp.status, resp.headers, data
 
@@ -59,7 +59,7 @@ class TestServerAPI(unittest.TestCase):
             data=body,
             headers={"Content-Type": "application/json"}
         )
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=3.0) as resp:
             data = resp.read()
             return resp.status, resp.headers, data
 
@@ -99,7 +99,7 @@ class TestServerAPI(unittest.TestCase):
     def test_05_options_cors_preflight(self):
         """Verifies OPTIONS request returns CORS headers."""
         req = urllib.request.Request(f"{self.base_url}/api/status", method="OPTIONS")
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, timeout=3.0) as resp:
             self.assertEqual(resp.status, 200)
             self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), "*")
             self.assertIn("POST", resp.headers.get("Access-Control-Allow-Methods", ""))

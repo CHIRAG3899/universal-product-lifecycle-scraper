@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -232,6 +233,7 @@ class UniversalAIExtractor:
         self.cache_ttl = cache_ttl or AI_PROMPT_CACHE_TTL
         self.batch_mode = batch_mode if batch_mode is not None else AI_BATCH_MODE
         self._active_cache_name: Optional[str] = None
+        self._last_call_timestamp: float = 0.0
 
         self.token_metrics: Dict[str, Any] = {
             "provider": self.provider,
@@ -332,6 +334,7 @@ class UniversalAIExtractor:
             last_err = ""
             for mod in candidate_models:
                 try:
+                    self._throttle_gemini_call()
                     response = self.client.models.generate_content(
                         model=mod,
                         contents="Reply with: 'OK'"
@@ -381,6 +384,24 @@ class UniversalAIExtractor:
             return True, f"Connection successful! Provider '{self.provider}' model '{self.model_name}' responded: {txt.strip()}"
         except Exception as e:
             return False, f"{self.provider.upper()} API Error: {e}"
+
+    def _throttle_gemini_call(self, min_interval: float = 4.1) -> None:
+        """
+        Throttles consecutive Gemini calls to prevent 429 RESOURCE_EXHAUSTED.
+        Gemini Free Tier has a 15 RPM limit; 4.1s spacing guarantees safety.
+        """
+        # Skip sleep in automated unit tests
+        if os.getenv("SCRAPER_TEST_MODE") == "1" or "unittest" in sys.modules:
+            self._last_call_timestamp = time.time()
+            return
+
+        now = time.time()
+        elapsed = now - self._last_call_timestamp
+        if elapsed < min_interval:
+            wait_time = min_interval - elapsed
+            logger.debug(f"Throttling Gemini request ({wait_time:.2f}s) to preserve 15 RPM quota.")
+            time.sleep(wait_time)
+        self._last_call_timestamp = time.time()
 
     def _build_thinking_config(self) -> Optional[Any]:
         """
@@ -709,6 +730,7 @@ class UniversalAIExtractor:
                 if thinking_cfg:
                     gen_config_kwargs["thinking_config"] = thinking_cfg
 
+                self._throttle_gemini_call()
                 response = self.client.models.generate_content(
                     model=self.model_name,
                     contents=user_prompt,
@@ -749,7 +771,7 @@ class UniversalAIExtractor:
             except Exception as e:
                 err_str = str(e).lower()
                 # If thinking_config is unsupported by the model, disable it and retry
-                if "thinking" in err_str and thinking_cfg is not None:
+                if ("thinking" in err_str or "invalid_argument" in err_str or "400" in err_str) and thinking_cfg is not None:
                     logger.info("Thinking budget not supported on this model; retrying without thinking_config.")
                     thinking_cfg = None
                     continue
@@ -767,6 +789,13 @@ class UniversalAIExtractor:
                     except ValueError:
                         next_candidate = candidates[0]
                     backoff_secs = (attempt + 1) * 2
+                    m_retry = re.search(r'retry\s+(?:in\s+)?(\d+(?:\.\d+)?)s', err_str) or re.search(r"['\"]retrydelay['\"]\s*:\s*['\"](\d+)s['\"]", err_str)
+                    if m_retry:
+                        try:
+                            parsed_wait = float(m_retry.group(1))
+                            backoff_secs = int(min(max(parsed_wait + 1.0, 5.0), 65.0))
+                        except Exception:
+                            pass
                     logger.warning(f"Gemini transient limit/error on '{self.model_name}' ({e}). Switching to '{next_candidate}' (backoff {backoff_secs}s)...")
                     self.model_name = next_candidate
                     time.sleep(backoff_secs)

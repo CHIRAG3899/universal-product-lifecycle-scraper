@@ -26,14 +26,38 @@ vendors:
     - contentstack.com
     - mitsubishielectricfa.com
     entry_points:
-    - name: Europe_FA_EOL
+    - name: Europe_FA_EOL_Portal
       url: https://se-fa.mitsubishielectric.com/fa/se_en/support/product-life-cycle-stage-eol
       region: Europe
       crawler_type: nextjs_apollo
-    - name: Nordic_FA_EOL
+    - name: Nordic_FA_EOL_Portal
       url: https://no-fa.mitsubishielectric.com/fa/no_en/support/Product-Life-Cycle-Information
       region: Nordic
       crawler_type: nextjs_apollo
+    - name: Mitsubishi_FA_PLC_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/cnt/plc/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Mitsubishi_FA_Inverter_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/drv/inv/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Mitsubishi_FA_Servo_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/drv/servo/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Mitsubishi_FA_HMI_GOT_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/hmi/got/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Mitsubishi_FA_Robots_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/rbt/robot/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
+    - name: Mitsubishi_FA_CNC_Discontinued
+      url: https://www.mitsubishielectric.com/fa/products/cnt/cnc/pmerit/select/discon/index.html
+      region: Global
+      crawler_type: dom_table
     - name: Americas_FA_Support
       url: https://us.mitsubishielectric.com/fa/en/support/technical-bulletins
       region: Americas
@@ -51,8 +75,28 @@ vendors:
     - sieportal.siemens.com
     - industry.siemens.com
     entry_points:
-    - name: SiePortal_Lifecycle
+    - name: Siemens_SiePortal_Lifecycle
       url: https://sieportal.siemens.com/en-ww/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Siemens_Industry_Support_Product_Milestones
+      url: https://support.industry.siemens.com/cs/ww/en/ps
+      region: Global
+      crawler_type: dom_table
+    - name: Siemens_SIMATIC_S7_PLC_Milestones
+      url: https://support.industry.siemens.com/cs/document/109486162
+      region: Global
+      crawler_type: dom_table
+    - name: Siemens_SINAMICS_Drives_Milestones
+      url: https://support.industry.siemens.com/cs/document/109748861
+      region: Global
+      crawler_type: dom_table
+    - name: Siemens_SCALANCE_Network_Milestones
+      url: https://support.industry.siemens.com/cs/document/109780185
+      region: Global
+      crawler_type: dom_table
+    - name: Siemens_SIMATIC_HMI_Panels_Milestones
+      url: https://support.industry.siemens.com/cs/document/109486161
       region: Global
       crawler_type: dom_table
     sectors:
@@ -73,6 +117,26 @@ vendors:
     - schneider-electric.com
     - apc.com
     entry_points:
+    - name: Schneider_Product_End_of_Life_Hub
+      url: https://www.se.com/ww/en/work/support/resources-and-tools/product-end-of-life/
+      region: Global
+      crawler_type: dom_table
+    - name: Schneider_Modicon_PLC_Legacy_Lifecycle
+      url: https://www.se.com/ww/en/work/products/industrial-automation-control/programmable-controllers-plcs/modicon-legacy.jsp
+      region: Global
+      crawler_type: dom_table
+    - name: Schneider_Altivar_Drives_Lifecycle
+      url: https://www.se.com/ww/en/work/products/industrial-automation-control/variable-speed-drives-and-soft-starters/
+      region: Global
+      crawler_type: dom_table
+    - name: Schneider_Harmony_HMI_Lifecycle
+      url: https://www.se.com/ww/en/work/products/industrial-automation-control/human-machine-interfaces-hmi/
+      region: Global
+      crawler_type: dom_table
+    - name: APC_Smart_UPS_Lifecycle_Support
+      url: https://www.apc.com/us/en/support/product-support/ups-lifecycle.jsp
+      region: Global
+      crawler_type: dom_table
     - name: Schneider_Lifecycle_Services
       url: https://www.se.com/ww/en/work/services/field-services/industrial-automation/modernization-and-upgrades/
       region: Global
@@ -90,6 +154,30 @@ vendors:
     - rockwellautomation.com
     - ab.com
     entry_points:
+    - name: Rockwell_Lifecycle_Status_Directory
+      url: https://www.rockwellautomation.com/en-us/support/documentation/overview/lifecycle-status.html
+      region: Global
+      crawler_type: dom_table
+    - name: Rockwell_Discontinued_Hardware_Matrix
+      url: https://www.rockwellautomation.com/en-us/products/hardware/discontinued.html
+      region: Global
+      crawler_type: dom_table
+    - name: Allen_Bradley_Migration_Solutions
+      url: https://www.rockwellautomation.com/en-us/capabilities/industrial-automation-services/modernization-migration.html
+      region: Global
+      crawler_type: dom_table
+    - name: Allen_Bradley_Drives_Lifecycle
+      url: https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/drives.html
+      region: Global
+      crawler_type: dom_table
+    - name: Allen_Bradley_HMI_Lifecycle
+      url: https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/human-machine-interface.html
+      region: Global
+      crawler_type: dom_table
+    - name: Allen_Bradley_Stratix_Network_Lifecycle
+      url: https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/network-security-infrastructure.html
+      region: Global
+      crawler_type: dom_table
     - name: Rockwell_Lifecycle_Status
       url: https://www.rockwellautomation.com/en-us/support/documentation/lifecycle-status.html
       region: Global
@@ -103,6 +191,26 @@ vendors:
     - omron.com
     - ia.omron.com
     entry_points:
+    - name: Omron_Discontinued_Products_Hub
+      url: https://ia.omron.com/support/discontinued/
+      region: Global
+      crawler_type: dom_table
+    - name: Omron_PLC_Discontinuation_List
+      url: https://ia.omron.com/support/discontinued/programmable-controllers/
+      region: Global
+      crawler_type: dom_table
+    - name: Omron_Motion_Drives_Discontinued
+      url: https://ia.omron.com/support/discontinued/motion-and-drives/
+      region: Global
+      crawler_type: dom_table
+    - name: Omron_HMI_Discontinued
+      url: https://ia.omron.com/support/discontinued/hmi/
+      region: Global
+      crawler_type: dom_table
+    - name: Omron_Sensors_Vision_Discontinued
+      url: https://ia.omron.com/support/discontinued/sensors/
+      region: Global
+      crawler_type: dom_table
     - name: Omron_Discontinued
       url: https://www.ia.omron.com/support/discontinued/
       region: Global
@@ -115,8 +223,20 @@ vendors:
     allowed_domains:
     - abb.com
     entry_points:
-    - name: ABB_PLC_Lifecycle
+    - name: ABB_PLC_Support_Lifecycle
       url: https://new.abb.com/plc/support/product-life-cycle
+      region: Global
+      crawler_type: dom_table
+    - name: ABB_Drives_Lifecycle_Management
+      url: https://new.abb.com/drives/services/lifecycle-management
+      region: Global
+      crawler_type: dom_table
+    - name: ABB_Robotics_Lifecycle_Management
+      url: https://new.abb.com/products/robotics/service/lifecycle-management
+      region: Global
+      crawler_type: dom_table
+    - name: ABB_Low_Voltage_Breakers_Lifecycle
+      url: https://new.abb.com/low-voltage/service/lifecycle-management
       region: Global
       crawler_type: dom_table
   yokogawa:
@@ -127,6 +247,14 @@ vendors:
     allowed_domains:
     - yokogawa.com
     entry_points:
+    - name: Yokogawa_Support_Lifecycle_Policy
+      url: https://www.yokogawa.com/solutions/services/lifecycle-support/
+      region: Global
+      crawler_type: dom_table
+    - name: Yokogawa_DCS_Lifecycle_Management
+      url: https://www.yokogawa.com/solutions/products-and-services/control-systems/distributed-control-systems-dcs/
+      region: Global
+      crawler_type: dom_table
     - name: Yokogawa_Lifecycle
       url: https://www.yokogawa.com/solutions/services/lifecycle-maintenance/
       region: Global
@@ -139,6 +267,14 @@ vendors:
     allowed_domains:
     - emerson.com
     entry_points:
+    - name: Emerson_DeltaV_DCS_Lifecycle
+      url: https://www.emerson.com/en-us/automation/systems-and-software/distributed-control-systems-dcs/deltav-distributed-control-system/deltav-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Emerson_PACSystems_PLC_Lifecycle
+      url: https://www.emerson.com/en-us/automation/control-and-computing-edge/programmable-logic-controllers-plcs
+      region: Global
+      crawler_type: dom_table
     - name: Emerson_Lifecycle
       url: https://www.emerson.com/en-us/support/lifecycle-services
       region: Global
@@ -151,8 +287,20 @@ vendors:
     allowed_domains:
     - beckhoff.com
     entry_points:
-    - name: Beckhoff_Discontinued
+    - name: Beckhoff_Discontinued_Products
       url: https://www.beckhoff.com/en-en/products/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+    - name: Beckhoff_Product_Life_Cycle_Policy
+      url: https://www.beckhoff.com/en-en/support/product-life-cycle/
+      region: Global
+      crawler_type: dom_table
+    - name: Beckhoff_Industrial_PCs_Discontinued
+      url: https://www.beckhoff.com/en-en/products/industrial-pc/discontinued-products/
+      region: Global
+      crawler_type: dom_table
+    - name: Beckhoff_IO_Terminals_Discontinued
+      url: https://www.beckhoff.com/en-en/products/i-o/ethercat-terminals/discontinued-products/
       region: Global
       crawler_type: dom_table
   phoenix_contact:
@@ -163,8 +311,16 @@ vendors:
     allowed_domains:
     - phoenixcontact.com
     entry_points:
-    - name: Phoenix_Discontinued
+    - name: Phoenix_Contact_Discontinued_Products
       url: https://www.phoenixcontact.com/en-us/products/discontinued-products
+      region: Global
+      crawler_type: dom_table
+    - name: Phoenix_Contact_Industrial_Ethernet_Discontinued
+      url: https://www.phoenixcontact.com/en-us/products/industrial-communication/discontinued-products
+      region: Global
+      crawler_type: dom_table
+    - name: Phoenix_Contact_Power_Supplies_Discontinued
+      url: https://www.phoenixcontact.com/en-us/products/power-supplies-and-ups/discontinued-products
       region: Global
       crawler_type: dom_table
   eaton:
@@ -175,6 +331,14 @@ vendors:
     allowed_domains:
     - eaton.com
     entry_points:
+    - name: Eaton_Obsolete_Products_Listing
+      url: https://www.eaton.com/us/en-us/support/obsolete-products.html
+      region: Global
+      crawler_type: dom_table
+    - name: Eaton_UPS_Data_Center_Power_Lifecycle
+      url: https://www.eaton.com/us/en-us/products/backup-power-ups-surge-it-power-distribution.html
+      region: Global
+      crawler_type: dom_table
     - name: Eaton_Lifecycle
       url: https://www.eaton.com/us/en-us/support/end-of-life.html
       region: Global
@@ -188,6 +352,14 @@ vendors:
     - fanuc.com
     - fanucamerica.com
     entry_points:
+    - name: FANUC_CNC_Obsolete_Parts_Repair
+      url: https://www.fanucamerica.com/services/cnc-repair/obsolete-parts
+      region: Global
+      crawler_type: dom_table
+    - name: FANUC_Robotics_Lifecycle_Support
+      url: https://www.fanucamerica.com/services/robotics/service-and-support
+      region: Global
+      crawler_type: dom_table
     - name: FANUC_Support
       url: https://www.fanucamerica.com/support
       region: Global
@@ -200,6 +372,14 @@ vendors:
     allowed_domains:
     - yaskawa.com
     entry_points:
+    - name: Yaskawa_AC_Drives_Legacy_Products
+      url: https://www.yaskawa.com/products/drives/industrial-ac-drives/legacy-drives
+      region: Global
+      crawler_type: dom_table
+    - name: Yaskawa_Servos_Motion_Legacy_Products
+      url: https://www.yaskawa.com/products/motion/sigma-series-servo-products/legacy-servos
+      region: Global
+      crawler_type: dom_table
     - name: Yaskawa_Legacy
       url: https://www.yaskawa.com/products/legacy-products
       region: Global
@@ -212,8 +392,12 @@ vendors:
     allowed_domains:
     - advantech.com
     entry_points:
-    - name: Advantech_EOL
+    - name: Advantech_EOL_Products_Portal
       url: https://www.advantech.com/en/support/eol-products
+      region: Global
+      crawler_type: dom_table
+    - name: Advantech_Details_EOL_Portal
+      url: https://www.advantech.com/en/support/details/eol
       region: Global
       crawler_type: dom_table
     sectors:
@@ -227,7 +411,11 @@ vendors:
     allowed_domains:
     - moxa.com
     entry_points:
-    - name: Moxa_Discontinued
+    - name: Moxa_Product_Lifecycle_Status
+      url: https://www.moxa.com/en/support/product-support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Moxa_Discontinued_Products_Search
       url: https://www.moxa.com/en/support/product-support/discontinued-products
       region: Global
       crawler_type: dom_table
@@ -239,8 +427,12 @@ vendors:
     allowed_domains:
     - wago.com
     entry_points:
-    - name: WAGO_Discontinued
+    - name: WAGO_Discontinued_Products_Catalog
       url: https://www.wago.com/us/discontinued-products
+      region: Global
+      crawler_type: dom_table
+    - name: WAGO_Controllers_IO_Lifecycle
+      url: https://www.wago.com/us/controllers-bus-couplers-i-o
       region: Global
       crawler_type: dom_table
   keyence:
@@ -252,6 +444,14 @@ vendors:
     - keyence.com
     - keyence.co.jp
     entry_points:
+    - name: Keyence_Discontinued_Products
+      url: https://www.keyence.com/support/user/discontinue/
+      region: Global
+      crawler_type: dom_table
+    - name: Keyence_Vision_Systems_Support
+      url: https://www.keyence.com/products/vision/vision-sys/
+      region: Global
+      crawler_type: dom_table
     - name: Keyence_Discontinued
       url: https://www.keyence.com/support/discontinued/
       region: Global
@@ -273,6 +473,14 @@ vendors:
     - danfoss.com
     - vacon.com
     entry_points:
+    - name: Danfoss_DrivePro_Lifecycle_Services
+      url: https://www.danfoss.com/en/service-and-support/drives/lifecycle-services/
+      region: Global
+      crawler_type: dom_table
+    - name: Danfoss_VLT_Drives_Discontinued
+      url: https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-frequency-converters/
+      region: Global
+      crawler_type: dom_table
     - name: Danfoss_Lifecycle
       url: https://www.danfoss.com/en/service-and-support/drives-lifecycle-management/
       region: Global
@@ -293,6 +501,10 @@ vendors:
     allowed_domains:
     - endress.com
     entry_points:
+    - name: Endress_Hauser_Lifecycle_Services
+      url: https://www.endress.com/en/Field-instruments-overview/services-field-devices/lifecycle-management
+      region: Global
+      crawler_type: dom_table
     - name: EH_Discontinued
       url: https://www.endress.com/en/field-instruments-overview/discontinued-products
       region: Global
@@ -305,6 +517,10 @@ vendors:
     allowed_domains:
     - br-automation.com
     entry_points:
+    - name: BR_Automation_Discontinued_Products
+      url: https://www.br-automation.com/en/services/product-life-cycle/
+      region: Global
+      crawler_type: dom_table
     - name: BR_Discontinued
       url: https://www.br-automation.com/en/support/discontinued-products/
       region: Global
@@ -317,6 +533,14 @@ vendors:
     allowed_domains:
     - kuka.com
     entry_points:
+    - name: KUKA_Robots_Lifecycle_Spare_Parts
+      url: https://www.kuka.com/en-us/services/customer-service/spare-parts
+      region: Global
+      crawler_type: dom_table
+    - name: KUKA_Robot_Controllers_Support
+      url: https://www.kuka.com/en-us/products/robot-systems/robot-controllers
+      region: Global
+      crawler_type: dom_table
     - name: Kuka_Lifecycle
       url: https://www.kuka.com/en-us/services/kuka-customer-support/product-lifecycle
       region: Global
@@ -330,6 +554,10 @@ vendors:
     - turck.com
     - turck.de
     entry_points:
+    - name: Turck_Discontinued_Products_Catalog
+      url: https://www.turck.de/en/discontinued-products-4528.php
+      region: Global
+      crawler_type: dom_table
     - name: Turck_Discontinued
       url: https://www.turck.de/en/discontinued-products-4422.php
       region: Global
@@ -342,6 +570,14 @@ vendors:
     allowed_domains:
     - festo.com
     entry_points:
+    - name: Festo_Discontinued_Products
+      url: https://www.festo.com/us/en/e/products/discontinued-products-id_5474/
+      region: Global
+      crawler_type: dom_table
+    - name: Festo_Electric_Automation_Lifecycle
+      url: https://www.festo.com/us/en/p/electric-automation-id_3100/
+      region: Global
+      crawler_type: dom_table
     - name: Festo_Discontinued
       url: https://www.festo.com/us/en/e/support/discontinued-products-id_342/
       region: Global
@@ -355,6 +591,14 @@ vendors:
     - belden.com
     - hirschmann.com
     entry_points:
+    - name: Hirschmann_Product_Lifecycle_Portal
+      url: https://www.belden.com/resources/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Hirschmann_Industrial_Ethernet_Switches
+      url: https://www.hirschmann.com/en/Hirschmann_Industrial_Ethernet/
+      region: Global
+      crawler_type: dom_table
     - name: Hirschmann_EOL
       url: https://www.belden.com/support/product-lifecycle
       region: Global
@@ -367,6 +611,10 @@ vendors:
     allowed_domains:
     - redlion.net
     entry_points:
+    - name: Red_Lion_Product_Lifecycle
+      url: https://www.redlion.net/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: RedLion_EOL
       url: https://www.redlion.net/support/product-bulletins-eol
       region: Global
@@ -379,6 +627,14 @@ vendors:
     allowed_domains:
     - weidmuller.com
     entry_points:
+    - name: Weidmuller_Discontinued_Products
+      url: https://www.weidmuller.com/en/service/support/discontinued_products.jsp
+      region: Global
+      crawler_type: dom_table
+    - name: Weidmuller_Industrial_Ethernet_Lifecycle
+      url: https://www.weidmuller.com/en/products/industrial_ethernet/index.jsp
+      region: Global
+      crawler_type: dom_table
     - name: Weidmuller_Discontinued
       url: https://www.weidmuller.com/en/support/product_discontinuation.jsp
       region: Global
@@ -393,8 +649,12 @@ vendors:
     - delta-emea.com
     - delta-americas.com
     entry_points:
-    - name: Delta_IA_Discontinued
+    - name: Delta_Industrial_Automation_Discontinued
       url: https://www.deltaww.com/en-US/products/Industrial-Automation/discontinued
+      region: Global
+      crawler_type: dom_table
+    - name: Delta_UPS_Power_Solutions_Lifecycle
+      url: https://www.deltaww.com/en-US/products/Power-Supplies/overview
       region: Global
       crawler_type: dom_table
     - name: Delta_Industrial_Automation
@@ -414,7 +674,7 @@ vendors:
     - hms-networks.com
     - anybus.com
     entry_points:
-    - name: HMS_Product_Lifecycle
+    - name: HMS_Networks_Product_Lifecycle
       url: https://www.hms-networks.com/support/product-lifecycle
       region: Global
       crawler_type: dom_table
@@ -425,7 +685,12 @@ vendors:
     website: https://www.proface.com
     allowed_domains:
     - proface.com
+    - pro-face.com
     entry_points:
+    - name: ProFace_HMI_Discontinued_Replacements
+      url: https://www.pro-face.com/otasuke/download/replace/
+      region: Global
+      crawler_type: dom_table
     - name: ProFace_Repair_Period
       url: https://www.proface.com/en/support/repair/period
       region: Global
@@ -439,6 +704,10 @@ vendors:
     - cognex.com
     - support.cognex.com
     entry_points:
+    - name: Cognex_Discontinued_Products
+      url: https://www.cognex.com/support/discontinued-products
+      region: Global
+      crawler_type: dom_table
     - name: Cognex_Discontinued
       url: https://support.cognex.com/en/discontinued-products
       region: Global
@@ -459,6 +728,10 @@ vendors:
     allowed_domains:
     - sick.com
     entry_points:
+    - name: SICK_Discontinued_Products_Catalog
+      url: https://www.sick.com/ag/en/discontinued-products/c/discontinued_products
+      region: Global
+      crawler_type: dom_table
     - name: SICK_Discontinued
       url: https://www.sick.com/ag/en/discontinued-products/c/discontinued
       region: Global
@@ -471,6 +744,10 @@ vendors:
     allowed_domains:
     - pepperl-fuchs.com
     entry_points:
+    - name: Pepperl_Fuchs_Discontinued_Products
+      url: https://www.pepperl-fuchs.com/global/en/discontinued_products.htm
+      region: Global
+      crawler_type: dom_table
     - name: PF_Discontinued
       url: https://www.pepperl-fuchs.com/global/en/discontinued-products.htm
       region: Global
@@ -483,6 +760,10 @@ vendors:
     allowed_domains:
     - ifm.com
     entry_points:
+    - name: ifm_Discontinued_Products_Catalog
+      url: https://www.ifm.com/us/en/category/discontinued-products
+      region: Global
+      crawler_type: dom_table
     - name: IFM_Discontinued
       url: https://www.ifm.com/us/en/category/discontinued-articles
       region: Global
@@ -495,7 +776,7 @@ vendors:
     allowed_domains:
     - pilz.com
     entry_points:
-    - name: Pilz_Discontinued
+    - name: Pilz_Safety_Relays_Discontinued
       url: https://www.pilz.com/en-INT/support/discontinued-products
       region: Global
       crawler_type: dom_table
@@ -508,6 +789,10 @@ vendors:
     - ge.com
     - gevernova.com
     entry_points:
+    - name: GE_Digital_Software_Lifecycle_Policies
+      url: https://www.ge.com/digital/support/lifecycle-policies
+      region: Global
+      crawler_type: dom_table
     - name: GEDigital_Lifecycle
       url: https://www.ge.com/digital/support/lifecycle
       region: Global
@@ -520,6 +805,10 @@ vendors:
     allowed_domains:
     - bannerengineering.com
     entry_points:
+    - name: Banner_Discontinued_Products
+      url: https://www.bannerengineering.com/us/en/support/discontinued-products.html
+      region: Global
+      crawler_type: dom_table
     - name: Banner_Discontinued
       url: https://www.bannerengineering.com/us/en/products/discontinued-products.html
       region: Global
@@ -532,6 +821,10 @@ vendors:
     allowed_domains:
     - smcworld.com
     entry_points:
+    - name: SMC_Discontinued_Products_Maintenance
+      url: https://www.smcworld.com/discon/en/
+      region: Global
+      crawler_type: dom_table
     - name: SMC_Discontinued
       url: https://www.smcworld.com/discontinued/en/
       region: Global
@@ -544,6 +837,10 @@ vendors:
     allowed_domains:
     - valmet.com
     entry_points:
+    - name: Valmet_DNA_Lifecycle_Services
+      url: https://www.valmet.com/automation/services/lifecycle-services/
+      region: Global
+      crawler_type: dom_table
     - name: Valmet_Lifecycle
       url: https://www.valmet.com/automation/services/lifecycle-management/
       region: Global
@@ -556,8 +853,24 @@ vendors:
     allowed_domains:
     - intel.com
     entry_points:
-    - name: Intel_Product_Lifecycle
+    - name: Intel_Product_Discontinuation_Portal
       url: https://www.intel.com/content/www/us/en/support/topics/product-lifecycle.html
+      region: Global
+      crawler_type: dom_table
+    - name: Intel_Discontinued_Processors_Database
+      url: https://www.intel.com/content/www/us/en/support/articles/000022396/processors.html
+      region: Global
+      crawler_type: dom_table
+    - name: Intel_Discontinued_Ethernet_Adapters
+      url: https://www.intel.com/content/www/us/en/support/articles/000005779/ethernet-products.html
+      region: Global
+      crawler_type: dom_table
+    - name: Intel_Discontinued_NUC_Mini_PCs
+      url: https://www.intel.com/content/www/us/en/support/articles/000005934/intel-nuc.html
+      region: Global
+      crawler_type: dom_table
+    - name: Intel_Server_Boards_Systems_Retirement
+      url: https://www.intel.com/content/www/us/en/support/articles/000006456/server-products.html
       region: Global
       crawler_type: dom_table
     sectors:
@@ -571,6 +884,10 @@ vendors:
     allowed_domains:
     - qualcomm.com
     entry_points:
+    - name: Qualcomm_Product_Longevity
+      url: https://www.qualcomm.com/products/application/industrial-commercial/longevity-program
+      region: Global
+      crawler_type: dom_table
     - name: Qualcomm_Product_Support
       url: https://www.qualcomm.com/products/internet-of-things
       region: Global
@@ -587,6 +904,10 @@ vendors:
     - ti.com
     entry_points:
     - name: TI_Product_Life_Cycle
+      url: https://www.ti.com/quality-reliability-packaging-download/quality-manual/product-life-cycle.html
+      region: Global
+      crawler_type: dom_table
+    - name: TI_Product_Life_Cycle
       url: https://www.ti.com/support-quality/quality-policies-procedures/product-life-cycle.html
       region: Global
       crawler_type: dom_table
@@ -598,6 +919,10 @@ vendors:
     allowed_domains:
     - nxp.com
     entry_points:
+    - name: NXP_Product_Longevity
+      url: https://www.nxp.com/products/product-longevity:PRDCT_LONGEVITY_HM
+      region: Global
+      crawler_type: dom_table
     - name: NXP_Longevity
       url: https://www.nxp.com/products/product-information/product-longevity:PRDCT_LONGEVITY_HM
       region: Global
@@ -610,6 +935,10 @@ vendors:
     allowed_domains:
     - st.com
     entry_points:
+    - name: STMicroelectronics_Product_Longevity
+      url: https://www.st.com/en/product-longevity.html
+      region: Global
+      crawler_type: dom_table
     - name: ST_Longevity
       url: https://www.st.com/content/st_com/en/about/quality-and-reliability/product-longevity.html
       region: Global
@@ -622,6 +951,10 @@ vendors:
     allowed_domains:
     - microchip.com
     entry_points:
+    - name: Microchip_PCN_Discontinued
+      url: https://www.microchip.com/en-us/support/product-change-notifications
+      region: Global
+      crawler_type: dom_table
     - name: Microchip_EOL
       url: https://www.microchip.com/en-us/support/product-change-notification
       region: Global
@@ -634,7 +967,7 @@ vendors:
     allowed_domains:
     - espressif.com
     entry_points:
-    - name: Espressif_Longevity
+    - name: Espressif_Longevity_Commitment
       url: https://www.espressif.com/en/products/longevity-commitment
       region: Global
       crawler_type: dom_table
@@ -646,6 +979,10 @@ vendors:
     allowed_domains:
     - silabs.com
     entry_points:
+    - name: Silicon_Labs_Longevity
+      url: https://www.silabs.com/products/longevity
+      region: Global
+      crawler_type: dom_table
     - name: SiliconLabs_EOL
       url: https://www.silabs.com/support/resources.p-wireless
       region: Global
@@ -658,6 +995,10 @@ vendors:
     allowed_domains:
     - telit.com
     entry_points:
+    - name: Telit_Product_Lifecycle_Status
+      url: https://www.telit.com/support/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: Telit_EOL_Notices
       url: https://www.telit.com/support/product-lifecycle-management/
       region: Global
@@ -670,6 +1011,10 @@ vendors:
     allowed_domains:
     - quectel.com
     entry_points:
+    - name: Quectel_Product_Lifecycle
+      url: https://www.quectel.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Quectel_Lifecycle
       url: https://www.quectel.com/support/product-lifecycle-management
       region: Global
@@ -682,6 +1027,10 @@ vendors:
     allowed_domains:
     - nordicsemi.com
     entry_points:
+    - name: Nordic_Product_Longevity
+      url: https://www.nordicsemi.com/Products/Product-Longevity
+      region: Global
+      crawler_type: dom_table
     - name: Nordic_Notices
       url: https://www.nordicsemi.com/Products/Product-Change-Notices
       region: Global
@@ -694,6 +1043,10 @@ vendors:
     allowed_domains:
     - particle.io
     entry_points:
+    - name: Particle_Product_Lifecycle
+      url: https://docs.particle.io/reference/datasheets/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: Particle_Lifecycle
       url: https://docs.particle.io/datasheets/asset-tracking/hardware-lifecycle-policy/
       region: Global
@@ -706,7 +1059,7 @@ vendors:
     allowed_domains:
     - arduino.cc
     entry_points:
-    - name: Arduino_Discontinued
+    - name: Arduino_Retired_Products
       url: https://www.arduino.cc/en/Main/Products#retired
       region: Global
       crawler_type: dom_table
@@ -718,6 +1071,10 @@ vendors:
     allowed_domains:
     - raspberrypi.com
     entry_points:
+    - name: Raspberry_Pi_Product_Longevity
+      url: https://www.raspberrypi.com/products/#product-longevity
+      region: Global
+      crawler_type: dom_table
     - name: RaspberryPi_Obsolescence
       url: https://www.raspberrypi.com/products/compute-module-4/#obsolescence-statement
       region: Global
@@ -730,6 +1087,14 @@ vendors:
     allowed_domains:
     - digi.com
     entry_points:
+    - name: Digi_Product_Lifecycle_Notices
+      url: https://www.digi.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Digi_Retired_Products_List
+      url: https://www.digi.com/support/retired-products
+      region: Global
+      crawler_type: dom_table
     - name: Digi_EOL
       url: https://www.digi.com/support/lifecycle
       region: Global
@@ -742,6 +1107,10 @@ vendors:
     allowed_domains:
     - eurotech.com
     entry_points:
+    - name: Eurotech_Product_Lifecycle
+      url: https://www.eurotech.com/en/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Eurotech_Lifecycle
       url: https://www.eurotech.com/en-us/products/hardware/lifecycle
       region: Global
@@ -754,6 +1123,10 @@ vendors:
     allowed_domains:
     - multitech.com
     entry_points:
+    - name: MultiTech_Product_Lifecycle
+      url: https://www.multitech.com/support/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: MultiTech_EOL
       url: https://www.multitech.com/support/product-lifecycle-notices
       region: Global
@@ -766,6 +1139,10 @@ vendors:
     allowed_domains:
     - teltonika-networks.com
     entry_points:
+    - name: Teltonika_EOL_Policy
+      url: https://wiki.teltonika-networks.com/view/End_of_Life_(EOL)_Policy
+      region: Global
+      crawler_type: dom_table
     - name: Teltonika_EOL
       url: https://teltonika-networks.com/support/end-of-life
       region: Global
@@ -778,7 +1155,7 @@ vendors:
     allowed_domains:
     - kerlink.com
     entry_points:
-    - name: Kerlink_Support
+    - name: Kerlink_Gateways_Support
       url: https://www.kerlink.com/support/
       region: Global
       crawler_type: dom_table
@@ -790,7 +1167,7 @@ vendors:
     allowed_domains:
     - libelium.com
     entry_points:
-    - name: Libelium_Support
+    - name: Libelium_Support_Lifecycle
       url: https://www.libelium.com/support/
       region: Global
       crawler_type: dom_table
@@ -802,6 +1179,10 @@ vendors:
     allowed_domains:
     - seeedstudio.com
     entry_points:
+    - name: Seeed_Retired_Products
+      url: https://www.seeedstudio.com/depot/index.php?main_page=page&id=20
+      region: Global
+      crawler_type: dom_table
     - name: Seeed_Discontinued
       url: https://www.seeedstudio.com/depot/discontinued
       region: Global
@@ -813,7 +1194,12 @@ vendors:
     website: https://www.lairdconnect.com
     allowed_domains:
     - lairdconnect.com
+    - ezurio.com
     entry_points:
+    - name: Ezurio_Laird_Product_Lifecycle
+      url: https://www.ezurio.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Laird_PCN_EOL
       url: https://www.lairdconnect.com/support/product-change-notifications
       region: Global
@@ -826,7 +1212,7 @@ vendors:
     allowed_domains:
     - u-blox.com
     entry_points:
-    - name: Ublox_PCN
+    - name: ublox_Product_Change_Notifications
       url: https://www.u-blox.com/en/product-resources/product-change-notifications
       region: Global
       crawler_type: dom_table
@@ -841,6 +1227,14 @@ vendors:
     - semtech.com
     - sierrawireless.com
     entry_points:
+    - name: Semtech_Product_Discontinuance
+      url: https://www.semtech.com/quality/product-discontinuance
+      region: Global
+      crawler_type: dom_table
+    - name: Sierra_Wireless_Lifecycle_Notices
+      url: https://source.sierrawireless.com/lifecycle/notices/
+      region: Global
+      crawler_type: dom_table
     - name: Semtech_Products
       url: https://www.semtech.com/products
       region: Global
@@ -857,6 +1251,10 @@ vendors:
     allowed_domains:
     - sensirion.com
     entry_points:
+    - name: Sensirion_Product_Longevity
+      url: https://sensirion.com/products/product-longevity-and-discontinuation/
+      region: Global
+      crawler_type: dom_table
     - name: Sensirion_EOL
       url: https://sensirion.com/products/discontinued-products/
       region: Global
@@ -869,7 +1267,7 @@ vendors:
     allowed_domains:
     - murata.com
     entry_points:
-    - name: Murata_Discontinued
+    - name: Murata_Discontinued_Components
       url: https://www.murata.com/en-global/support/discontinued
       region: Global
       crawler_type: dom_table
@@ -881,6 +1279,10 @@ vendors:
     allowed_domains:
     - kontron.com
     entry_points:
+    - name: Kontron_Product_Lifecycle
+      url: https://www.kontron.com/en/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Kontron_EOL
       url: https://www.kontron.com/en/support/product-life-cycle
       region: Global
@@ -893,7 +1295,7 @@ vendors:
     allowed_domains:
     - dragino.com
     entry_points:
-    - name: Dragino_Support
+    - name: Dragino_Support_Documentation
       url: https://www.dragino.com/support.html
       region: Global
       crawler_type: dom_table
@@ -909,12 +1311,28 @@ vendors:
     - hpe.com
     - arubanetworks.com
     entry_points:
-    - name: HPE_Product_Lifecycle
-      url: https://www.hpe.com/us/en/support.html
+    - name: Aruba_Networks_EOS_EOL_Matrix
+      url: https://www.arubanetworks.com/support-services/end-of-life/
       region: Global
       crawler_type: dom_table
-    - name: Aruba_EOS_EOL
-      url: https://www.arubanetworks.com/support-services/end-of-life/
+    - name: HPE_FlexNetwork_EOS_Notices
+      url: https://support.hpe.com/hpesc/public/docDisplay?docId=c05278946
+      region: Global
+      crawler_type: dom_table
+    - name: HPE_Servers_Storage_Lifecycle_Portal
+      url: https://support.hpe.com/hpesc/public/home/productLifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: HPE_3PAR_Nimble_Storage_EOSL
+      url: https://support.hpe.com/hpesc/public/docDisplay?docId=a00115011en_us
+      region: Global
+      crawler_type: dom_table
+    - name: HPE_BladeSystem_Synergy_EOSL
+      url: https://support.hpe.com/hpesc/public/docDisplay?docId=c04803975
+      region: Global
+      crawler_type: dom_table
+    - name: HPE_Product_Lifecycle
+      url: https://www.hpe.com/us/en/support.html
       region: Global
       crawler_type: dom_table
   dell:
@@ -925,8 +1343,32 @@ vendors:
     allowed_domains:
     - dell.com
     entry_points:
-    - name: Dell_EOL_Policy
+    - name: Dell_Enterprise_EOSL_Hub
       url: https://www.dell.com/support/kbdoc/en-us/000185736/end-of-service-life-eosl
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_PowerEdge_Servers_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000185734/poweredge-server-end-of-service-life
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_Storage_Systems_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000185735/storage-end-of-service-life
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_Networking_Switches_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000185737/networking-end-of-service-life
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_Converged_Infrastructure_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000185738/converged-infrastructure-end-of-service-life
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_Precision_Workstations_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000192563/precision-workstations-end-of-service-life
+      region: Global
+      crawler_type: dom_table
+    - name: Dell_Wyse_Thin_Clients_EOSL
+      url: https://www.dell.com/support/kbdoc/en-us/000142345/dell-wyse-end-of-service-life-policy
       region: Global
       crawler_type: dom_table
   ibm:
@@ -937,8 +1379,12 @@ vendors:
     allowed_domains:
     - ibm.com
     entry_points:
-    - name: IBM_Lifecycle
+    - name: IBM_Systems_Hardware_Lifecycle
       url: https://www.ibm.com/support/pages/lifecycle/
+      region: Global
+      crawler_type: dom_table
+    - name: IBM_Storage_End_of_Service_Dates
+      url: https://www.ibm.com/support/pages/ibm-storage-end-service-dates
       region: Global
       crawler_type: dom_table
   juniper:
@@ -949,8 +1395,20 @@ vendors:
     allowed_domains:
     - juniper.net
     entry_points:
-    - name: Juniper_EOL
+    - name: Juniper_EOL_Hub
       url: https://support.juniper.net/support/eol/
+      region: Global
+      crawler_type: dom_table
+    - name: Juniper_EX_Switches_EOL
+      url: https://support.juniper.net/support/eol/product/ex-series/
+      region: Global
+      crawler_type: dom_table
+    - name: Juniper_MX_Routers_EOL
+      url: https://support.juniper.net/support/eol/product/mx-series/
+      region: Global
+      crawler_type: dom_table
+    - name: Juniper_SRX_Firewalls_EOL
+      url: https://support.juniper.net/support/eol/product/srx-series/
       region: Global
       crawler_type: dom_table
   arista:
@@ -961,6 +1419,14 @@ vendors:
     allowed_domains:
     - arista.com
     entry_points:
+    - name: Arista_End_of_Sale_Lifecycle_Notices
+      url: https://www.arista.com/en/support/advisories-notices/end-of-sale-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Arista_Software_EOS_Notices
+      url: https://www.arista.com/en/support/advisories-notices/end-of-software-support
+      region: Global
+      crawler_type: dom_table
     - name: Arista_EOL
       url: https://www.arista.com/en/support/product-end-of-life-policy
       region: Global
@@ -973,8 +1439,12 @@ vendors:
     allowed_domains:
     - fortinet.com
     entry_points:
-    - name: Fortinet_Product_Life_Cycle
+    - name: Fortinet_Product_Lifecycle_Information
       url: https://support.fortinet.com/Information/ProductLifeCycle.aspx
+      region: Global
+      crawler_type: dom_table
+    - name: Fortinet_FortiOS_Lifecycle_Information
+      url: https://support.fortinet.com/Information/ProductLifeCycle.aspx?type=FortiOS
       region: Global
       crawler_type: dom_table
   palo_alto:
@@ -985,6 +1455,14 @@ vendors:
     allowed_domains:
     - paloaltonetworks.com
     entry_points:
+    - name: PaloAlto_Hardware_EOL_Dates
+      url: https://www.paloaltonetworks.com/services/support/end-of-life-summary/hardware-end-of-life-dates
+      region: Global
+      crawler_type: dom_table
+    - name: PaloAlto_PAN_OS_EOL_Dates
+      url: https://www.paloaltonetworks.com/services/support/end-of-life-summary/pan-os-end-of-life-dates
+      region: Global
+      crawler_type: dom_table
     - name: PANW_EOL
       url: https://www.paloaltonetworks.com/services/support/end-of-life-summary
       region: Global
@@ -997,7 +1475,7 @@ vendors:
     allowed_domains:
     - checkpoint.com
     entry_points:
-    - name: CheckPoint_EOL
+    - name: CheckPoint_Support_Life_Cycle_Policy
       url: https://www.checkpoint.com/support-services/support-life-cycle-policy/
       region: Global
       crawler_type: dom_table
@@ -1009,8 +1487,12 @@ vendors:
     allowed_domains:
     - f5.com
     entry_points:
-    - name: F5_Platform_Lifecycle
+    - name: F5_Hardware_Platform_Lifecycle
       url: https://my.f5.com/manage/s/article/K4309
+      region: Global
+      crawler_type: dom_table
+    - name: F5_Software_Lifecycle_Matrix
+      url: https://my.f5.com/manage/s/article/K8986
       region: Global
       crawler_type: dom_table
   netapp:
@@ -1021,6 +1503,14 @@ vendors:
     allowed_domains:
     - netapp.com
     entry_points:
+    - name: NetApp_Hardware_Version_Support
+      url: https://mysupport.netapp.com/site/info/version-support
+      region: Global
+      crawler_type: dom_table
+    - name: NetApp_ONTAP_Software_Lifecycle
+      url: https://mysupport.netapp.com/site/info/ontap-release-model
+      region: Global
+      crawler_type: dom_table
     - name: NetApp_EOSL
       url: https://mysupport.netapp.com/info/communications/ECMLP2849887.html
       region: Global
@@ -1033,6 +1523,10 @@ vendors:
     allowed_domains:
     - purestorage.com
     entry_points:
+    - name: Pure_Storage_Product_EOL_Policy
+      url: https://www.purestorage.com/legal/product-end-of-life-policy.html
+      region: Global
+      crawler_type: dom_table
     - name: PureStorage_Lifecycle
       url: https://support.purestorage.com/FlashArray/Getting_Started/Pure_Storage_End_of_Life_Policy
       region: Global
@@ -1045,6 +1539,14 @@ vendors:
     allowed_domains:
     - lenovo.com
     entry_points:
+    - name: Lenovo_Server_Storage_EOS_Dates
+      url: https://datacentersupport.lenovo.com/us/en/solutions/ht504708
+      region: Global
+      crawler_type: dom_table
+    - name: Lenovo_ThinkSystem_EOS_List
+      url: https://datacentersupport.lenovo.com/us/en/end-of-service-list
+      region: Global
+      crawler_type: dom_table
     - name: Lenovo_EOSL
       url: https://datacentersupport.lenovo.com/us/en/solutions/end-of-service-list
       region: Global
@@ -1063,6 +1565,14 @@ vendors:
     allowed_domains:
     - supermicro.com
     entry_points:
+    - name: Supermicro_Discontinued_Motherboards
+      url: https://www.supermicro.com/en/products/motherboards/discontinued
+      region: Global
+      crawler_type: dom_table
+    - name: Supermicro_Discontinued_Chassis
+      url: https://www.supermicro.com/en/products/chassis/discontinued
+      region: Global
+      crawler_type: dom_table
     - name: Supermicro_Products
       url: https://www.supermicro.com/en/products
       region: Global
@@ -1075,6 +1585,14 @@ vendors:
     allowed_domains:
     - oracle.com
     entry_points:
+    - name: Oracle_Lifetime_Support_Policy
+      url: https://www.oracle.com/support/lifetime-support/
+      region: Global
+      crawler_type: dom_table
+    - name: Oracle_Systems_Hardware_Support_Policy
+      url: https://www.oracle.com/support/lifetime-support/systems-support-policy.html
+      region: Global
+      crawler_type: dom_table
     - name: Oracle_Hardware_Support
       url: https://www.oracle.com/support/lifetime-support/hardware-systems.html
       region: Global
@@ -1088,8 +1606,20 @@ vendors:
     - vmware.com
     - broadcom.com
     entry_points:
-    - name: VMware_Lifecycle
+    - name: VMware_Product_Lifecycle_Matrix
       url: https://lifecycle.vmware.com/
+      region: Global
+      crawler_type: dom_table
+    - name: Broadcom_VMware_Lifecycle_Announcements
+      url: https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/release-announcements/VMware-Lifecycle-Product-Matrix/21034
+      region: Global
+      crawler_type: dom_table
+    - name: VMware_End_of_Availability_Catalog
+      url: https://kb.vmware.com/s/article/96113
+      region: Global
+      crawler_type: dom_table
+    - name: VMware_vSphere_ESXi_Lifecycle_Policy
+      url: https://kb.vmware.com/s/article/2143838
       region: Global
       crawler_type: dom_table
   red_hat:
@@ -1100,8 +1630,24 @@ vendors:
     allowed_domains:
     - redhat.com
     entry_points:
-    - name: RHEL_Life_Cycle
+    - name: RHEL_Life_Cycle_Policies_Errata
       url: https://access.redhat.com/support/policy/updates/errata
+      region: Global
+      crawler_type: dom_table
+    - name: RHEL_Major_Release_Phases
+      url: https://access.redhat.com/support/policy/updates/rhel
+      region: Global
+      crawler_type: dom_table
+    - name: RedHat_OpenShift_Lifecycle_Matrix
+      url: https://access.redhat.com/support/policy/updates/openshift
+      region: Global
+      crawler_type: dom_table
+    - name: RedHat_Ansible_Platform_Lifecycle
+      url: https://access.redhat.com/support/policy/updates/ansible-automation-platform
+      region: Global
+      crawler_type: dom_table
+    - name: RedHat_OpenStack_Platform_Lifecycle
+      url: https://access.redhat.com/support/policy/updates/openstack
       region: Global
       crawler_type: dom_table
   microsoft:
@@ -1112,8 +1658,32 @@ vendors:
     allowed_domains:
     - microsoft.com
     entry_points:
-    - name: Microsoft_Lifecycle_Search
+    - name: Microsoft_Lifecycle_Products_Search
       url: https://learn.microsoft.com/en-us/lifecycle/products/
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_End_of_Support_2024
+      url: https://learn.microsoft.com/en-us/lifecycle/end-of-support/end-of-support-2024
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_End_of_Support_2025
+      url: https://learn.microsoft.com/en-us/lifecycle/end-of-support/end-of-support-2025
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_Surface_Driver_Firmware_Lifecycle
+      url: https://learn.microsoft.com/en-us/surface/surface-driver-firmware-lifecycle-support
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_Windows_Client_Lifecycle
+      url: https://learn.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_Windows_Server_Lifecycle
+      url: https://learn.microsoft.com/en-us/lifecycle/products/windows-server-2016
+      region: Global
+      crawler_type: dom_table
+    - name: Microsoft_Lifecycle_Announcements
+      url: https://learn.microsoft.com/en-us/lifecycle/announcements/
       region: Global
       crawler_type: dom_table
   canonical:
@@ -1125,7 +1695,7 @@ vendors:
     - canonical.com
     - ubuntu.com
     entry_points:
-    - name: Ubuntu_Releases
+    - name: Ubuntu_Releases_Lifecycle
       url: https://ubuntu.com/about/release-cycle
       region: Global
       crawler_type: dom_table
@@ -1137,7 +1707,7 @@ vendors:
     allowed_domains:
     - suse.com
     entry_points:
-    - name: SUSE_Lifecycle
+    - name: SUSE_Product_Support_Lifecycle
       url: https://www.suse.com/lifecycle/
       region: Global
       crawler_type: dom_table
@@ -1149,6 +1719,14 @@ vendors:
     allowed_domains:
     - extremenetworks.com
     entry_points:
+    - name: Extreme_Networks_Hardware_EOL
+      url: https://www.extremenetworks.com/support/end-of-life-policy/
+      region: Global
+      crawler_type: dom_table
+    - name: Extreme_Networks_Software_Lifecycle
+      url: https://www.extremenetworks.com/support/policies/software-release-lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: Extreme_EOS_Policy
       url: https://www.extremenetworks.com/support/end-of-sale-and-end-of-service-policy/
       region: Global
@@ -1161,7 +1739,7 @@ vendors:
     allowed_domains:
     - synology.com
     entry_points:
-    - name: Synology_Status
+    - name: Synology_Product_Support_Status
       url: https://www.synology.com/en-us/products/status
       region: Global
       crawler_type: dom_table
@@ -1173,7 +1751,7 @@ vendors:
     allowed_domains:
     - qnap.com
     entry_points:
-    - name: QNAP_Product_Status
+    - name: QNAP_Product_Support_Status
       url: https://www.qnap.com/en/product/status
       region: Global
       crawler_type: dom_table
@@ -1185,8 +1763,12 @@ vendors:
     allowed_domains:
     - ui.com
     entry_points:
-    - name: Ubiquiti_Vintage
+    - name: Ubiquiti_Vintage_Legacy_Products
       url: https://help.ui.com/hc/en-us/articles/1500001268521-Ubiquiti-s-Vintage-and-Legacy-Products
+      region: Global
+      crawler_type: dom_table
+    - name: Ubiquiti_Retiring_Products
+      url: https://ui.com/retiring
       region: Global
       crawler_type: dom_table
   sonicwall:
@@ -1197,7 +1779,7 @@ vendors:
     allowed_domains:
     - sonicwall.com
     entry_points:
-    - name: SonicWall_Product_Lifecycle
+    - name: SonicWall_Product_Lifecycle_Tables
       url: https://www.sonicwall.com/support/product-lifecycle-tables/
       region: Global
       crawler_type: dom_table
@@ -1209,7 +1791,7 @@ vendors:
     allowed_domains:
     - sophos.com
     entry_points:
-    - name: Sophos_Retirement_Calendar
+    - name: Sophos_Hardware_EOL_Lifecycle
       url: https://support.sophos.com/support/s/article/KB-000035279
       region: Global
       crawler_type: dom_table
@@ -1221,7 +1803,7 @@ vendors:
     allowed_domains:
     - watchguard.com
     entry_points:
-    - name: WatchGuard_EOL
+    - name: WatchGuard_End_of_Life_Policy
       url: https://www.watchguard.com/wgrd-resource-center/end-of-life-policy
       region: Global
       crawler_type: dom_table
@@ -1233,8 +1815,16 @@ vendors:
     allowed_domains:
     - nutanix.com
     entry_points:
-    - name: Nutanix_EOL
+    - name: Nutanix_Product_Lifecycle_Policy
       url: https://www.nutanix.com/support-services/product-support/lifecycle-policy
+      region: Global
+      crawler_type: dom_table
+    - name: Nutanix_Hardware_Platforms_EOL
+      url: https://www.nutanix.com/support-services/product-support/hardware-platforms
+      region: Global
+      crawler_type: dom_table
+    - name: Nutanix_End_of_Maintenance_EOSL
+      url: https://www.nutanix.com/support-services/product-support/eos
       region: Global
       crawler_type: dom_table
   zebra:
@@ -1248,8 +1838,28 @@ vendors:
     allowed_domains:
     - zebra.com
     entry_points:
-    - name: Zebra_Product_Lifecycle
+    - name: Zebra_Master_Lifecycle_Information
       url: https://www.zebra.com/us/en/support-downloads/lifecycle-information.html
+      region: Global
+      crawler_type: dom_table
+    - name: Zebra_Discontinued_Mobile_Computers
+      url: https://www.zebra.com/us/en/support-downloads/mobile-computers/discontinued.html
+      region: Global
+      crawler_type: dom_table
+    - name: Zebra_Discontinued_Industrial_Printers
+      url: https://www.zebra.com/us/en/support-downloads/printers/discontinued.html
+      region: Global
+      crawler_type: dom_table
+    - name: Zebra_Discontinued_Barcode_Scanners
+      url: https://www.zebra.com/us/en/support-downloads/scanners/discontinued.html
+      region: Global
+      crawler_type: dom_table
+    - name: Zebra_Discontinued_RFID_Readers
+      url: https://www.zebra.com/us/en/support-downloads/rfid/discontinued.html
+      region: Global
+      crawler_type: dom_table
+    - name: Zebra_Discontinued_Tablets
+      url: https://www.zebra.com/us/en/support-downloads/tablets/discontinued.html
       region: Global
       crawler_type: dom_table
   parker_hannifin:
@@ -1260,6 +1870,10 @@ vendors:
     allowed_domains:
     - parker.com
     entry_points:
+    - name: Parker_Electromechanical_Legacy_Products
+      url: https://www.parker.com/us/en/support/electromechanical-legacy-products.html
+      region: Global
+      crawler_type: dom_table
     - name: Parker_Discontinued
       url: https://www.parker.com/us/en/support/discontinued-products.html
       region: Americas
@@ -1272,6 +1886,10 @@ vendors:
     allowed_domains:
     - lenze.com
     entry_points:
+    - name: Lenze_Discontinued_Products_Lifecycle
+      url: https://www.lenze.com/en-de/service/lifecycle-management/discontinued-products/
+      region: Global
+      crawler_type: dom_table
     - name: Lenze_Lifecycle
       url: https://www.lenze.com/en-us/service/product-lifecycle/
       region: Global
@@ -1284,6 +1902,10 @@ vendors:
     allowed_domains:
     - fujielectric.com
     entry_points:
+    - name: Fuji_Electric_Discontinued_Products
+      url: https://www.fujielectric.com/products/discontinued/
+      region: Global
+      crawler_type: dom_table
     - name: Fuji_Discontinued
       url: https://www.fujielectric.com/products/automation/discontinued/
       region: Global
@@ -1296,6 +1918,10 @@ vendors:
     allowed_domains:
     - idec.com
     entry_points:
+    - name: IDEC_Discontinued_Products_Listing
+      url: https://us.idec.com/idec-us/en/USD/discontinued-products
+      region: Global
+      crawler_type: dom_table
     - name: IDEC_Discontinued
       url: https://www.idec.com/home/support/discontinued/
       region: Global
@@ -1308,6 +1934,10 @@ vendors:
     allowed_domains:
     - ni.com
     entry_points:
+    - name: NI_Product_Lifecycle_Policies
+      url: https://www.ni.com/en/support/documentation/supplemental/18/product-life-cycle-policies.html
+      region: Global
+      crawler_type: dom_table
     - name: NI_Lifecycle
       url: https://www.ni.com/en/support/documentation/lifecycle.html
       region: Global
@@ -1320,7 +1950,7 @@ vendors:
     allowed_domains:
     - unitronicsplc.com
     entry_points:
-    - name: Unitronics_Discontinued
+    - name: Unitronics_Discontinued_Products_Hub
       url: https://www.unitronicsplc.com/support-discontinued-products/
       region: Global
       crawler_type: dom_table
@@ -1332,6 +1962,10 @@ vendors:
     allowed_domains:
     - baumueller.com
     entry_points:
+    - name: Baumuller_Life_Cycle_Management
+      url: https://www.baumueller.com/en/service/life-cycle-management
+      region: Global
+      crawler_type: dom_table
     - name: Baumuller_Lifecycle
       url: https://www.baumueller.com/en/service/lifecycle-management
       region: Europe
@@ -1344,6 +1978,10 @@ vendors:
     allowed_domains:
     - moog.com
     entry_points:
+    - name: Moog_Servo_Valves_Motion_Support
+      url: https://www.moog.com/products/servovalves-servo-proportional-valves.html
+      region: Global
+      crawler_type: dom_table
     - name: Moog_Lifecycle
       url: https://www.moog.com/products/servovalves-servo-proportional-valves/lifecycle.html
       region: Global
@@ -1357,6 +1995,10 @@ vendors:
     - controltechniques.com
     - nidec.com
     entry_points:
+    - name: Control_Techniques_Legacy_Drives
+      url: https://acim.nidec.com/drives/control-techniques/support/legacy-products
+      region: Global
+      crawler_type: dom_table
     - name: ControlTechniques_Legacy
       url: https://www.controltechniques.com/support/legacy-products/
       region: Global
@@ -1369,8 +2011,24 @@ vendors:
     allowed_domains:
     - axis.com
     entry_points:
-    - name: Axis_Camera_Lifecycle
+    - name: Axis_Product_Lifecycle_Policy
       url: https://www.axis.com/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Axis_Discontinued_Products_Catalog
+      url: https://www.axis.com/support/product-lifecycle/discontinued-products
+      region: Global
+      crawler_type: dom_table
+    - name: Axis_OS_Lifecycle_Tracks
+      url: https://www.axis.com/support/axis-os/lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Axis_Network_Audio_Discontinued
+      url: https://www.axis.com/products/network-audio
+      region: Global
+      crawler_type: dom_table
+    - name: Axis_Access_Control_Discontinued
+      url: https://www.axis.com/products/access-control
       region: Global
       crawler_type: dom_table
   hikvision:
@@ -1381,6 +2039,10 @@ vendors:
     allowed_domains:
     - hikvision.com
     entry_points:
+    - name: Hikvision_Discontinued_Products
+      url: https://www.hikvision.com/en/support/tools/discontinued-products/
+      region: Global
+      crawler_type: dom_table
     - name: Hikvision_Lifecycle
       url: https://www.hikvision.com/en/support/product-lifecycle/
       region: Global
@@ -1393,6 +2055,10 @@ vendors:
     allowed_domains:
     - dahuasecurity.com
     entry_points:
+    - name: Dahua_Discontinued_Products_Catalog
+      url: https://www.dahuasecurity.com/support/discontinuedProducts
+      region: Global
+      crawler_type: dom_table
     - name: Dahua_Discontinued
       url: https://www.dahuasecurity.com/support/announcement/discontinued-products
       region: Global
@@ -1405,7 +2071,12 @@ vendors:
     allowed_domains:
     - hanwhavision.com
     - hanwhasecurity.com
+    - hanwhavisionamerica.com
     entry_points:
+    - name: Hanwha_Vision_Discontinued_Products
+      url: https://hanwhavisionamerica.com/support/discontinued-products/
+      region: Global
+      crawler_type: dom_table
     - name: Hanwha_Discontinued
       url: https://www.hanwhavision.com/en/support/discontinued-products/
       region: Global
@@ -1420,6 +2091,10 @@ vendors:
     allowed_domains:
     - flir.com
     entry_points:
+    - name: FLIR_Discontinued_Products
+      url: https://www.flir.com/support/products/discontinued-products/
+      region: Global
+      crawler_type: dom_table
     - name: FLIR_Products_Portal
       url: https://www.flir.com/products/
       region: Global
@@ -1432,6 +2107,10 @@ vendors:
     allowed_domains:
     - baslerweb.com
     entry_points:
+    - name: Basler_Discontinued_Products
+      url: https://www.baslerweb.com/en/support/downloads/discontinued-products/
+      region: Global
+      crawler_type: dom_table
     - name: Basler_Camera_Lifecycle
       url: https://www.baslerweb.com/en/services/product-life-cycle/
       region: Global
@@ -1444,6 +2123,10 @@ vendors:
     allowed_domains:
     - mobotix.com
     entry_points:
+    - name: Mobotix_Product_Lifecycle
+      url: https://www.mobotix.com/en/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Mobotix_EOL
       url: https://www.mobotix.com/en/support/end-of-life-policy
       region: Global
@@ -1457,6 +2140,10 @@ vendors:
     - avigilon.com
     - motorolasolutions.com
     entry_points:
+    - name: Avigilon_End_of_Life_Policy
+      url: https://www.avigilon.com/support/end-of-life-policy
+      region: Global
+      crawler_type: dom_table
     - name: Avigilon_EOL
       url: https://www.avigilon.com/support/warranty/end-of-life
       region: Global
@@ -1469,7 +2156,7 @@ vendors:
     allowed_domains:
     - uniview.com
     entry_points:
-    - name: Uniview_Discontinued
+    - name: Uniview_Discontinued_Products
       url: https://www.uniview.com/Support/Download_Center/Discontinued_Products/
       region: Global
       crawler_type: dom_table
@@ -1481,6 +2168,10 @@ vendors:
     allowed_domains:
     - alliedtelesis.com
     entry_points:
+    - name: Allied_Telesis_End_of_Life_Notices
+      url: https://www.alliedtelesis.com/us/en/support/end-of-life
+      region: Global
+      crawler_type: dom_table
     - name: AlliedTelesis_Switch_EOL
       url: https://www.alliedtelesis.com/en/services/end-of-life-policy
       region: Global
@@ -1493,6 +2184,10 @@ vendors:
     allowed_domains:
     - dlink.com
     entry_points:
+    - name: DLink_Product_Lifecycle
+      url: https://www.dlink.com/en/support/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: DLink_Switch_EOL
       url: https://www.dlink.com/en/end-of-life-policy
       region: Global
@@ -1508,6 +2203,10 @@ vendors:
     allowed_domains:
     - netgear.com
     entry_points:
+    - name: Netgear_Business_EOL_Policy
+      url: https://www.netgear.com/about/eol-policy/
+      region: Global
+      crawler_type: dom_table
     - name: Netgear_Switch_EOS
       url: https://www.netgear.com/about/eos/
       region: Global
@@ -1520,6 +2219,10 @@ vendors:
     allowed_domains:
     - tp-link.com
     entry_points:
+    - name: TPLink_End_of_Life_Policy
+      url: https://www.tp-link.com/us/support/eol/
+      region: Global
+      crawler_type: dom_table
     - name: TPLink_Omada_EOL
       url: https://www.tp-link.com/en/support/replacement-identity/
       region: Global
@@ -1535,6 +2238,10 @@ vendors:
     allowed_domains:
     - zyxel.com
     entry_points:
+    - name: Zyxel_Networks_EOL_Policy
+      url: https://www.zyxel.com/global/en/support/eol-policy
+      region: Global
+      crawler_type: dom_table
     - name: Zyxel_Switch_Lifecycle
       url: https://www.zyxel.com/global/en/support/lifecycle-policy
       region: Global
@@ -1547,7 +2254,7 @@ vendors:
     allowed_domains:
     - westermo.com
     entry_points:
-    - name: Westermo_Switch_Lifecycle
+    - name: Westermo_Product_Life_Cycle
       url: https://www.westermo.com/support/product-life-cycle
       region: Global
       crawler_type: dom_table
@@ -1559,6 +2266,10 @@ vendors:
     allowed_domains:
     - al-enterprise.com
     entry_points:
+    - name: ALE_End_of_Life_Matrix
+      url: https://www.al-enterprise.com/en/support/end-of-life
+      region: Global
+      crawler_type: dom_table
     - name: ALE_OmniSwitch_EOL
       url: https://www.al-enterprise.com/en/support/end-of-life-policy
       region: Global
@@ -1572,6 +2283,10 @@ vendors:
     - commscope.com
     - ruckuswireless.com
     entry_points:
+    - name: Ruckus_Networks_EOL_Policy
+      url: https://support.ruckuswireless.com/eol
+      region: Global
+      crawler_type: dom_table
     - name: Ruckus_ICX_EOL
       url: https://support.ruckuswireless.com/documents?filter=end-of-life
       region: Global
@@ -1584,6 +2299,10 @@ vendors:
     allowed_domains:
     - huawei.com
     entry_points:
+    - name: Huawei_Enterprise_Product_Lifecycle
+      url: https://e.huawei.com/en/services/product-lifecycle
+      region: Global
+      crawler_type: dom_table
     - name: Huawei_Switch_Lifecycle
       url: https://e.huawei.com/en/services/lifecycle-policy
       region: Global
@@ -1601,13 +2320,21 @@ vendors:
     - jtekt.co.jp
     - toyoda-americas.com
     entry_points:
-    - name: Toyoda_Toyopuc_PLC_Support
+    - name: Toyoda_TOYOPUC_PLC_Discontinued_Support
+      url: https://toyoda.jtekt.co.jp/en/products/electronics/support/
+      region: Global
+      crawler_type: dom_table
+    - name: JTEKT_Electronics_Maintenance_Matrix
       url: https://www.jtekt.co.jp/e/products/electronics/support/
       region: Global
       crawler_type: dom_table
-    - name: Toyoda_Americas_Lifecycle
+    - name: Toyoda_Americas_Parts_Service_Lifecycle
       url: https://www.toyoda-americas.com/support/parts-service/
       region: Americas
+      crawler_type: dom_table
+    - name: Toyoda_Mechatronics_CNC_Discontinued
+      url: https://toyoda.jtekt.co.jp/en/products/machine/support/
+      region: Global
       crawler_type: dom_table
   verkada:
     id: verkada
@@ -1617,6 +2344,10 @@ vendors:
     allowed_domains:
     - verkada.com
     entry_points:
+    - name: Verkada_Hardware_Warranty_Lifecycle
+      url: https://www.verkada.com/legal/hardware-warranty-and-lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: Verkada_Products_Portal
       url: https://www.verkada.com/products/
       region: Global
@@ -1634,6 +2365,10 @@ vendors:
     - shibaura-machine.co.jp
     - toshiba-machine.com
     entry_points:
+    - name: Shibaura_Machine_Robots_Support
+      url: https://www.shibaura-machine.co.jp/en/product/robot/
+      region: Global
+      crawler_type: dom_table
     - name: Shibaura_Products_Portal
       url: https://www.shibaura-machine.co.jp/en/product/
       region: Global
@@ -1650,6 +2385,10 @@ vendors:
     allowed_domains:
     - dragos.com
     entry_points:
+    - name: Dragos_Platform_Appliances_Support
+      url: https://www.dragos.com/products/dragos-platform/
+      region: Global
+      crawler_type: dom_table
     - name: Dragos_Platform_Appliance
       url: https://www.dragos.com/platform/
       region: Global
@@ -1666,6 +2405,10 @@ vendors:
     allowed_domains:
     - nozomi-networks.com
     entry_points:
+    - name: Nozomi_Networks_Appliances
+      url: https://www.nozomi-networks.com/products/appliances/
+      region: Global
+      crawler_type: dom_table
     - name: Nozomi_Guardian_Appliances
       url: https://www.nozomi-networks.com/products/guardian/
       region: Global
@@ -1682,6 +2425,10 @@ vendors:
     allowed_domains:
     - barracuda.com
     entry_points:
+    - name: Barracuda_Hardware_EOL_Policy
+      url: https://www.barracuda.com/legal/end-of-life
+      region: Global
+      crawler_type: dom_table
     - name: Barracuda_Hardware_EOL
       url: https://www.barracuda.com/support/eol
       region: Global
@@ -1699,6 +2446,10 @@ vendors:
     - flukenetworks.com
     - fluke.com
     entry_points:
+    - name: Fluke_Networks_Obsolete_Products
+      url: https://www.flukenetworks.com/knowledge-base/obsolete-products
+      region: Global
+      crawler_type: dom_table
     - name: Fluke_Product_Lifecycle
       url: https://www.flukenetworks.com/support/product-lifecycle
       region: Global
@@ -1720,16 +2471,44 @@ vendors:
     - cisco.com
     - meraki.cisco.com
     entry_points:
-    - name: Cisco_Products_Catalog
-      url: https://www.cisco.com/c/en/us/products/index.html
-      region: Global
-      crawler_type: dom_table
-    - name: Cisco_EOL_Listing
+    - name: Cisco_Master_EOS_EOL_Listing
       url: https://www.cisco.com/c/en/us/products/eos-eol-listing.html
       region: Global
       crawler_type: dom_table
-    - name: Meraki_EOL_Hub
+    - name: Cisco_Switches_EOS_EOL
+      url: https://www.cisco.com/c/en/us/products/switches/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Routers_EOS_EOL
+      url: https://www.cisco.com/c/en/us/products/routers/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Security_Firewalls_EOS_EOL
+      url: https://www.cisco.com/c/en/us/products/security/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Wireless_Access_Points_EOL
+      url: https://www.cisco.com/c/en/us/products/wireless/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Meraki_Hardware_Software_EOL
+      url: https://meraki.cisco.com/support/#lifecycle
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_UCS_Servers_EOS_EOL
+      url: https://www.cisco.com/c/en/us/products/servers-unified-computing/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Collaboration_Endpoints_EOL
+      url: https://www.cisco.com/c/en/us/products/collaboration-endpoints/eos-eol-listing.html
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Meraki_Hardware_Software_EOL
       url: https://documentation.meraki.com/General_Administration/Other_Topics/Meraki_End-of-Life_(EOL)_Policy_and_Dates
+      region: Global
+      crawler_type: dom_table
+    - name: Cisco_Products_Catalog
+      url: https://www.cisco.com/c/en/us/products/index.html
       region: Global
       crawler_type: dom_table
   honeywell:
@@ -1744,6 +2523,14 @@ vendors:
     - honeywell.com
     - process.honeywell.com
     entry_points:
+    - name: Honeywell_Process_Lifecycle_Support
+      url: https://process.honeywell.com/us/en/services/lifecycle-support
+      region: Global
+      crawler_type: dom_table
+    - name: Honeywell_Scanning_Discontinued_Products
+      url: https://sps.honeywell.com/us/en/support/productivity/discontinued-products
+      region: Global
+      crawler_type: dom_table
     - name: Honeywell_Process_Lifecycle
       url: https://process.honeywell.com/us/en/support
       region: Global
@@ -1765,12 +2552,16 @@ vendors:
     - boschrexroth.com
     - boschsecurity.com
     entry_points:
-    - name: Bosch_Rexroth_Service
-      url: https://www.boschrexroth.com/en/xc/service/
+    - name: Bosch_Rexroth_Lifecycle_Management
+      url: https://www.boschrexroth.com/en/us/service-and-support/service/lifecycle-management/
       region: Global
       crawler_type: dom_table
-    - name: Bosch_Security_Lifecycle
+    - name: Bosch_Security_Product_Lifecycle
       url: https://www.boschsecurity.com/xc/en/support/product-lifecycle/
+      region: Global
+      crawler_type: dom_table
+    - name: Bosch_Rexroth_Service
+      url: https://www.boschrexroth.com/en/xc/service/
       region: Global
       crawler_type: dom_table
   panasonic:
@@ -1786,6 +2577,10 @@ vendors:
     - panasonic.com
     - industrial.panasonic.com
     entry_points:
+    - name: Panasonic_Industrial_FA_Discontinued
+      url: https://industrial.panasonic.com/ac/e/fasys/component/discontinue/index.jsp
+      region: Global
+      crawler_type: dom_table
     - name: Panasonic_Industry_Portal
       url: https://industry.panasonic.eu
       region: Global
@@ -1805,6 +2600,10 @@ vendors:
     - yamaha-motor-robotics.com
     - yamaha-motor.com
     entry_points:
+    - name: Yamaha_Robotics_Discontinued_Models
+      url: https://global.yamaha-motor.com/business/robot/support/discontinued/
+      region: Global
+      crawler_type: dom_table
     - name: Yamaha_Robotics_Lifecycle
       url: https://www.yamaha-motor-robotics.com/service-support
       region: Global
@@ -1820,6 +2619,10 @@ vendors:
     - pro.sony
     - sony.com
     entry_points:
+    - name: Sony_Pro_Discontinued_Products
+      url: https://pro.sony/en_US/support-services/discontinued-products
+      region: Global
+      crawler_type: dom_table
     - name: Sony_Pro_Products
       url: https://pro.sony/en_US/products
       region: Global
@@ -1835,7 +2638,12 @@ vendors:
     allowed_domains:
     - kyocera-avx.com
     - kyocera.com
+    - kyoceradocumentsolutions.com
     entry_points:
+    - name: Kyocera_Discontinued_Printers
+      url: https://www.kyoceradocumentsolutions.com/support/discontinued/
+      region: Global
+      crawler_type: dom_table
     - name: Kyocera_Products
       url: https://www.kyocera-avx.com/products/
       region: Global
@@ -1854,6 +2662,14 @@ vendors:
     - hitachi-ies.co.jp
     - hitachivantara.com
     entry_points:
+    - name: Hitachi_Industrial_Inverters_PLC_Discontinued
+      url: https://www.hitachi-ies.co.jp/english/products/discon/index.htm
+      region: Global
+      crawler_type: dom_table
+    - name: Hitachi_Vantara_Storage_Lifecycle
+      url: https://support.hitachivantara.com/en_us/product-lifecycle.html
+      region: Global
+      crawler_type: dom_table
     - name: Hitachi_Global_Products
       url: https://www.hitachi.com/products/
       region: Global
@@ -1872,6 +2688,10 @@ vendors:
     allowed_domains:
     - milesight.com
     entry_points:
+    - name: Milesight_Discontinued_Products
+      url: https://www.milesight.com/support/download/discontinued/
+      region: Global
+      crawler_type: dom_table
     - name: Milesight_IoT_Products
       url: https://www.milesight.com/iot/products
       region: Global
@@ -1886,6 +2706,10 @@ vendors:
     allowed_domains:
     - citrix.com
     entry_points:
+    - name: Citrix_Product_Lifecycle_Matrix
+      url: https://www.citrix.com/support/product-lifecycle/product-matrix.html
+      region: Global
+      crawler_type: dom_table
     - name: Citrix_Products_Catalog
       url: https://www.citrix.com/products/
       region: Global
@@ -1904,6 +2728,10 @@ vendors:
     allowed_domains:
     - trendmicro.com
     entry_points:
+    - name: Trend_Micro_Product_EOL_Schedule
+      url: https://success.trendmicro.com/dcx/s/solution/1060931-product-end-of-life-schedule
+      region: Global
+      crawler_type: dom_table
     - name: Trend_Micro_Products
       url: https://www.trendmicro.com/en_us/business/products.html
       region: Global
@@ -1922,7 +2750,89 @@ vendors:
     allowed_domains:
     - commvault.com
     entry_points:
+    - name: Commvault_Release_Lifecycle
+      url: https://documentation.commvault.com/lifecycle/
+      region: Global
+      crawler_type: dom_table
     - name: Commvault_Platform
       url: https://www.commvault.com/platform
+      region: Global
+      crawler_type: dom_table
+  apple:
+    id: apple
+    name: Apple Inc.
+    sector: IT
+    sectors:
+    - IT
+    website: https://www.apple.com
+    allowed_domains:
+    - apple.com
+    - support.apple.com
+    entry_points:
+    - name: Apple_Vintage_and_Obsolete_Products
+      url: https://support.apple.com/en-us/102772
+      region: Global
+      crawler_type: dom_table
+    - name: Apple_Security_Releases_Lifecycle
+      url: https://support.apple.com/en-us/HT201222
+      region: Global
+      crawler_type: dom_table
+    - name: Apple_Hardware_Service_Repair_Eligibility
+      url: https://support.apple.com/en-us/HT201624
+      region: Global
+      crawler_type: dom_table
+    - name: Apple_Mac_Hardware_Lifecycle
+      url: https://support.apple.com/en-us/HT201862
+      region: Global
+      crawler_type: dom_table
+  igel:
+    id: igel
+    name: IGEL Technology
+    sector: IT
+    sectors:
+    - IT
+    website: https://www.igel.com
+    allowed_domains:
+    - igel.com
+    - kb.igel.com
+    entry_points:
+    - name: IGEL_Hardware_EOL_Matrix
+      url: https://kb.igel.com/hardware/en/end-of-life-maintenance-and-support-10331006.html
+      region: Global
+      crawler_type: dom_table
+    - name: IGEL_OS_Software_Lifecycle_Matrix
+      url: https://kb.igel.com/software-lifecycle/en/igel-software-lifecycle-policy-matrix-9969018.html
+      region: Global
+      crawler_type: dom_table
+    - name: IGEL_UMS_Lifecycle_Matrix
+      url: https://kb.igel.com/software-lifecycle/en/igel-ums-lifecycle-matrix-28956708.html
+      region: Global
+      crawler_type: dom_table
+  philips:
+    id: philips
+    name: Philips
+    sector: IoT
+    sectors:
+    - IoT
+    website: https://www.philips.com
+    allowed_domains:
+    - philips.com
+    - philips-hue.com
+    - dictation.philips.com
+    entry_points:
+    - name: Philips_Healthcare_Discontinued_Products
+      url: https://www.philips.com/a-w/about/support/discontinued-products.html
+      region: Global
+      crawler_type: dom_table
+    - name: Philips_Hue_End_of_Support_Policy
+      url: https://www.philips-hue.com/en-us/support/legal/end-of-support-policy
+      region: Global
+      crawler_type: dom_table
+    - name: Philips_Dictation_Hardware_EOL
+      url: https://www.dictation.philips.com/us/support/end-of-life/
+      region: Global
+      crawler_type: dom_table
+    - name: Philips_Enterprise_Support
+      url: https://www.philips.com/a-w/about/support.html
       region: Global
       crawler_type: dom_table

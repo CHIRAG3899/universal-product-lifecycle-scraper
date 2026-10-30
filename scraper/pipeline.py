@@ -9,6 +9,7 @@ and enterprise observability alerts.
 import asyncio
 import logging
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -127,56 +128,50 @@ class LifecyclePipeline:
         error_msg = None
 
         try:
-            if site_crawl and website:
+            # 1. Primary execution: Crawl verified, trusted lifecycle portal entry points
+            for ep in entry_points:
+                url = ep.get("url")
+                name = ep.get("name", "entry")
+                region = ep.get("region", "Global")
+
+                if not is_safe_url(url, allowed_domains):
+                    print(f"  [!] Security Guard: Blocked untrusted URL or non-whitelisted domain: {url}")
+                    continue
+
+                print(f"  -> Crawling verified lifecycle portal '{name}' ({region}): {url}")
+                try:
+                    records = await self.crawler.run(url)
+                    for r in records:
+                        r.vendor_name = vendor_name
+                        if "region" not in r.metadata:
+                            r.metadata["region"] = region
+                    vendor_products.extend(records)
+                except Exception as ep_err:
+                    print(f"  [!] Warning on entry point {name} ({url}): {ep_err}")
+                    self.dlq.record_failure(
+                        url=str(url),
+                        vendor_id=vendor_id,
+                        error_type=type(ep_err).__name__,
+                        message=str(ep_err),
+                        details={"region": region, "entry_point": name}
+                    )
+
+            # 2. Secondary discovery: Run domain-level site crawl if explicitly requested or if entry points yielded 0 records
+            should_site_crawl = site_crawl or (len(vendor_products) == 0 and bool(website))
+            if should_site_crawl and website:
                 page_str = "Unlimited" if not max_pages or max_pages <= 0 else str(max_pages)
                 depth_str = "Unlimited" if not max_depth or max_depth <= 0 else str(max_depth)
-                print(f"  -> Executing site-level discovery crawl across domain: {website} (Max pages: {page_str}, Max depth: {depth_str})")
-                records = await self.crawler.crawl_website(website, allowed_domains=allowed_domains, max_pages=max_pages, max_depth=max_depth)
-                for r in records:
-                    r.vendor_name = vendor_name
-                    if "region" not in r.metadata:
-                        r.metadata["region"] = "Global"
-                vendor_products.extend(records)
-            else:
-                for ep in entry_points:
-                    url = ep.get("url")
-                    name = ep.get("name", "entry")
-                    region = ep.get("region", "Global")
-
-                    if not is_safe_url(url, allowed_domains):
-                        print(f"  [!] Security Guard: Blocked untrusted URL or non-whitelisted domain: {url}")
-                        continue
-
-                    print(f"  -> Crawling entry point '{name}' ({region}): {url}")
-                    try:
-                        records = await self.crawler.run(url)
-                        for r in records:
-                            r.vendor_name = vendor_name
-                            if "region" not in r.metadata:
-                                r.metadata["region"] = region
-                        vendor_products.extend(records)
-                    except Exception as ep_err:
-                        print(f"  [!] Warning on entry point {name} ({url}): {ep_err}")
-                        self.dlq.record_failure(
-                            url=str(url),
-                            vendor_id=vendor_id,
-                            error_type=type(ep_err).__name__,
-                            message=str(ep_err),
-                            details={"region": region, "entry_point": name}
-                        )
-
-                # Automatic recovery fallback: If entry points yield 0 records, try domain-level discovery crawl
-                if len(vendor_products) == 0 and website:
-                    print(f"  [!] Entry points returned 0 records. Initiating automatic fallback site discovery crawl on: {website}")
-                    try:
-                        fb_records = await self.crawler.crawl_website(website, allowed_domains=allowed_domains, max_pages=max_pages, max_depth=max_depth)
-                        for r in fb_records:
-                            r.vendor_name = vendor_name
-                            if "region" not in r.metadata:
-                                r.metadata["region"] = "Global"
-                        vendor_products.extend(fb_records)
-                    except Exception as fb_err:
-                        print(f"  [!] Fallback site discovery crawl failed: {fb_err}")
+                crawl_reason = "Supplementary deep discovery" if site_crawl else "Automatic fallback (0 records from entry points)"
+                print(f"  -> [{crawl_reason}] Crawling vendor domain: {website} (Max pages: {page_str}, Max depth: {depth_str})")
+                try:
+                    records = await self.crawler.crawl_website(website, allowed_domains=allowed_domains, max_pages=max_pages, max_depth=max_depth)
+                    for r in records:
+                        r.vendor_name = vendor_name
+                        if "region" not in r.metadata:
+                            r.metadata["region"] = "Global"
+                    vendor_products.extend(records)
+                except Exception as sc_err:
+                    print(f"  [!] Domain site discovery crawl notice on {website}: {sc_err}")
 
             # -------------------------------------------------------------------------
             # STEP 2/6: EXTRACTION
@@ -212,6 +207,21 @@ class LifecyclePipeline:
                 is_sw = is_well_known_os_or_software(category=cat, os_name=os_val, model_name=m_name)
 
                 if not v_name or v_name.lower() in ("n/a", "none", "null", "nan"):
+                    purged_noise_count += 1
+                    continue
+
+                # Strict Lifecycle Relevance Guard: Discard non-lifecycle statuses (sitemaps, video guides, consumer fans)
+                st_lower = st_val.lower()
+                cat_lower = cat.lower()
+                disallowed_status_terms = {
+                    "active", "active sitemaps record", "support video published",
+                    "consulting services", "flexible credits", "operations offerings",
+                    "service program", "battery recall program", "available order"
+                }
+                if st_lower in disallowed_status_terms or "video" in st_lower or "sitemap" in st_lower:
+                    purged_noise_count += 1
+                    continue
+                if any(kw in cat_lower for kw in ("electric fan", "ventilation fan", "home appliance", "refrigerator")):
                     purged_noise_count += 1
                     continue
 
@@ -264,7 +274,14 @@ class LifecyclePipeline:
             print(f"  -> Field & Model Validator: Purged {purged_noise_count} invalid noise elements. Retained {len(sanitized_products)} clean products (including undated EOL models).")
             print("  -> CSV Formula Injection Shield: Sanitized formula trigger characters (=, +, -, @)")
             print(f"  -> SSRF Protection: Verified private IP restrictions across {len(allowed_domains)} allowed domains")
-            vendor_products = sanitized_products
+            # Deduplicate records across entry points and discovery crawl for this vendor
+            deduped_vendor_products: List[ProductRecord] = []
+            seen_fps = set()
+            for p in sanitized_products:
+                if p.fingerprint not in seen_fps:
+                    seen_fps.add(p.fingerprint)
+                    deduped_vendor_products.append(p)
+            vendor_products = deduped_vendor_products
 
             # Record per-vendor duration & telemetry
             vendor_duration = (datetime.now() - vendor_start).total_seconds()
@@ -344,11 +361,37 @@ class LifecyclePipeline:
                 )
                 raise e
         else:
-            # Filter targeted vendors
+            # Filter targeted vendors (supports comma-separated list and vendor aliases)
             target_vendors = []
+            normalized_filter_keys = set()
+            if vendor_filter and vendor_filter.lower() != "all":
+                alias_map = {
+                    "redhat": "red_hat",
+                    "rockwell": "rockwell_automation",
+                    "axis": "axis_communications",
+                    "jtekt": "toyoda",
+                    "toyoda": "toyoda",
+                    "mitssubishi": "mitsubishi",
+                    "phillips": "philips",
+                }
+                cleaned_filter = vendor_filter.replace(" and ", ",")
+                raw_tokens = [t.strip().lower() for t in cleaned_filter.split(",") if t.strip()]
+                for tok in raw_tokens:
+                    mapped = alias_map.get(tok, tok)
+                    normalized_filter_keys.add(mapped)
+
             for v_key, v_cfg in vendors_dict.items():
-                if vendor_filter and vendor_filter.lower() != "all" and vendor_filter.lower() != v_key.lower():
-                    continue
+                if normalized_filter_keys:
+                    v_k_lower = v_key.lower()
+                    v_id_lower = str(v_cfg.get("id", "")).lower()
+                    v_name_lower = str(v_cfg.get("name", "")).lower()
+                    matched = False
+                    for query in normalized_filter_keys:
+                        if query in (v_k_lower, v_id_lower) or re.search(r'\b' + re.escape(query) + r'\b', v_name_lower):
+                            matched = True
+                            break
+                    if not matched:
+                        continue
                 if sector_filter and sector_filter.lower() != "all":
                     s_filter = sector_filter.lower()
                     v_sector = str(v_cfg.get("sector", "")).lower()

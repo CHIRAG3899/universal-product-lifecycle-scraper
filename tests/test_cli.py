@@ -7,6 +7,7 @@ Validates:
 4. Correct invocation of LifecyclePipeline.execute with parsed CLI options.
 """
 
+import asyncio
 import io
 import sys
 import unittest
@@ -17,10 +18,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 import cli
+import setup_key  # noqa: F401
 from scraper.models import ScrapedDataset
 
 
-class TestCLI(unittest.IsolatedAsyncioTestCase):
+class TestCLI(unittest.TestCase):
 
     def setUp(self):
         self.held_stdout = io.StringIO()
@@ -38,34 +40,34 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Universal Multi-Provider AI", output)
 
     @patch("setup_key.main")
-    async def test_02_setup_key_flag(self, mock_setup_main):
+    def test_02_setup_key_flag(self, mock_setup_main):
         """Verifies --setup-key launches interactive setup_key module."""
         with patch.object(sys, "argv", ["cli.py", "--setup-key"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
         mock_setup_main.assert_called_once()
 
     @patch("sys.stdout", new_callable=io.StringIO)
-    async def test_03_compare_modes_flag(self, mock_stdout):
+    def test_03_compare_modes_flag(self, mock_stdout):
         """Verifies --compare-modes prints technical crawler matrix."""
         with patch.object(sys, "argv", ["cli.py", "--compare-modes"]):
-            await cli.main()
+            asyncio.run(cli.main())
         output = mock_stdout.getvalue()
         self.assertIn("TECHNICAL COMPARISON", output)
         self.assertIn("GENERIC IDE CRAWLER vs. ENTERPRISE AI CRAWLER", output)
 
     @patch("sys.stdout", new_callable=io.StringIO)
-    async def test_04_list_vendors_flag(self, mock_stdout):
-        """Verifies --list-vendors displays table with 100 supported vendors."""
+    def test_04_list_vendors_flag(self, mock_stdout):
+        """Verifies --list-vendors displays table with supported vendors."""
         with patch.object(sys, "argv", ["cli.py", "--list-vendors"]):
-            await cli.main()
+            asyncio.run(cli.main())
         output = mock_stdout.getvalue()
         self.assertIn("Configured Vendors", output)
         self.assertIn("mitsubishi", output)
         self.assertIn("Total:", output)
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_05_default_vendor_fallback(self, mock_execute):
+    def test_05_default_vendor_fallback(self, mock_execute):
         """Verifies default vendor target falls back to 'mitsubishi'."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -76,7 +78,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
         with patch.object(sys, "argv", ["cli.py"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="mitsubishi",
@@ -89,7 +91,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_06_custom_vendor_and_sector_flags(self, mock_execute):
+    def test_06_custom_vendor_and_sector_flags(self, mock_execute):
         """Verifies custom --vendor, --sector, and --site-crawl arguments."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -106,7 +108,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
             "--webhook-url", "https://hooks.slack.com/services/test"
         ]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="siemens",
@@ -119,7 +121,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_07_all_vendors_flag(self, mock_execute):
+    def test_07_all_vendors_flag(self, mock_execute):
         """Verifies --all-vendors sets vendor_filter to 'all'."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -130,7 +132,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
         with patch.object(sys, "argv", ["cli.py", "--all-vendors", "--sector", "IoT"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="all",
@@ -143,7 +145,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_09_max_pages_and_depth_flags(self, mock_execute):
+    def test_09_max_pages_and_depth_flags(self, mock_execute):
         """Verifies --max-pages and --max-depth are passed to pipeline.execute."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -160,7 +162,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
             "--max-depth", "3"
         ]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="rockwell_automation",
@@ -173,7 +175,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_12_resume_flag(self, mock_execute):
+    def test_12_resume_flag(self, mock_execute):
         """Verifies --resume flag is passed to pipeline.execute."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -184,7 +186,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
         with patch.object(sys, "argv", ["cli.py", "--resume", "--vendor", "mitsubishi"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="mitsubishi",
@@ -197,7 +199,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("scraper.pipeline.LifecyclePipeline.execute", new_callable=AsyncMock)
-    async def test_13_no_site_crawl_flag(self, mock_execute):
+    def test_13_no_site_crawl_flag(self, mock_execute):
         """Verifies --no-site-crawl flag explicitly disables site crawl."""
         mock_execute.return_value = ScrapedDataset(
             source_url="manifest",
@@ -208,7 +210,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
         )
         with patch.object(sys, "argv", ["cli.py", "--no-site-crawl", "--vendor", "mitsubishi"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_execute.assert_called_once_with(
             vendor_filter="mitsubishi",
@@ -230,15 +232,15 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
                     parser.add_argument("--sector", choices=["OT", "IoT", "IT", "all"])
                     parser.parse_args(["--sector", "INVALID_SECTOR"])
 
-    async def test_09_clean_artifacts_flag(self):
+    def test_09_clean_artifacts_flag(self):
         """Verifies --clean-artifacts flag executes cleanup."""
         with patch.object(sys, "argv", ["cli.py", "--clean-artifacts"]):
             with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-                await cli.main()
+                asyncio.run(cli.main())
                 self.assertIn("Successfully cleaned", mock_stdout.getvalue())
 
     @patch("cli.LifecyclePipeline")
-    async def test_10_token_optimization_flags(self, mock_pipeline_cls):
+    def test_10_token_optimization_flags(self, mock_pipeline_cls):
         """Verifies --batch-mode, --thinking-budget, and --prompt-caching flags are passed to LifecyclePipeline."""
         mock_instance = MagicMock()
         mock_instance.execute = AsyncMock()
@@ -246,7 +248,7 @@ class TestCLI(unittest.IsolatedAsyncioTestCase):
 
         with patch.object(sys, "argv", ["cli.py", "--model", "gemini-1.5-flash", "--batch-mode", "--thinking-budget", "0", "--prompt-caching"]):
             with patch("sys.stdout", new_callable=io.StringIO):
-                await cli.main()
+                asyncio.run(cli.main())
 
         mock_pipeline_cls.assert_called_once_with(
             api_key=None,

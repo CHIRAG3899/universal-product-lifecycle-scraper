@@ -240,6 +240,86 @@ class TestStorage(unittest.TestCase):
         self.assertIn("1756-L61", loaded_models)
         self.assertIn("S7-300 CPU 315-2DP", loaded_models)
 
+    def test_multi_run_successive_appends_across_vendors(self):
+        """Verifies that each pipeline run appends to the master CSV without overwriting previous runs."""
+        storage = MasterStorageManager(master_csv_path=self.master_csv, output_dir=self.output_dir)
+
+        # Run 1: Cisco products
+        cisco_run = [
+            ProductRecord(
+                vendor_name="Cisco",
+                model_name="Catalyst 2960-X",
+                status="End of Sale",
+                stage_date_utc="2020-10-31T00:00:00Z",
+                replacement="Catalyst 9200",
+            ),
+            ProductRecord(
+                vendor_name="Cisco",
+                model_name="Catalyst 3750-X",
+                status="End of Life",
+                stage_date_utc="2016-10-30T00:00:00Z",
+                replacement="Catalyst 9300",
+            ),
+        ]
+        total_1, new_1, upd_1 = storage.upsert_and_persist(cisco_run)
+        self.assertEqual(total_1, 2)
+        self.assertEqual(new_1, 2)
+        self.assertEqual(upd_1, 0)
+
+        # Run 2: Dell products (simulating second separate execution)
+        dell_run = [
+            ProductRecord(
+                vendor_name="Dell",
+                model_name="PowerEdge R720",
+                status="End of Service Life",
+                stage_date_utc="2019-02-28T00:00:00Z",
+                replacement="PowerEdge R750",
+            ),
+            ProductRecord(
+                vendor_name="Dell",
+                model_name="PowerEdge R630",
+                status="End of Standard Support",
+                stage_date_utc="2021-05-31T00:00:00Z",
+                replacement="PowerEdge R650",
+            ),
+        ]
+        total_2, new_2, upd_2 = storage.upsert_and_persist(dell_run)
+        # Must contain ALL 4 records (Cisco + Dell) - no overwrite!
+        self.assertEqual(total_2, 4)
+        self.assertEqual(new_2, 2)
+        self.assertEqual(upd_2, 0)
+
+        # Run 3: Cisco re-run with 1 duplicate + 1 new product
+        cisco_run_2 = [
+            ProductRecord(
+                vendor_name="Cisco",
+                model_name="Catalyst 2960-X",
+                status="End of Sale",
+                stage_date_utc="2020-10-31T00:00:00Z",
+                replacement="Catalyst 9200-L",  # updated replacement
+            ),
+            ProductRecord(
+                vendor_name="Cisco",
+                model_name="ISR 4331",
+                status="End of Sale",
+                stage_date_utc="2023-11-30T00:00:00Z",
+                replacement="Catalyst 8300",
+            ),
+        ]
+        total_3, new_3, upd_3 = storage.upsert_and_persist(cisco_run_2)
+        # Total records now: 5 (2 original Cisco + 2 Dell + 1 new Cisco ISR, 1 refreshed Cisco 2960-X)
+        self.assertEqual(total_3, 5)
+        self.assertEqual(new_3, 1)
+        self.assertEqual(upd_3, 1)
+
+        # Read directly from disk CSV and verify all 5 distinct records are persisted
+        df = pd.read_csv(self.master_csv, dtype=str)
+        self.assertEqual(len(df), 5)
+        vendors_in_csv = set(df["vendor_name"].tolist())
+        self.assertEqual(vendors_in_csv, {"Cisco", "Dell"})
+        models_in_csv = set(df["model_name"].tolist())
+        self.assertEqual(models_in_csv, {"Catalyst 2960-X", "Catalyst 3750-X", "PowerEdge R720", "PowerEdge R630", "ISR 4331"})
+
 
 if __name__ == "__main__":
     unittest.main()

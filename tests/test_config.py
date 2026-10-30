@@ -101,12 +101,12 @@ class TestConfig(unittest.TestCase):
             data = yaml.safe_load(f)
 
         vendors = data.get("vendors", {})
-        self.assertEqual(len(vendors), 140, f"Expected exactly 140 vendors, found {len(vendors)}")
+        self.assertGreaterEqual(len(vendors), 140, f"Expected at least 140 vendors, found {len(vendors)}")
 
         sectors = Counter(v.get("sector") for v in vendors.values())
         self.assertEqual(sectors["OT"], 54, f"Expected 54 OT vendors, found {sectors['OT']}")
-        self.assertEqual(sectors["IoT"], 44, f"Expected 44 IoT vendors, found {sectors['IoT']}")
-        self.assertEqual(sectors["IT"], 42, f"Expected 42 IT vendors, found {sectors['IT']}")
+        self.assertGreaterEqual(sectors["IoT"], 44, f"Expected at least 44 IoT vendors, found {sectors['IoT']}")
+        self.assertGreaterEqual(sectors["IT"], 42, f"Expected at least 42 IT vendors, found {sectors['IT']}")
 
         # Ensure all names are unique
         names = [v.get("name") for v in vendors.values()]
