@@ -10,7 +10,7 @@ import re
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # Ensure Crawl4AI stores cache/db inside workspace (prevents PermissionError on Windows/sandbox)
 os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(Path(__file__).resolve().parent.parent / ".cache"))
@@ -141,7 +141,30 @@ class UniversalAICrawler:
         browser_config = BrowserConfig(
             headless=HEADLESS_BROWSER,
             verbose=False,
-            user_agent=USER_AGENT
+            user_agent=USER_AGENT,
+            enable_stealth=True,
+            ignore_https_errors=True,
+            viewport_width=1920,
+            viewport_height=1080,
+            extra_args=[
+                '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-infobars',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+            ],
+            headers={
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": '"Windows"',
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1",
+                "Upgrade-Insecure-Requests": "1",
+            }
         )
 
         run_config = CrawlerRunConfig(
@@ -149,9 +172,14 @@ class UniversalAICrawler:
             word_count_threshold=10,
             page_timeout=page_timeout,
             wait_until="domcontentloaded",
-            delay_before_return_html=0.5,
-            remove_overlay_elements=False,
-            remove_consent_popups=False,
+            delay_before_return_html=2.5,
+            magic=True,
+            simulate_user=True,
+            override_navigator=True,
+            scan_full_page=True,
+            scroll_delay=0.3,
+            remove_overlay_elements=True,
+            remove_consent_popups=True,
             excluded_tags=['nav', 'footer', 'header', 'script', 'style', 'noscript', 'aside'],
             excluded_selector='#onetrust-consent-sdk, .onetrust-pc-dark-filter, #onetrust-banner-sdk, .cookie-notice, footer, header, nav, .site-footer, .global-header, .ot-sdk-container, .cookie-banner, .ot-floating-button'
         )
@@ -202,8 +230,8 @@ class UniversalAICrawler:
 
     def fetch_http_fallback(self, target_url: str) -> Dict[str, Any]:
         """
-        Lightweight, resilient HTTP fallback using urllib with realistic Chrome headers
-        for sites that block headless browsers or when Chromium is unavailable.
+        Lightweight, resilient HTTP fallback using requests with realistic Chrome headers,
+        automatic decompression, and retries for sites that block headless browsers or when Chromium is unavailable.
         """
         if os.getenv("SCRAPER_TEST_MODE") == "1" and any(k in target_url for k in ("fail", "missing", "example.com")):
             return {
@@ -213,43 +241,63 @@ class UniversalAICrawler:
                 "status_code": 500,
                 "extracted_content": None
             }
+        import requests
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+
+        session = requests.Session()
+        retries = Retry(
+            total=3,
+            backoff_factor=0.8,
+            status_forcelist=[429, 500, 502, 503, 504],
+            raise_on_status=False
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Upgrade-Insecure-Requests": "1",
+        }
+
         try:
-            req = urllib.request.Request(
-                target_url,
-                headers={
-                    "User-Agent": USER_AGENT,
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "Accept-Language": "en-US,en;q=0.9",
-                    "Sec-Ch-Ua": '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
-                    "Sec-Ch-Ua-Mobile": "?0",
-                    "Sec-Ch-Ua-Platform": '"Windows"',
-                }
-            )
-            with urllib.request.urlopen(req, timeout=20) as resp:
-                status = resp.status
-                raw_bytes = resp.read()
-                import gzip
-                if resp.headers.get("Content-Encoding") == "gzip":
-                    try:
-                        raw_bytes = gzip.decompress(raw_bytes)
-                    except Exception:
-                        pass
-                html_text = raw_bytes.decode("utf-8", errors="replace")
-
-                # Basic clean text conversion via BeautifulSoup
-                soup = BeautifulSoup(html_text, "html.parser")
-                for s in soup(["script", "style", "nav", "footer", "header"]):
-                    s.decompose()
-                text = soup.get_text(separator="\n", strip=True)
-
-                logger.info(f"Resilient HTTP fallback succeeded for {target_url} ({len(html_text)} bytes).")
+            resp = session.get(target_url, headers=headers, timeout=25, allow_redirects=True)
+            status = resp.status_code
+            if status >= 400:
+                logger.warning(f"Resilient HTTP fallback got HTTP {status} for {target_url}")
                 return {
                     "url": target_url,
-                    "markdown": text,
-                    "html": html_text,
+                    "markdown": "",
+                    "html": resp.text if resp.text else "",
                     "status_code": status,
                     "extracted_content": None
                 }
+
+            html_text = resp.text
+            soup = BeautifulSoup(html_text, "html.parser")
+            for s in soup(["script", "style", "nav", "footer", "header", "noscript", "svg"]):
+                s.decompose()
+            text = soup.get_text(separator="\n", strip=True)
+
+            logger.info(f"Resilient HTTP fallback succeeded for {target_url} ({len(html_text)} bytes, {len(text)} chars text).")
+            return {
+                "url": target_url,
+                "markdown": text,
+                "html": html_text,
+                "status_code": status,
+                "extracted_content": None
+            }
         except Exception as fallback_err:
             logger.debug(f"Resilient HTTP fallback unavailable for {target_url}: {fallback_err}")
             return {
@@ -375,34 +423,29 @@ class UniversalAICrawler:
             blocks.append("\n".join(lines))
         return blocks
 
-    async def run(self, target_url: str, chunk_size: int = 15) -> List[ProductRecord]:
+    def prepare_page_chunks(
+        self,
+        target_url: str,
+        crawl_data: Dict[str, Any],
+        vendor: str,
+        chunk_size: int = 15
+    ) -> Tuple[List[ProductRecord], List[Dict[str, Any]]]:
         """
-        Coordinates full crawl, markdown processing, and multi-provider AI lifecycle extraction.
-        Uses run_cache to eliminate duplicate crawls and AI extraction calls for identical URLs.
+        Parses crawl data (HTML and markdown), extracts Apollo/DOM tables, body markdown,
+        and linked PDF lifecycle bulletins.
+        Returns:
+            (pre_extracted_records, chunks_for_ai_extraction)
         """
-        norm_url = self.run_cache.normalize_url(target_url)
-        if self.run_cache.has_extracted_products(norm_url):
-            logger.info(f"[RUN_CACHE HIT: EXTRACTION] Reusing cached extracted products for {target_url}")
-            cached_products = self.run_cache.get_extracted_products(norm_url)
-            if cached_products is not None:
-                return cached_products
-
-        vendor = detect_vendor_from_url_or_text(target_url)
-        logger.info(f"Detected target vendor: {vendor} from URL: {target_url}")
-
-        # 1. Crawl via Crawl4AI
-        crawl_data = await self.crawl_with_crawl4ai(target_url)
         markdown = crawl_data.get("markdown", "")
         html = crawl_data.get("html", "")
         status_code = crawl_data.get("status_code", 200)
 
         if (status_code and status_code >= 400) or not markdown:
-            logger.warning(f"URL {target_url} returned HTTP {status_code} with no usable content. Skipping.")
-            return []
+            return [], []
 
-        all_products: List[ProductRecord] = []
+        pre_extracted: List[ProductRecord] = []
 
-        # Check if Crawl4AI LLMExtractionStrategy already extracted structured products directly
+        # 1. Check if Crawl4AI LLMExtractionStrategy already extracted structured products directly
         extracted_content = crawl_data.get("extracted_content")
         if extracted_content:
             try:
@@ -411,88 +454,56 @@ class UniversalAICrawler:
                     for it in items:
                         try:
                             rec = ProductRecord.model_validate(it)
-                            all_products.append(rec)
+                            pre_extracted.append(rec)
                         except Exception:
                             pass
-                    if all_products:
-                        logger.info(f"Loaded {len(all_products)} products directly from Crawl4AI LLMExtractionStrategy.")
+                    if pre_extracted:
+                        logger.info(f"Loaded {len(pre_extracted)} products directly from Crawl4AI LLMExtractionStrategy.")
             except Exception as e:
                 logger.debug(f"Could not parse Crawl4AI extracted_content: {e}")
 
-        # 2. Extract structured Apollo tables from DOM or universal HTML tables if present
+        chunks_to_extract: List[Dict[str, Any]] = []
+
+        # 2. Extract structured Apollo tables from DOM or universal HTML tables
         apollo_tables = self.extract_apollo_state_tables(html)
         dom_tables = apollo_tables if apollo_tables else self.extract_dom_tables(html)
 
         if dom_tables:
             table_blocks = self.apollo_tables_to_markdown_blocks(dom_tables)
             prov_name = getattr(self.extractor, "provider", "AI").upper()
-            print(f"  -> Discovered {len(table_blocks)} structured lifecycle tables. Processing with AI engine ({prov_name})...")
-            logger.info(f"Processing {len(table_blocks)} product lifecycle tables with AI engine ({prov_name})...")
+            logger.info(f"Discovered {len(table_blocks)} structured lifecycle tables on {target_url} ({prov_name}).")
+            for i in range(0, len(table_blocks), chunk_size):
+                chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
+                chunks_to_extract.append({
+                    "markdown_chunk": chunk_text,
+                    "context": f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
+                    "source_url": target_url
+                })
 
-            if getattr(self.extractor, "batch_mode", False) and self.extractor.is_configured() and len(table_blocks) > chunk_size:
-                logger.info(f"Using asynchronous Batch API (50% token cost reduction) across {len(table_blocks)} tables...")
-                batch_chunks = [
-                    {
-                        "markdown_chunk": "\n\n---\n\n".join(table_blocks[i:i + chunk_size]),
-                        "context": f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
-                        "source_url": target_url
-                    }
-                    for i in range(0, len(table_blocks), chunk_size)
-                ]
-                extracted = self.extractor.extract_batch(batch_chunks)
-                all_products.extend(extracted)
-            else:
-                for i in range(0, len(table_blocks), chunk_size):
-                    chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
-                    extracted = self.extractor.extract_from_markdown(
-                        markdown_chunk=chunk_text,
-                        context=f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
-                        source_url=target_url
-                    )
-                    all_products.extend(extracted)
-
-        # 3. Process crawled body markdown (essential when no tables present or to capture unlisted items)
-        if markdown and (not dom_tables or len(all_products) == 0):
+        # 3. Process crawled body markdown (if no tables present or to capture unlisted items)
+        if markdown and (not dom_tables or len(pre_extracted) == 0):
             lines = markdown.split("\n")
             step = 800
-            md_chunks = []
             for i in range(0, len(lines), step):
                 chunk_md = "\n".join(lines[i:i + step])
                 if len(chunk_md.strip()) >= 50:
-                    md_chunks.append({
+                    chunks_to_extract.append({
                         "markdown_chunk": chunk_md,
                         "context": f"{vendor} Discontinued Products Catalog - Section {i//step + 1}",
                         "source_url": target_url
                     })
-
-            if getattr(self.extractor, "batch_mode", False) and self.extractor.is_configured() and len(md_chunks) > 1:
-                logger.info(f"Using asynchronous Batch API across {len(md_chunks)} markdown chunks...")
-                extracted = self.extractor.extract_batch(md_chunks)
-                all_products.extend(extracted)
-            else:
-                max_chunks = getattr(self, "max_markdown_chunks", 0)
-                if max_chunks and max_chunks > 0 and len(md_chunks) > max_chunks:
-                    logger.warning(
-                        f"Markdown catalog exceeds {max_chunks} chunks ({len(md_chunks)} found). "
-                        f"Processing first {max_chunks} chunks. Use --batch-mode for unlimited processing."
-                    )
-                    chunks_to_process = md_chunks[:max_chunks]
-                else:
-                    chunks_to_process = md_chunks
-                for item in chunks_to_process:
-                    extracted = self.gemini.extract_from_markdown(
-                        markdown_chunk=item["markdown_chunk"],
-                        context=item["context"],
-                        source_url=item["source_url"]
-                    )
-                    all_products.extend(extracted)
 
         # 4. Deep Document Notice Inspection: Check for linked PDF lifecycle bulletins
         if html:
             try:
                 soup = BeautifulSoup(html, "html.parser")
                 pdf_links = []
-                bulletin_kw = re.compile(r'(?:eol|ltb|eos|bulletin|notice|discontinu|obsolesc|abk[uü]ndigung)', re.IGNORECASE)
+                bulletin_kw = re.compile(
+                    r'(?:eol|ltb|eos|eosl|ldos|eoa|end[-_\s]?of[-_\s]?(?:life|sale|sales|support|service|availability)|'
+                    r'bulletin|notice|discontinu|obsolesc|phase[-_\s]?out|phaseout|last[-_\s]?time[-_\s]?buy|final[-_\s]?order|'
+                    r'abk[uü]ndigung|auslauf|生産終了|製造中止|販売終了|保守終了|修理対応)',
+                    re.IGNORECASE
+                )
                 for a in soup.find_all("a", href=True):
                     href = str(a.get("href") or "").strip()
                     if ".pdf" in href.lower():
@@ -503,17 +514,50 @@ class UniversalAICrawler:
                                 if resolved_pdf not in pdf_links:
                                     pdf_links.append(resolved_pdf)
 
-                # Ingest PDF notices: prioritize if table yielded no records, or check top 2 bulletins
-                max_pdfs = 2 if len(all_products) > 0 else 5
+                max_pdfs = 2 if len(pre_extracted) > 0 else 5
                 for pdf_url in pdf_links[:max_pdfs]:
                     print(f"  -> Ingesting lifecycle bulletin PDF: {pdf_url.split('/')[-1]}")
                     try:
                         pdf_products = self.gemini.extract_from_pdf_url(pdf_url, default_vendor=vendor)
-                        all_products.extend(pdf_products)
+                        pre_extracted.extend(pdf_products)
                     except Exception as pdf_err:
                         logger.debug(f"Could not parse bulletin PDF {pdf_url}: {pdf_err}")
             except Exception as soup_err:
                 logger.debug(f"Could not inspect HTML for PDF bulletins: {soup_err}")
+
+        return pre_extracted, chunks_to_extract
+
+    def extract_accumulated_batches(
+        self,
+        chunks: List[Dict[str, Any]],
+        pre_extracted: Optional[List[ProductRecord]] = None,
+        default_vendor: str = ""
+    ) -> List[ProductRecord]:
+        """
+        Dispatches all accumulated chunks across crawled pages to the AI extraction engine.
+        Leverages Gemini Batch API (50% token cost reduction) when batch_mode is enabled.
+        Enriches records with replacement models and deduplicates by (vendor, model, stage).
+        """
+        all_products: List[ProductRecord] = list(pre_extracted or [])
+
+        if chunks:
+            prov_name = getattr(self.extractor, "provider", "AI").upper()
+            logger.info(f"Dispatching {len(chunks)} accumulated markdown/table chunks to AI engine ({prov_name})...")
+
+            if getattr(self.extractor, "batch_mode", False) and self.extractor.is_configured():
+                logger.info(f"Using asynchronous Batch API (50% token discount) across {len(chunks)} chunks...")
+                extracted = self.extractor.extract_batch(chunks)
+                all_products.extend(extracted)
+            else:
+                max_chunks = getattr(self, "max_markdown_chunks", 0)
+                chunks_to_process = chunks[:max_chunks] if (max_chunks and max_chunks > 0 and len(chunks) > max_chunks) else chunks
+                for item in chunks_to_process:
+                    extracted = self.gemini.extract_from_markdown(
+                        markdown_chunk=item["markdown_chunk"],
+                        context=item.get("context", f"{default_vendor} Lifecycle"),
+                        source_url=item.get("source_url", "")
+                    )
+                    all_products.extend(extracted)
 
         # Enrich products with actual replacement models from PDF cache & eliminate placeholders
         for p in all_products:
@@ -546,16 +590,40 @@ class UniversalAICrawler:
                 unique_records[key] = p
             else:
                 existing = unique_records[key]
-                # If existing has no replacement but new record has one, copy it
                 if not existing.replacement and p.replacement:
                     existing.replacement = p.replacement
                     if "replacement" in existing.metadata:
                         existing.metadata["replacement"] = p.replacement
-                # Prefer the record that has a populated UTC date
                 if not existing.stage_date_utc and p.stage_date_utc:
                     unique_records[key] = p
 
         final_list = list(unique_records.values())
+        return final_list
+
+    async def run(self, target_url: str, chunk_size: int = 15) -> List[ProductRecord]:
+        """
+        Coordinates full crawl, markdown processing, and multi-provider AI lifecycle extraction.
+        Uses run_cache to eliminate duplicate crawls and AI extraction calls for identical URLs.
+        """
+        norm_url = self.run_cache.normalize_url(target_url)
+        if self.run_cache.has_extracted_products(norm_url):
+            logger.info(f"[RUN_CACHE HIT: EXTRACTION] Reusing cached extracted products for {target_url}")
+            cached_products = self.run_cache.get_extracted_products(norm_url)
+            if cached_products is not None:
+                return cached_products
+
+        vendor = detect_vendor_from_url_or_text(target_url)
+        logger.info(f"Detected target vendor: {vendor} from URL: {target_url}")
+
+        # 1. Crawl via Crawl4AI
+        crawl_data = await self.crawl_with_crawl4ai(target_url)
+        pre_extracted, chunks = self.prepare_page_chunks(target_url, crawl_data, vendor, chunk_size=chunk_size)
+
+        if not pre_extracted and not chunks:
+            logger.warning(f"URL {target_url} returned no extractable lifecycle content. Skipping.")
+            return []
+
+        final_list = self.extract_accumulated_batches(chunks, pre_extracted=pre_extracted, default_vendor=vendor)
         self.run_cache.set_extracted_products(norm_url, final_list)
         logger.info(f"Finished extraction! Total unique per-stage product records: {len(final_list)}")
         return final_list
@@ -632,6 +700,11 @@ class UniversalAICrawler:
             f"{origin}/sitemap_index.xml",
             f"{origin}/sitemap-products.xml",
             f"{origin}/sitemap/sitemap.xml",
+            f"{origin}/en/sitemap.xml",
+            f"{origin}/ja/sitemap.xml",
+            f"{origin}/jp/sitemap.xml",
+            f"{origin}/sitemap-en.xml",
+            f"{origin}/sitemap-jp.xml",
         ]
 
         # 1. Check robots.txt for Sitemap: directives
@@ -662,11 +735,15 @@ class UniversalAICrawler:
         # 2. Products across ALL hardware/software categories (controllers, drives, switches, sensors, etc.)
         # 3. Catalogs, support, documentation, downloads, bulletins
         relevant_url_pattern = re.compile(
-            r'(?:lifecycle|eol|ltb|eos|discontinu|obsolesc|phase-out|bulletin|product|catalog|hardware|device|item|support|notice|archive|download)',
+            r'(?:lifecycle|life[-_\s]?cycle|eol|ltb|eos|eosl|ldos|eoa|'
+            r'end[-_\s]?of[-_\s]?(?:life|sale|sales|support|service|availability)|'
+            r'discontinu|obsolesc|phase[-_\s]?out|phaseout|last[-_\s]?time[-_\s]?buy|final[-_\s]?order|'
+            r'classic|limited|bulletin|product|catalog|hardware|device|item|support|notice|archive|download|'
+            r'abk[uü]ndigung|auslauf|生産終了|製造中止|販売終了|保守終了|修理対応)',
             re.IGNORECASE
         )
 
-        for sm_url in sitemap_urls_to_fetch[:3]:
+        for sm_url in sitemap_urls_to_fetch[:6]:
             if not is_safe_url(sm_url, allowed_domains):
                 continue
             try:
@@ -693,7 +770,7 @@ class UniversalAICrawler:
                             if loc is not None and loc.text:
                                 child_sm = loc.text.strip()
                                 if is_safe_url(child_sm, allowed_domains) and relevant_url_pattern.search(child_sm):
-                                    if child_sm not in sitemap_urls_to_fetch and len(sitemap_urls_to_fetch) < 6:
+                                    if child_sm not in sitemap_urls_to_fetch and len(sitemap_urls_to_fetch) < 12:
                                         sitemap_urls_to_fetch.append(child_sm)
 
                         # Handle urlset (actual URLs)
@@ -723,7 +800,8 @@ class UniversalAICrawler:
         allowed_domains: Optional[List[str]] = None,
         max_pages: int = 0,
         max_depth: int = 0,
-        enable_sitemap: bool = True
+        enable_sitemap: bool = True,
+        accumulate_batches: bool = False
     ) -> List[ProductRecord]:
         """
         Deep crawls a vendor website network map:
@@ -732,15 +810,22 @@ class UniversalAICrawler:
         3. Recursively traverses internal category trees and pagination links via BFS queue (up to max_depth; 0 = unlimited).
         4. Filters links strictly within allowed_domains (SSRF boundary guard).
         5. Crawls discovered sub-portals up to max_pages (0 = unlimited full site crawl) and extracts structured products.
+        6. When accumulate_batches=True, accumulates all page content first and dispatches a single batch AI extraction.
         """
         pages_limit_str = "Unlimited" if not max_pages or max_pages <= 0 else str(max_pages)
         depth_limit_str = "Unlimited" if not max_depth or max_depth <= 0 else str(max_depth)
-        logger.info(f"[CRAWLER] Initiating site-level crawl on domain: {base_url} (Max pages: {pages_limit_str}, Max depth: {depth_limit_str})")
+        logger.info(f"[CRAWLER] Initiating site-level crawl on domain: {base_url} (Max pages: {pages_limit_str}, Max depth: {depth_limit_str}, Accumulate: {accumulate_batches})")
+
+        site_vendor = detect_vendor_from_url_or_text(base_url)
 
         # Broad discovery keyword patterns:
         # Priority 1: Direct lifecycle, EOL, obsolescence, bulletins
         lifecycle_keywords = re.compile(
-            r'(?:lifecycle|life-cycle|eol|ltb|eos|discontinu|obsolescen|phase-out|bulletin|product-status|support|abk[uü]ndigung|生産終了)',
+            r'(?:lifecycle|life[-_\s]?cycle|eol|ltb|eos|eosl|ldos|eoa|'
+            r'end[-_\s]?of[-_\s]?(?:life|sale|sales|support|service|availability)|'
+            r'discontinu|obsolesc|phase[-_\s]?out|phaseout|last[-_\s]?time[-_\s]?buy|final[-_\s]?order|last[-_\s]?order|'
+            r'classic|limited|bulletin|product[-_\s]?status|support|'
+            r'abk[uü]ndigung|auslauf|生産終了|製造中止|販売終了|保守終了|修理対応)',
             re.IGNORECASE
         )
         # Priority 2: Product catalogs, categories, hardware hubs across ALL product categories (no category bias)
@@ -809,6 +894,8 @@ class UniversalAICrawler:
 
         # 3. BFS traversal
         all_products: List[ProductRecord] = []
+        accumulated_chunks: List[Dict[str, Any]] = []
+        accumulated_pre_extracted: List[ProductRecord] = []
         pages_crawled = 0
 
         while queue and (not max_pages or max_pages <= 0 or pages_crawled < max_pages):
@@ -826,9 +913,16 @@ class UniversalAICrawler:
 
             page_label = f"{pages_crawled}/{pages_limit_str}"
             logger.info(f"[CRAWLER] Crawling network map portal ({page_label}, depth={current_depth}): {u}")
+            crawl_data = {}
             try:
-                page_products = await self.run(u)
-                all_products.extend(page_products)
+                if accumulate_batches:
+                    crawl_data = await self.crawl_with_crawl4ai(u)
+                    pre_recs, chunks = self.prepare_page_chunks(u, crawl_data, site_vendor)
+                    accumulated_pre_extracted.extend(pre_recs)
+                    accumulated_chunks.extend(chunks)
+                else:
+                    page_products = await self.run(u)
+                    all_products.extend(page_products)
             except Exception as pe:
                 logger.warning(f"Error crawling portal {u}: {pe}")
 
@@ -837,7 +931,8 @@ class UniversalAICrawler:
             queue_budget_allowed = (not max_pages or max_pages <= 0 or len(queue) < max_pages * 2)
             if depth_allowed and queue_budget_allowed:
                 try:
-                    crawl_data = await self.crawl_with_crawl4ai(u)
+                    if not crawl_data:
+                        crawl_data = await self.crawl_with_crawl4ai(u)
                     sub_html = crawl_data.get("html", "")
                     if sub_html:
                         sub_soup = BeautifulSoup(sub_html, "html.parser")
@@ -855,6 +950,12 @@ class UniversalAICrawler:
                             add_to_queue(p_url, depth=current_depth + 1, priority=1)
                 except Exception as sub_err:
                     logger.debug(f"Sub-portal link discovery notice for {u}: {sub_err}")
+
+        # Batch AI Extraction if accumulate_batches mode was active
+        if accumulate_batches and (accumulated_chunks or accumulated_pre_extracted):
+            logger.info(f"[BATCH CRAWL] Extracted content accumulated across {pages_crawled} pages ({len(accumulated_chunks)} chunks). Dispatching batch extraction...")
+            batch_products = self.extract_accumulated_batches(accumulated_chunks, pre_extracted=accumulated_pre_extracted, default_vendor=site_vendor)
+            all_products.extend(batch_products)
 
         # De-duplicate products across pages
         unique_products: Dict[str, ProductRecord] = {}

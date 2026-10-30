@@ -108,11 +108,14 @@ class LifecyclePipeline:
         vendor_cfg: Dict[str, Any],
         site_crawl: bool = True,
         max_pages: int = 0,
-        max_depth: int = 0
+        max_depth: int = 0,
+        accumulate_batches: Optional[bool] = None
     ) -> List[ProductRecord]:
         """
         Executes pipeline for a single vendor across configured entry points or full website domain.
         Logs each of the 6 pipeline stages clearly.
+        When accumulate_batches is True, crawls all entry points/pages first without LLM calls,
+        then dispatches a single batch AI extraction job (50% cost reduction and zero per-page latency).
         """
         vendor_name = vendor_cfg.get("name", vendor_key.title())
         vendor_id = vendor_cfg.get("id", vendor_key.lower())
@@ -121,8 +124,10 @@ class LifecyclePipeline:
         entry_points = vendor_cfg.get("entry_points", [])
         allowed_domains = vendor_cfg.get("allowed_domains", [])
 
+        accumulate = bool(getattr(self.extractor, "batch_mode", False)) if accumulate_batches is None else accumulate_batches
+
         print("\n" + "=" * 90)
-        print(f"[*] LIFECYCLE SCRAPING WORKFLOW: [{sector}] {vendor_name} (ID: {vendor_id})")
+        print(f"[*] LIFECYCLE SCRAPING WORKFLOW: [{sector}] {vendor_name} (ID: {vendor_id}) [Batch Accumulate: {accumulate}]")
         print("=" * 90)
 
         # -------------------------------------------------------------------------
@@ -132,6 +137,9 @@ class LifecyclePipeline:
         vendor_products: List[ProductRecord] = []
         vendor_start = datetime.now()
         error_msg = None
+
+        accumulated_chunks: List[Dict[str, Any]] = []
+        accumulated_direct: List[ProductRecord] = []
 
         try:
             # 1. Primary execution: Crawl verified, trusted lifecycle portal entry points
@@ -157,12 +165,22 @@ class LifecyclePipeline:
 
                 print(f"  -> Crawling verified lifecycle portal '{name}' ({region}): {url}")
                 try:
-                    records = await self.crawler.run(url)
-                    for r in records:
-                        r.vendor_name = vendor_name
-                        if "region" not in r.metadata:
-                            r.metadata["region"] = region
-                    vendor_products.extend(records)
+                    if accumulate:
+                        crawl_data = await self.crawler.crawl_with_crawl4ai(url)
+                        dir_recs, chunks = self.crawler.prepare_page_chunks(url, crawl_data, vendor_name)
+                        for dr in dir_recs:
+                            dr.vendor_name = vendor_name
+                            if "region" not in dr.metadata:
+                                dr.metadata["region"] = region
+                        accumulated_direct.extend(dir_recs)
+                        accumulated_chunks.extend(chunks)
+                    else:
+                        records = await self.crawler.run(url)
+                        for r in records:
+                            r.vendor_name = vendor_name
+                            if "region" not in r.metadata:
+                                r.metadata["region"] = region
+                        vendor_products.extend(records)
                 except Exception as ep_err:
                     print(f"  [!] Warning on entry point {name} ({url}): {ep_err}")
                     self.dlq.record_failure(
@@ -174,14 +192,20 @@ class LifecyclePipeline:
                     )
 
             # 2. Secondary discovery: Run domain-level site crawl if explicitly requested or if entry points yielded 0 records
-            should_site_crawl = site_crawl or (len(vendor_products) == 0 and bool(website))
+            should_site_crawl = site_crawl or (len(vendor_products) == 0 and len(accumulated_chunks) == 0 and bool(website))
             if should_site_crawl and website:
                 page_str = "Unlimited" if not max_pages or max_pages <= 0 else str(max_pages)
                 depth_str = "Unlimited" if not max_depth or max_depth <= 0 else str(max_depth)
                 crawl_reason = "Supplementary deep discovery" if site_crawl else "Automatic fallback (0 records from entry points)"
                 print(f"  -> [{crawl_reason}] Crawling vendor domain: {website} (Max pages: {page_str}, Max depth: {depth_str})")
                 try:
-                    records = await self.crawler.crawl_website(website, allowed_domains=allowed_domains, max_pages=max_pages, max_depth=max_depth)
+                    records = await self.crawler.crawl_website(
+                        website,
+                        allowed_domains=allowed_domains,
+                        max_pages=max_pages,
+                        max_depth=max_depth,
+                        accumulate_batches=accumulate
+                    )
                     for r in records:
                         r.vendor_name = vendor_name
                         if "region" not in r.metadata:
@@ -193,6 +217,18 @@ class LifecyclePipeline:
             # -------------------------------------------------------------------------
             # STEP 2/6: EXTRACTION
             # -------------------------------------------------------------------------
+            if accumulate and (accumulated_chunks or accumulated_direct):
+                print(f"[STEP 2/6: AI BATCH EXTRACTION] Dispatching {len(accumulated_chunks)} accumulated chunks to AI engine...")
+                batch_records = self.crawler.extract_accumulated_batches(
+                    accumulated_chunks,
+                    pre_extracted=accumulated_direct,
+                    default_vendor=vendor_name
+                )
+                for br in batch_records:
+                    if "region" not in br.metadata:
+                        br.metadata["region"] = "Global"
+                vendor_products.extend(batch_records)
+
             print(f"[STEP 2/6: AI / APOLLO EXTRACTION] Extracted {len(vendor_products)} candidate records.")
 
             # -------------------------------------------------------------------------
@@ -265,10 +301,10 @@ class LifecyclePipeline:
                             continue
                     else:
                         if m_name.startswith(("=", "+", "-", "@")):
-                            p.model_name = m_name[0] + clean_m
+                            p.model_name = "'" + m_name[0] + clean_m
                         else:
                             p.model_name = clean_m
-                            m_name = clean_m
+                        m_name = clean_m
                 else:
                     if m_name and m_name.lower() not in ("n/a", "none", "null", "nan"):
                         clean_m = clean_and_sanitize_identifier(m_name)
@@ -336,6 +372,7 @@ class LifecyclePipeline:
         max_pages: int = 0,
         max_depth: int = 0,
         resume: bool = False,
+        accumulate_batches: Optional[bool] = None,
     ) -> ScrapedDataset:
         """
         Executes the entire multi-vendor pipeline across the 6 observable stages:
@@ -426,7 +463,14 @@ class LifecyclePipeline:
 
                 async def _worker(vk: str, vc: Dict[str, Any]):
                     async with sem:
-                        res = await self.execute_vendor(vk, vc, site_crawl=site_crawl, max_pages=max_pages, max_depth=max_depth)
+                        res = await self.execute_vendor(
+                            vk,
+                            vc,
+                            site_crawl=site_crawl,
+                            max_pages=max_pages,
+                            max_depth=max_depth,
+                            accumulate_batches=accumulate_batches
+                        )
                         completed_vendor_keys.append(vk)
                         return res
 
@@ -453,7 +497,14 @@ class LifecyclePipeline:
             else:
                 for v_key, v_cfg in target_vendors:
                     try:
-                        v_prods = await self.execute_vendor(v_key, v_cfg, site_crawl=site_crawl, max_pages=max_pages, max_depth=max_depth)
+                        v_prods = await self.execute_vendor(
+                            v_key,
+                            v_cfg,
+                            site_crawl=site_crawl,
+                            max_pages=max_pages,
+                            max_depth=max_depth,
+                            accumulate_batches=accumulate_batches
+                        )
                         all_harvested_products.extend(v_prods)
                         completed_vendor_keys.append(v_key)
                     except Exception as v_err:

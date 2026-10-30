@@ -61,6 +61,7 @@ async def main():
     parser.add_argument("--thinking-budget", type=int, default=None, help="Cap thinking token budget on Flash models (default: 0 to eliminate reasoning output token costs)")
     parser.add_argument("--prompt-caching", action="store_true", default=None, help="Enable Google Prompt Caching for repetitive site layouts (up to 90%% input discount)")
     parser.add_argument("--batch-mode", action="store_true", help="Enable Gemini Batch API for 50%% discount across both input and output tokens")
+    parser.add_argument("--accumulate-batches", "--batch-crawl", dest="accumulate_batches", action="store_true", default=None, help="Accumulate all crawled page markdowns across portals before dispatching AI batch extraction (eliminates per-page latency and leverages 50%% batch discount)")
     parser.add_argument("--concurrency", type=int, default=None, help="Number of concurrent vendor crawl workers (defaults to MAX_CONCURRENT_VENDORS or 1)")
     parser.add_argument("--max-pages", type=int, default=0, help="Maximum number of website pages to crawl during site discovery (default: 0 = unlimited full site crawl)")
     parser.add_argument("--max-depth", type=int, default=0, help="Maximum link recursion depth for website network map crawling (default: 0 = unlimited depth)")
@@ -184,6 +185,8 @@ async def main():
     }
     if args.concurrency is not None:
         exec_kwargs["concurrency"] = args.concurrency
+    if args.accumulate_batches is not None:
+        exec_kwargs["accumulate_batches"] = args.accumulate_batches
 
     dataset = await pipeline.execute(**exec_kwargs)
     

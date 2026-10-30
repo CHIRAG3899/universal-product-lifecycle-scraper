@@ -310,6 +310,33 @@ class TestGeminiExtractor(unittest.TestCase):
         self.assertEqual(extract_text_from_pdf_bytes(b""), "")
         self.assertEqual(extract_text_from_pdf_bytes(b"not a valid pdf"), "")
 
+    def test_multi_stage_milestone_table_extraction(self):
+        """Verifies multi-stage tables with End of Sale, Last Time Buy, and End of Support explode into per-stage records."""
+        extractor = GeminiExtractor(api_key="")
+        md_table = """
+| Product Model | End of Sale Date | Last Time Buy Date | End of Support Date | Replacement |
+| :--- | :--- | :--- | :--- | :--- |
+| Catalyst 2960-X | 2021-10-31 | 2022-04-30 | 2026-10-31 | Catalyst 9200 |
+| Nexus 9300-EX | 2022-06-30 | 2022-12-31 | 2027-06-30 | Nexus 9300-FX3 |
+"""
+        records = extractor.fallback_rule_based_extraction(
+            md_table,
+            source_url="https://www.cisco.com/c/en/us/products/eos-eol-policy.html",
+            default_vendor="Cisco Systems"
+        )
+        self.assertEqual(len(records), 6)  # 2 products * 3 milestone stages
+        c2960_records = [r for r in records if r.model_name == "Catalyst 2960-X"]
+        self.assertEqual(len(c2960_records), 3)
+
+        stages = [r.stage for r in c2960_records]
+        self.assertIn("End of Sale", stages)
+        self.assertIn("Last Time Buy (LTB)", stages)
+        self.assertIn("End of Support", stages)
+
+        for r in c2960_records:
+            self.assertEqual(r.replacement, "Catalyst 9200")
+            self.assertIsNotNone(r.stage_date_utc)
+
 
 if __name__ == "__main__":
     unittest.main()

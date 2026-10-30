@@ -41,14 +41,33 @@ STAGE_TRANSLATIONS: Dict[str, str] = {
     # Standard EOL / LTB / EOS Terms
     "end of life": "End of Life (EOL)",
     "eol": "End of Life (EOL)",
+    "product end of life": "End of Life (EOL)",
+    "end of life cycle": "End of Life (EOL)",
+    "end of support": "End of Support",
+    "support end": "End of Support",
+    "eosl": "End of Service Life (EOSL)",
+    "end of service life": "End of Service Life (EOSL)",
+    "end of availability": "End of Availability (EOA)",
+    "eoa": "End of Availability (EOA)",
+    "last support date": "Last Date of Support",
+    "final order date": "Last Time Buy (LTB)",
+    "last order date": "Last Time Buy (LTB)",
+    "last order": "Last Time Buy (LTB)",
+    "last purchase date": "Last Time Buy (LTB)",
+    "last purchase": "Last Time Buy (LTB)",
     "last time buy": "Last Time Buy (LTB)",
     "ltb": "Last Time Buy (LTB)",
     "end of service": "End of Service (EOS)",
     "eos": "End of Service (EOS)",
     "discontinued": "Discontinued",
+    "discontinued model": "Discontinued",
+    "discontinued product": "Discontinued",
+    "discontinuation notification": "Discontinuation Notification",
     "withdrawal": "Production Withdrawal",
     "final order": "Last Time Buy (LTB)",
     "repair end": "End of Service (EOS)",
+    "phaseout": "Phase-Out",
+    "end of maintenance": "End of Maintenance",
 
     # German (Siemens, Phoenix Contact, Beckhoff)
     "produktabkündigung": "End of Life (EOL)",
@@ -252,17 +271,23 @@ def normalize_stage_name(raw_stage: Optional[str]) -> str:
             return STAGE_TRANSLATIONS[pattern]
 
     # 2. Check for common vendor status phrases
-    if "last date of support" in c_lower or "ldos" in c_lower:
+    if "last date of support" in c_lower or "last support date" in c_lower or "ldos" in c_lower:
         return "Last Date of Support"
+    if "end of service life" in c_lower or "eosl" in c_lower:
+        return "End of Service Life (EOSL)"
+    if "end of support" in c_lower or "support end" in c_lower:
+        return "End of Support"
+    if "end of availability" in c_lower or "eoa" in c_lower:
+        return "End of Availability (EOA)"
     if "end of sale" in c_lower or "eos" == c_lower or "end of sales" in c_lower:
         return "End of Sale"
-    if "ltb" in c_lower or ("last" in c_lower and "buy" in c_lower):
+    if "ltb" in c_lower or ("last" in c_lower and "buy" in c_lower) or "final order" in c_lower or "last order" in c_lower or "last purchase" in c_lower:
         return "Last Time Buy (LTB)"
     if "eol" in c_lower or "end of life" in c_lower:
         return "End of Life (EOL)"
     if "eos" in c_lower or "end of service" in c_lower or "repair end" in c_lower:
         return "End of Service (EOS)"
-    if "phase-out" in c_lower or "phase out" in c_lower:
+    if "phase-out" in c_lower or "phase out" in c_lower or "phaseout" in c_lower:
         return "Phase-Out"
     if "discontinu" in c_lower:
         return "Discontinued"
@@ -274,6 +299,8 @@ def normalize_stage_name(raw_stage: Optional[str]) -> str:
         return "Limited"
     if "active mature" in c_lower:
         return "Active Mature"
+    if "maintenance only" in c_lower:
+        return "Maintenance Only"
 
     # 3. Preserve the exact vendor status cleanly title-cased or preserved (up to 100 chars, no truncation)
     clean_title = cleaned[:100].strip()

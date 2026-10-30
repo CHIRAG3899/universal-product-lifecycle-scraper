@@ -2313,28 +2313,34 @@ vendors:
     - OT
   toyoda:
     id: toyoda
-    name: JTEKT Toyoda
+    name: JTEKT Toyoda (JTEKT Electronics)
     sector: OT
     website: https://www.jtekt.co.jp
     allowed_domains:
     - jtekt.co.jp
-    - toyoda-americas.com
+    - electronics.jtekt.co.jp
+    - koyoele.co.jp
+    - jtektmachinery.com
     entry_points:
-    - name: Toyoda_TOYOPUC_PLC_Discontinued_Support
-      url: https://toyoda.jtekt.co.jp/en/products/electronics/support/
+    - name: JTEKT_Electronics_Discontinued_Catalog
+      url: https://www.electronics.jtekt.co.jp/en/product/discon/
       region: Global
       crawler_type: dom_table
-    - name: JTEKT_Electronics_Maintenance_Matrix
-      url: https://www.jtekt.co.jp/e/products/electronics/support/
+    - name: JTEKT_Electronics_Discontinued_DirectLogic_PLC
+      url: https://www.electronics.jtekt.co.jp/en/product/discon/discon_plc/directlogic-305/
       region: Global
       crawler_type: dom_table
-    - name: Toyoda_Americas_Parts_Service_Lifecycle
-      url: https://www.toyoda-americas.com/support/parts-service/
+    - name: JTEKT_Electronics_Discontinued_Japan_Catalog
+      url: https://www.electronics.jtekt.co.jp/jp/product/discon/
+      region: Japan
+      crawler_type: dom_table
+    - name: JTEKT_Electronics_Support_Portal
+      url: https://www.electronics.jtekt.co.jp/en/support/
+      region: Global
+      crawler_type: dom_table
+    - name: JTEKT_Machinery_Americas_Support
+      url: https://jtektmachinery.com/jtekt-support/service-technical-support
       region: Americas
-      crawler_type: dom_table
-    - name: Toyoda_Mechatronics_CNC_Discontinued
-      url: https://toyoda.jtekt.co.jp/en/products/machine/support/
-      region: Global
       crawler_type: dom_table
   verkada:
     id: verkada

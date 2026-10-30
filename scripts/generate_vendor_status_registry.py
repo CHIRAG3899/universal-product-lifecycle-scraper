@@ -146,15 +146,16 @@ VENDOR_STATUS_DICTIONARY: Dict[str, Dict[str, Any]] = {
         ]
     },
     "toyoda": {
-        "vendor": "JTEKT Toyoda",
+        "vendor": "JTEKT Toyoda (JTEKT Electronics)",
         "sector": "OT",
-        "lifecycle_model": "TOYOPUC PLC Lifecycle Timeline",
-        "trusted_source_url": "https://toyoda.jtekt.co.jp/en/products/electronics/support/",
+        "lifecycle_model": "JTEKT Electronics & TOYOPUC Lifecycle Timeline",
+        "trusted_source_url": "https://www.electronics.jtekt.co.jp/en/product/discon/",
         "statuses": [
-            {"term": "Standard Production", "meaning": "Current generation TOYOPUC PAC/PLC series."},
-            {"term": "Discontinuation Notification", "meaning": "Published notice indicating scheduled production cutoff."},
-            {"term": "Discontinued (製造中止)", "meaning": "Manufacturing terminated; maintenance supported for 7 years."},
-            {"term": "Repair Service Concluded", "meaning": "Repair support ceased; migration to TOYOPUC-Plus required."}
+            {"term": "Standard Production", "meaning": "Current generation TOYOPUC PAC/PLC series and electronic equipment in active production."},
+            {"term": "Discontinuation Notification", "meaning": "Advance manufacturer notice indicating scheduled production cutoff and transition plan."},
+            {"term": "Discontinued Model (生産終了)", "meaning": "Manufacturing concluded; guaranteed spare parts and maintenance support period begins."},
+            {"term": "Maintenance / Repair Period (修理対応期間)", "meaning": "Repair services and spare parts supported according to parts availability (typically 7 years post-discontinuation)."},
+            {"term": "End of Maintenance (修理対応終了)", "meaning": "Repair support ceased; migration to modern replacement series (e.g. TOYOPUC-Plus, DL06) required."}
         ]
     },
     "danfoss": {

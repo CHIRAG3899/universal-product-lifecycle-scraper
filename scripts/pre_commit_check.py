@@ -369,7 +369,7 @@ def check_7_full_test_suite() -> Tuple[bool, str]:
                     test_count += 1
                     parts = line.split()
                     test_name = parts[0] if parts else ""
-                    print(f"\r  [{test_count:>3}/191] {test_name[:50]:<50} -> ok", end="", flush=True)
+                    print(f"\r  [{test_count:>3}/213] {test_name[:50]:<50} -> ok", end="", flush=True)
 
         proc.wait(timeout=45)
         print()  # Clear carriage return

@@ -128,10 +128,11 @@ MASTER_VERIFIED_URLS: Dict[str, List[Dict[str, str]]] = {
         {"name": "Intel_Server_Boards_Systems_Retirement", "url": "https://www.intel.com/content/www/us/en/support/articles/000006456/server-products.html", "region": "Global", "crawler_type": "dom_table"}
     ],
     "toyoda": [
-        {"name": "Toyoda_TOYOPUC_PLC_Discontinued_Support", "url": "https://toyoda.jtekt.co.jp/en/products/electronics/support/", "region": "Global", "crawler_type": "dom_table"},
-        {"name": "JTEKT_Electronics_Maintenance_Matrix", "url": "https://www.jtekt.co.jp/e/products/electronics/support/", "region": "Global", "crawler_type": "dom_table"},
-        {"name": "Toyoda_Americas_Parts_Service_Lifecycle", "url": "https://www.toyoda-americas.com/support/parts-service/", "region": "Americas", "crawler_type": "dom_table"},
-        {"name": "Toyoda_Mechatronics_CNC_Discontinued", "url": "https://toyoda.jtekt.co.jp/en/products/machine/support/", "region": "Global", "crawler_type": "dom_table"}
+        {"name": "JTEKT_Electronics_Discontinued_Catalog", "url": "https://www.electronics.jtekt.co.jp/en/product/discon/", "region": "Global", "crawler_type": "dom_table"},
+        {"name": "JTEKT_Electronics_Discontinued_DirectLogic_PLC", "url": "https://www.electronics.jtekt.co.jp/en/product/discon/discon_plc/directlogic-305/", "region": "Global", "crawler_type": "dom_table"},
+        {"name": "JTEKT_Electronics_Discontinued_Japan_Catalog", "url": "https://www.electronics.jtekt.co.jp/jp/product/discon/", "region": "Japan", "crawler_type": "dom_table"},
+        {"name": "JTEKT_Electronics_Support_Portal", "url": "https://www.electronics.jtekt.co.jp/en/support/", "region": "Global", "crawler_type": "dom_table"},
+        {"name": "JTEKT_Machinery_Americas_Support", "url": "https://jtektmachinery.com/jtekt-support/service-technical-support", "region": "Americas", "crawler_type": "dom_table"}
     ],
     "microsoft": [
         {"name": "Microsoft_Lifecycle_Products_Search", "url": "https://learn.microsoft.com/en-us/lifecycle/products/", "region": "Global", "crawler_type": "dom_table"},

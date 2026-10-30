@@ -22,14 +22,30 @@ class TestVendors(unittest.TestCase):
         cases = [
             ("End of Life", "End of Life (EOL)"),
             ("EOL", "End of Life (EOL)"),
+            ("Product End of Life", "End of Life (EOL)"),
+            ("End of Sale", "End of Sale"),
+            ("End of Support", "End of Support"),
+            ("Support End", "End of Support"),
+            ("EOSL", "End of Service Life (EOSL)"),
+            ("End of Service Life", "End of Service Life (EOSL)"),
+            ("End of Availability", "End of Availability (EOA)"),
+            ("EOA", "End of Availability (EOA)"),
+            ("Last Support Date", "Last Date of Support"),
             ("Last Time Buy", "Last Time Buy (LTB)"),
             ("LTB", "Last Time Buy (LTB)"),
+            ("Final Order Date", "Last Time Buy (LTB)"),
+            ("Last Order Date", "Last Time Buy (LTB)"),
+            ("Last Purchase Date", "Last Time Buy (LTB)"),
             ("End of Service", "End of Service (EOS)"),
             ("EOS", "End of Service (EOS)"),
             ("Discontinued", "Discontinued"),
+            ("Discontinued Model", "Discontinued"),
             ("Phase Out", "Phase-Out Announced"),
+            ("Phaseout", "Phase-Out"),
             ("Final Order", "Last Time Buy (LTB)"),
-            ("Repair End", "End of Service (EOS)")
+            ("Repair End", "End of Service (EOS)"),
+            ("End of Maintenance", "End of Maintenance"),
+            ("Maintenance Only", "Maintenance Only"),
         ]
         for raw, expected in cases:
             with self.subTest(raw=raw):

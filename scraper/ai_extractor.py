@@ -52,10 +52,17 @@ Analyze the provided crawled web content or technical notice and extract all pro
 
 ### MANDATORY EXTRACTION RULES:
 1. **MULTI-VENDOR & STRUCTURE AGNOSTIC**: Support any vendor (e.g., Mitsubishi Electric, Siemens, Schneider Electric, Rockwell Automation / Allen-Bradley, Omron, Cisco, ABB, etc.). Fit all data into the standardized ProductRecord schema.
-2. **VENDOR-SPECIFIC LIFECYCLE STATUS (NO FIXED STATUS WHITELIST)**:
-   - Manufacturers do NOT follow a single fixed status list. Vendors define distinct lifecycle phases tailored to their operational models (e.g., 'Phase-Out Product', 'Delivery Release', 'Announced Discontinuation', 'Product Cancellation', 'End of Sale', 'Last Date of Support', 'Classic', 'Limited', 'Obsolete', 'Active Mature', 'End of New Service', 'Repair Termination', 'Maintenance Only', 'Stop Shipment', 'Discontinued', 'End of Life', 'Last Time Buy', 'End of Support').
+2. **VENDOR-SPECIFIC LIFECYCLE STATUS & MULTI-STAGE RECOGNITION (NO FIXED STATUS WHITELIST)**:
+   - Actively focus on and extract products across ALL product lifecycle stages:
+     * Discontinued / Production Discontinuation / Announced Discontinuation
+     * End of Life (EOL) / Product EOL / Product Cancellation
+     * End of Sale (EOS) / End of Availability (EOA) / Commercialization End / Stop Shipment
+     * End of Support / End of Service Life (EOSL) / Last Date of Support (LDoS) / Maintenance Termination
+     * Last Time Buy (LTB) / Final Order Date / Last Order Date / Last Purchase Date
+     * Phase-Out / Phase-Out Announced / Auslauftyp / Auslaufphase
+     * Obsolete / Classic / Limited / Maintenance Only / Extended Maintenance / Active Mature
    - Capture the EXACT official status/phase used by the manufacturer. Put NO artificial limitation or restricted enum on status names in output.
-   - If a product lists multiple lifecycle milestones (e.g. End of Sale date and Last Date of Support date), emit a SEPARATE ProductRecord for EACH milestone.
+   - If a product lists multiple lifecycle milestones (e.g., separate dates for End of Sale, Last Time Buy, and End of Support/EOSL), you MUST emit an individual ProductRecord for EACH milestone so the full lifecycle progression is captured.
 3. **UTC DATE NORMALIZATION & DATE OPTIONALITY**:
    - The 'stage_date_utc' column MUST be in UTC ISO 8601 format: 'YYYY-MM-DDTHH:MM:SSZ' (e.g., '2026-09-30T00:00:00Z').
    - If only year/month is given, use the last day of that month at 00:00:00Z.
@@ -1166,7 +1173,13 @@ class UniversalAIExtractor:
                 # Check if heading has a status keyword
                 h_low = heading_text.lower()
                 current_heading_status = ""
-                for kw_stg in ["discontinued", "obsolete", "phase-out", "phase out", "end of life", "end of sale", "classic", "limited", "stop shipment", "production termination"]:
+                for kw_stg in [
+                    "discontinued", "obsolete", "phase-out", "phase out", "phaseout",
+                    "end of life", "end of sale", "end of sales", "end of support", "end of service life",
+                    "last date of support", "last support date", "last time buy", "final order", "last order",
+                    "classic", "limited", "stop shipment", "production termination", "maintenance only",
+                    "auslauftyp", "abkündigung", "生産終了", "製造中止", "販売終了", "保守終了", "修理対応"
+                ]:
                     if kw_stg in h_low:
                         current_heading_status = normalize_stage_name(kw_stg)
                         break
@@ -1246,7 +1259,12 @@ class UniversalAIExtractor:
 
                     if any(kw in k_lower for kw in ["document", "bulletin", "pdf", "notice"]):
                         bulletin_code = v
-                    elif any(kw in k_lower for kw in ["eol", "life", "buy", "ltb", "service", "eos", "repair", "discontinu", "phase", "order", "sale", "support", "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment", "maintenance", "withdrawal", "abkündigung", "生産終了", "最終受注"]):
+                    elif any(kw in k_lower for kw in [
+                        "eol", "eos", "eosl", "ldos", "eoa", "life", "buy", "ltb", "sale", "sales",
+                        "support", "service", "repair", "discontinu", "phase", "phaseout", "order",
+                        "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment",
+                        "maintenance", "withdrawal", "abkündigung", "auslauf", "生産終了", "製造中止", "販売終了", "保守終了", "修理対応", "最終受注"
+                    ]):
                         if len(k) <= 100 and not any(non_stg in k_lower for non_stg in ["series", "example", "unit", "expansion", "cpu"]):
                             norm_stage = normalize_stage_name(k)
                             stage_dates[norm_stage] = (v, k)
@@ -1306,7 +1324,12 @@ class UniversalAIExtractor:
                     # Check for dedicated stage columns (e.g. End of Sale Date, End of Support Date)
                     stage_cols_found = []
                     for h in table_headers:
-                        if any(kw in h for kw in ["eol", "eos", "life", "buy", "ltb", "sale", "support", "service", "repair", "discontinu", "phase", "order", "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment", "maintenance", "withdrawal", "abkündigung", "生産終了"]):
+                        if any(kw in h for kw in [
+                            "eol", "eos", "eosl", "ldos", "eoa", "life", "buy", "ltb", "sale", "sales",
+                            "support", "service", "repair", "discontinu", "phase", "phaseout", "order",
+                            "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment",
+                            "maintenance", "withdrawal", "abkündigung", "auslauf", "生産終了", "製造中止", "販売終了", "保守終了", "修理対応", "最終受注"
+                        ]):
                             val = header_map[h]
                             if val and val != "-" and val.lower() != "n/a":
                                 stage_cols_found.append((h, val))
@@ -1358,9 +1381,9 @@ class UniversalAIExtractor:
                                             model_name=r_mod,
                                             os=None,
                                             firmware=None,
-                                            status=stg_header[:100] if stg_header else n_stage,
+                                            status=n_stage,
                                             stage=n_stage,
-                                            vendor_status=stg_header[:100] if stg_header else n_stage,
+                                            vendor_status=n_stage,
                                             stage_date_utc=u_date,
                                             product_category=row_cat,
                                             metadata=m_dict
@@ -1426,7 +1449,12 @@ class UniversalAIExtractor:
                     k_lower = k.lower()
                     if any(kw in k_lower for kw in ["document", "pdf", "bulletin"]):
                         bulletin_code = v
-                    elif any(kw in k_lower for kw in ["eol", "life", "buy", "ltb", "service", "eos", "repair", "discontinu", "phase", "order", "sale", "support", "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment", "maintenance", "withdrawal", "abkündigung", "生産終了", "最終受注"]):
+                    elif any(kw in k_lower for kw in [
+                        "eol", "eos", "eosl", "ldos", "eoa", "life", "buy", "ltb", "sale", "sales",
+                        "support", "service", "repair", "discontinu", "phase", "phaseout", "order",
+                        "obsolete", "classic", "limited", "delivery", "cancellation", "stop shipment",
+                        "maintenance", "withdrawal", "abkündigung", "auslauf", "生産終了", "製造中止", "販売終了", "保守終了", "修理対応", "最終受注"
+                    ]):
                         if len(k) <= 100 and not any(non_stg in k_lower for non_stg in ["series", "example", "unit", "expansion", "cpu"]):
                             norm_stage = normalize_stage_name(k)
                             stage_dates[norm_stage] = (v, k)

@@ -7,10 +7,10 @@
   <img src="https://img.shields.io/badge/AI_Engine-Universal_Multi--Provider_LLM-4285F4.svg?style=for-the-badge" alt="Universal Multi-Provider AI" />
   <img src="https://img.shields.io/badge/Crawler-Crawl4AI-orange.svg?style=for-the-badge" alt="Crawl4AI" />
   <img src="https://img.shields.io/badge/Vendors-143_Enterprise-success.svg?style=for-the-badge" alt="143 Vendors" />
-  <img src="https://img.shields.io/badge/Tests-206_Passing-brightgreen.svg?style=for-the-badge" alt="206 Tests" />
+  <img src="https://img.shields.io/badge/Tests-213_Passing-brightgreen.svg?style=for-the-badge" alt="213 Tests" />
 </p>
 
-An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, and **End of Service / End of Support (EOS)** milestones.
+An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, **End of Sale (EOS)**, and **End of Service / End of Support (EOSL/LDoS)** milestones across all phases.
 
 The platform natively supports **143 global enterprise vendors** across **Operational Technology (OT)** (54 vendors), **Internet of Things (IoT)** (45 vendors), and **Enterprise IT & Networking** (44 vendors), backed by **386 authentic category lifecycle URLs** across switches, routers, firewalls, servers, storage, PLCs, inverters, servos, HMIs, robotics, CNC, barcode scanners, printers, and enterprise operating systems. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and pluggable **Universal Multi-Provider AI** (OpenAI GPT-4o, Anthropic Claude 3.5, Google Gemini, Microsoft Azure OpenAI, Amazon AWS Bedrock, and Local Ollama/vLLM).
 
@@ -30,22 +30,26 @@ The platform natively supports **143 global enterprise vendors** across **Operat
 ## 📋 Table of Contents
 1. [Key Architecture & Highlights](#-key-architecture--highlights)
 2. [Universal Multi-Provider AI Architecture & Setup](#-universal-multi-provider-ai-architecture--setup)
-3. [URL Management & Lifecycle Directory Synchronizer (`scripts/update_vendor_urls.py`)](#-url-management--lifecycle-directory-synchronizer)
+3. [URL Management & Lifecycle Directory Synchronizer (`scripts/update_vendor_urls.py`)](#-url-management--category-expanded-lifecycle-directory-synchronizer)
 4. [Manufacturer-Exact Terminology & Status Registry Tool (`scripts/update_vendor_status_registry.py`)](#-manufacturer-exact-lifecycle-status-registry--readme-tool)
-5. [Framework Pluggability & Adapter Integration](#-framework-pluggability--adapter-integration)
-6. [Enterprise Security Layer & Threat Incident Prevention Shield](#-enterprise-security-layer--threat-incident-prevention-shield)
-7. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
-8. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
-9. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
-10. [Top 143 Enterprise Vendors Registry](#-top-143-enterprise-vendors-registry)
-11. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
-12. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
-13. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
-14. [Zero-Defaults Policy & Strict Garbage Elimination](#-zero-defaults-policy--dynamic-terminology)
-15. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
-16. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
-17. [Automated Verification & Testing](#-automated-verification--testing)
-18. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
+5. [AI Source Discovery & Regional Website Intelligence (`scripts/discover_vendor_sources.py`)](#-ai-source-discovery--regional-website-intelligence-scriptsdiscover_vendor_sourcespy)
+6. [Anti-Bot Stealth Architecture & SPA Hydration](#-anti-bot-stealth-architecture--spa-hydration)
+7. [Full-Website Accumulation & Batch AI Extraction Mode](#-full-website-accumulation--batch-ai-extraction-mode)
+8. [All-Stage Lifecycle Recognition & Per-Milestone Explosion](#-all-stage-lifecycle-recognition--per-milestone-explosion)
+9. [Framework Pluggability & Adapter Integration](#-framework-pluggability--adapter-integration)
+10. [Enterprise Security Layer & Threat Incident Prevention Shield](#-enterprise-security-layer--threat-incident-prevention-shield)
+11. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
+12. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
+13. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
+14. [Top 143 Enterprise Vendors Registry](#-top-143-enterprise-vendors-registry)
+15. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
+16. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
+17. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
+18. [Zero-Defaults Policy & Strict Garbage Elimination](#-zero-defaults-policy--dynamic-terminology)
+19. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
+20. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
+21. [Automated Verification & Testing](#-automated-verification--testing)
+22. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
 
 ---
 
@@ -272,6 +276,97 @@ python scripts/update_vendor_status_registry.py --vendor apple \
 python cli.py --vendor-terminology --vendor mitsubishi
 python cli.py --status-registry
 ```
+
+---
+
+## 🔍 AI Source Discovery & Regional Website Intelligence (`scripts/discover_vendor_sources.py`)
+
+Enterprise hardware vendors often host lifecycle data across regional subsidiaries, local language catalogs, or re-branded divisions (for example, JTEKT Electronics `electronics.jtekt.co.jp`, formerly Koyo Electronics `koyoele.co.jp`, JTEKT Machinery `jtektmachinery.com`, or Siemens SiePortal `sieportal.siemens.com`).
+
+The automated discovery tool [`scripts/discover_vendor_sources.py`](scripts/discover_vendor_sources.py) pairs Google Gemini with live HTTP probing and XML sitemap parsing to uncover authentic manufacturer lifecycle hubs:
+
+### Key Discovery Features:
+1. **Regional & Subsidiary Discovery**: Locates active regional domains across North America, Europe, Japan, and Asia-Pacific.
+2. **Deep Keyword Probing**: Validates candidate URLs for tables (`<table`, `__APOLLO_STATE__`) and multi-stage lifecycle keywords across English, Japanese (`生産終了`, `製造中止`, `販売終了`, `保守終了`), German (`Abkündigung`, `Auslauftyp`), and French (`Fin de vie`).
+3. **XML Sitemap Network Mapping**: Recursively parses `robots.txt` and `sitemap.xml` to discover unindexed discontinued product archives.
+4. **Safe Config Enrichment (`--apply`)**: Appends discovered valid entry points and domains directly to `configs/vendors.yaml` with automated timestamped backups.
+
+```bash
+# 1. Discover authentic regional and global sources for a specific vendor
+python scripts/discover_vendor_sources.py --vendor toyoda --probe
+
+# 2. Probe candidate URLs and automatically enrich configs/vendors.yaml with backup
+python scripts/discover_vendor_sources.py --vendor toyoda --probe --apply
+
+# 3. Discover sources for core enterprise vendors
+python scripts/discover_vendor_sources.py --vendor "siemens,mitsubishi,dell,hpe,toyoda" --probe
+```
+
+---
+
+## 🛡️ Anti-Bot Stealth Architecture & SPA Hydration
+
+Industrial vendor portals increasingly deploy bot protection (Akamai Edge, Cloudflare, PerimeterX) and client-side single page applications (SPAs in React, Angular, Next.js). The scraping engine features built-in bypass and hydration mechanics:
+
+1. **Anti-Bot Stealth Engine**:
+   - `enable_stealth=True` via Crawl4AI overrides `navigator.webdriver`, masks automation flags, and configures modern Chrome user agents.
+   - Chromium headless flags: `--disable-blink-features=AutomationControlled`, `--no-sandbox`, `--disable-dev-shm-usage`, realistic 1920x1080 viewport.
+   - User interaction simulation: mouse movement simulation, natural scroll delays, overlay popup and cookie banner auto-removal.
+2. **SPA Hydration Delay**:
+   - Complex single-page portals (such as Siemens SiePortal, HPE Support Center, Dell TechDirect) require client-side JavaScript execution before tables render. The crawler enforces a configurable hydration delay (`delay_before_return_html=2.5s`) to prevent empty shell scrapes.
+3. **Resilient HTTP Fallback**:
+   - If headless Chromium is blocked or times out, the engine automatically falls back to `requests.Session()` with browser TLS emulation, automatic decompression (`gzip`, `deflate`, `br`), exponential retry backoff, and BeautifulSoup DOM parsing.
+
+---
+
+## 🚀 Full-Website Accumulation & Batch AI Extraction Mode
+
+To maximize throughput and avoid hitting per-page API rate limits during deep website crawls, the pipeline offers **Accumulated Crawling & Batch AI Extraction** (`--accumulate-batches` / `--batch-crawl`):
+
+```mermaid
+graph LR
+    A["Deep Site Crawl<br/>(Full Browser Speed)"] --> B["Accumulate Chunks & Tables<br/>(HTML, Apollo, PDFs)"]
+    B --> C["Single Dispatch to AI Batch Engine<br/>(50% Token Discount)"]
+    C --> D["Enrich with Replacement Matrix<br/>(From Ingested PDFs)"]
+    D --> E["Deduplicate (Vendor, Model, Stage)<br/>(1 Record Per Milestone)"]
+
+    style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    style C fill:#ede7f6,stroke:#512da8,stroke-width:2px;
+    style D fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    style E fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
+```
+
+- **Uninterrupted Full-Speed Crawl**: The browser traverses all site pages and accumulates table blocks, Apollo states, and PDF notices without stopping for synchronous LLM round-trips.
+- **50% Token Cost Reduction**: All accumulated chunks are dispatched in an asynchronous batch extraction job leveraging provider Batch APIs (e.g. Gemini Batch API, OpenAI Batch).
+- **Comprehensive Replacement Enrichment**: Correlates discontinued models with replacement units extracted from cached PDF migration bulletins.
+
+```bash
+# Execute accumulated full-website crawl with batch AI extraction
+python cli.py --vendor toyoda --site-crawl --accumulate-batches
+python cli.py --all-vendors --batch-crawl --batch-mode
+```
+
+---
+
+## 🎯 All-Stage Lifecycle Recognition & Per-Milestone Explosion
+
+Enterprise IT and OT products transition through multiple distinct lifecycle milestones before reaching total obsolescence. The engine actively scans for and extracts products across **all lifecycle phases**:
+
+| Lifecycle Stage | Recognized Keywords / Phrasings | Manufacturer Meaning & Scope | Output Stage |
+|:---|:---|:---|:---|
+| **Discontinued** | `discontinued`, `discontinued model`, `discontinued product`, `製造中止`, `Lieferstopp` | Manufacturing terminated; factory orders closed. | `Discontinued` |
+| **End of Life (EOL)** | `end of life`, `eol`, `product end of life`, `生産終了`, `Produktabkündigung`, `fin de vie` | Product retirement phase; series production stopped. | `End of Life (EOL)` |
+| **End of Sale (EOS)** | `end of sale`, `eos`, `end of sales`, `end of availability`, `eoa`, `販売終了`, `arrêt de commercialisation` | Last commercial sales window; final shipping deadline. | `End of Sale` |
+| **End of Support (EOSL)** | `end of support`, `support end`, `end of service life`, `eosl`, `ldos`, `last date of support`, `保守終了`, `修理対応終了` | Warranty, security patches, TAC support, and repairs expired. | `End of Support` / `Last Date of Support` |
+| **Last Time Buy (LTB)** | `last time buy`, `ltb`, `final order date`, `last order date`, `last purchase date`, `最終受注`, `letzte bestellmöglichkeit` | Absolute final deadline to submit non-cancellable purchase orders. | `Last Time Buy (LTB)` |
+| **Phase-Out** | `phase-out`, `phaseout`, `phase out`, `phase-out announced`, `auslauftyp`, `auslaufphase` | Notice of impending retirement; migration to successor urged. | `Phase-Out` / `Phase-Out Announced` |
+| **Obsolete & Mature** | `obsolete`, `classic`, `limited`, `active mature`, `maintenance only`, `extended maintenance` | Limited service availability, spare parts only, or mature generation. | `Obsolete` / `Classic` / `Limited` |
+
+### 💥 Per-Stage Milestone Record Explosion
+When a manufacturer publishes multiple dates for a single model (e.g. Cisco publishing separate dates for End of Sale, Last Time Buy, End of Vulnerability Support, and Last Date of Support), the extractor **emits a distinct ProductRecord for each milestone**.
+- Full timeline history is captured with zero loss of intermediate milestone dates.
+- Output records are deduplicated by `(vendor_name, model_name, stage)`, guaranteeing that each phase has a verified record.
 
 ---
 
@@ -1012,21 +1107,21 @@ Open **`http://localhost:8000`** in any web browser to:
 
 ## 🧪 Automated Verification & Testing
 
-The repository contains **206 automated unit, regression, edge-case, and end-to-end integration tests** across **23 test modules**, all passing with 100% green status in sub-second execution:
+The repository contains **213 automated unit, regression, edge-case, and end-to-end integration tests** across **24 test modules**, all passing with 100% green status in sub-second execution:
 
 ```bash
-# Run all 206 tests with verbose output
+# Run all 213 tests with verbose output
 python -m unittest discover tests -v
 
 # Run the comprehensive 8-stage pre-commit quality gate (AST, Ruff, Mypy, Secrets, 143-Vendor Config, SQL Schema, Tests, E2E)
 python scripts/pre_commit_check.py
 ```
 
-### Complete Test Suite Structure (23 Test Modules)
+### Complete Test Suite Structure (24 Test Modules)
 | Test Module | Tests | Key Invariants Tested |
 |---|:---:|---|
 | [`tests/test_adapters.py`](tests/test_adapters.py) | 13 | Multi-provider AI adapters (OpenAI, Claude, Azure, AWS Bedrock, Ollama, Gemini), prompt formatting, payload normalization. |
-| [`tests/test_ai_extractor.py`](tests/test_ai_extractor.py) | 15 | `UniversalAIExtractor`, thinking budget capping, prompt caching, JSON code-fence stripping, bulletin date recovery, rule-based fallbacks. |
+| [`tests/test_ai_extractor.py`](tests/test_ai_extractor.py) | 16 | `UniversalAIExtractor`, thinking budget capping, prompt caching, JSON code-fence stripping, bulletin date recovery, multi-stage milestone extraction, rule-based fallbacks. |
 | [`tests/test_artifacts.py`](tests/test_artifacts.py) | 5 | Run artifact directory isolation, Markdown run summaries, vendor trace logs, atomic persistence. |
 | [`tests/test_checkpoint.py`](tests/test_checkpoint.py) | 3 | Atomic checkpoint save/load, failure recovery state, pending URL queue preservation, clean clear. |
 | [`tests/test_cli.py`](tests/test_cli.py) | 13 | All CLI argument flags, multi-vendor comma-separated parsing, alias resolution, `--no-site-crawl`, `--clean-artifacts`, setup key. |
@@ -1046,8 +1141,9 @@ python scripts/pre_commit_check.py
 | [`tests/test_security.py`](tests/test_security.py) | 16 | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense, threat detection. |
 | [`tests/test_server.py`](tests/test_server.py) | 8 | Built-in HTTP dashboard server, REST endpoints (`/api/vendors`, `/api/products`), search/filter handlers. |
 | [`tests/test_setup_key.py`](tests/test_setup_key.py) | 7 | Universal AI provider key setup tool, environment persistence, model validation routines. |
+| [`tests/test_stealth_and_batch_crawl.py`](tests/test_stealth_and_batch_crawl.py) | 6 | Anti-bot stealth browser configuration, SPA hydration delay (2.5s), prepare_page_chunks extraction, and batch extraction dispatch. |
 | [`tests/test_storage.py`](tests/test_storage.py) | 8 | `MasterStorageManager`, non-destructive multi-run incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap, genuine lifecycle filter. |
-| [`tests/test_vendors.py`](tests/test_vendors.py) | 16 | Dynamic 143-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction. |
+| [`tests/test_vendors.py`](tests/test_vendors.py) | 16 | Dynamic 143-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction, multi-stage keyword normalization. |
 
 ---
 
