@@ -218,6 +218,7 @@ class UniversalAIExtractor:
         batch_mode: Optional[bool] = None,
         provider: Optional[str] = None,
         api_base: Optional[str] = None,
+        run_cache: Optional[Any] = None,
     ):
         self.provider, self.model_name, self.api_key = resolve_provider_and_model(
             provider=provider,
@@ -226,6 +227,8 @@ class UniversalAIExtractor:
         )
         self.api_base = api_base or os.getenv("OPENAI_BASE_URL", "")
         self.client: Any = None
+        from scraper.run_cache import RunCache, get_global_run_cache
+        self.run_cache: RunCache = run_cache or get_global_run_cache()
 
         # Multi-Provider Token & Cost Optimization Settings
         self.thinking_budget = thinking_budget if thinking_budget is not None else AI_THINKING_BUDGET
@@ -645,6 +648,8 @@ class UniversalAIExtractor:
         """
         Downloads a technical PDF notice and extracts structured lifecycle records
         via pypdf and structured extraction.
+        Caches file bytes, extracted text, and parsed products in run_cache to eliminate
+        redundant network downloads, pypdf parsing, and LLM calls.
         """
         import requests
 
@@ -654,16 +659,35 @@ class UniversalAIExtractor:
         if not is_safe_url(pdf_url):
             return []
 
+        norm_url = self.run_cache.normalize_url(pdf_url)
+        if self.run_cache.has_extracted_products(norm_url):
+            logger.info(f"[RUN_CACHE HIT: PDF EXTRACTION] Reusing cached extracted products for PDF: {pdf_url}")
+            cached = self.run_cache.get_extracted_products(norm_url)
+            return cached if cached is not None else []
+
         try:
-            resp = requests.get(pdf_url, timeout=timeout, headers={"User-Agent": USER_AGENT})
-            if resp.status_code == 200 and resp.content:
-                text = extract_text_from_pdf_bytes(resp.content)
+            raw_content = self.run_cache.get_file_bytes(norm_url)
+            if raw_content is None:
+                resp = requests.get(pdf_url, timeout=timeout, headers={"User-Agent": USER_AGENT})
+                if resp.status_code == 200 and resp.content:
+                    raw_content = resp.content
+                    self.run_cache.set_file_bytes(norm_url, raw_content)
+
+            if raw_content:
+                text = self.run_cache.get_file_text(norm_url)
+                if text is None:
+                    text = extract_text_from_pdf_bytes(raw_content)
+                    if text:
+                        self.run_cache.set_file_text(norm_url, text)
+
                 if text:
-                    return self.extract_from_markdown(
+                    extracted = self.extract_from_markdown(
                         markdown_chunk=text[:25000],
                         context=f"{default_vendor} PDF Lifecycle Notice",
                         source_url=pdf_url
                     )
+                    self.run_cache.set_extracted_products(norm_url, extracted)
+                    return extracted
         except Exception as e:
             logger.debug(f"Could not extract lifecycle records from PDF {pdf_url}: {e}")
         return []

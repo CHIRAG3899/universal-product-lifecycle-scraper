@@ -24,6 +24,7 @@ if sys.platform == "win32":
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import setup_key
 from scraper.crawler_comparison import get_comparison_summary
 from scraper.pipeline import LifecyclePipeline
 
@@ -79,7 +80,6 @@ async def main():
         return
 
     if args.setup_key:
-        import setup_key
         setup_key.main()
         return
 

@@ -25,6 +25,7 @@ from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler
 from scraper.models import ProductRecord, ScrapedDataset, parse_to_utc_iso
 from scraper.pipeline import LifecyclePipeline
 from scraper.providers import DEFAULT_MODELS, SUPPORTED_PROVIDERS, resolve_provider_and_model
+from scraper.run_cache import RunCache, get_global_run_cache, normalize_cache_url
 from scraper.security import (
     SecurityThreatError,
     detect_command_injection,
@@ -47,6 +48,9 @@ __all__ = [
     "UniversalAICrawler",
     "MitsubishiAICrawler",
     "LifecyclePipeline",
+    "RunCache",
+    "get_global_run_cache",
+    "normalize_cache_url",
     "detect_vendor_from_url_or_text",
     "normalize_stage_name",
     "VENDOR_PROFILES",

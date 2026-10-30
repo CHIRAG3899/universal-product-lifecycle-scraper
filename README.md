@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/AI_Engine-Universal_Multi--Provider_LLM-4285F4.svg?style=for-the-badge" alt="Universal Multi-Provider AI" />
   <img src="https://img.shields.io/badge/Crawler-Crawl4AI-orange.svg?style=for-the-badge" alt="Crawl4AI" />
   <img src="https://img.shields.io/badge/Vendors-143_Enterprise-success.svg?style=for-the-badge" alt="143 Vendors" />
-  <img src="https://img.shields.io/badge/Tests-191_Passing-brightgreen.svg?style=for-the-badge" alt="191 Tests" />
+  <img src="https://img.shields.io/badge/Tests-206_Passing-brightgreen.svg?style=for-the-badge" alt="206 Tests" />
 </p>
 
 An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, and **End of Service / End of Support (EOS)** milestones.
@@ -860,6 +860,33 @@ graph TD
 
 ---
 
+## ⚡ Run-Time In-Memory Cache System (Zero-Redundancy Guarantee)
+
+The framework features a session-level, thread-safe in-memory caching engine ([`scraper/run_cache.py`](scraper/run_cache.py)) that guarantees **zero duplicate network operations or LLM calls** during a single execution run:
+
+1. **Deterministic Canonical URL Normalization**:
+   - Strips anchor fragments (`#section1` $\to$ base URL).
+   - Alphabetically sorts query parameters (`?p=2&cat=switches` $\equiv$ `?cat=switches&p=2`).
+   - Normalizes schemes and domain names to lowercase and strips default ports (`:80`, `:443`).
+   - Normalizes path trailing slashes to eliminate dual-crawling of identical web endpoints.
+
+2. **Dual-Layer Caching Hierarchy**:
+   - **Page Crawl Cache (`_page_crawl_cache`)**: Caches rendered DOM, status codes, and clean markdown. Re-visiting an identical URL reuses cached data directly without spawning or navigating headless Chromium browser tabs.
+   - **AI Extraction Cache (`_page_records_cache`)**: Caches parsed `List[ProductRecord]` per URL with deep copy isolation. Re-encountered URLs (e.g., referenced across multiple category hubs, breadcrumbs, or entry points) return structured records instantly with **zero LLM tokens consumed and zero API latency**.
+
+3. **Technical File & PDF Bulletin Caching**:
+   - **Raw File Bytes Cache (`_file_bytes_cache`)**: Eliminates duplicate network downloads of manufacturer PDF bulletins, circulars, and firmware datasheets.
+   - **Extracted Text Cache (`_file_text_cache`)**: Reuses text extracted via `pypdf`, skipping redundant CPU-heavy PDF stream decodes.
+   - **PDF Replacement Map Cache (`_pdf_replacements_cache`)**: Reuses parsed discontinued-to-replacement model maps across all product enrichment steps.
+
+4. **Circular Graph Loop Prevention**:
+   - The BFS queue tracks all visited canonical URLs in `_visited_urls` alongside FIFO memory eviction (`max_page_entries=1000`, `max_file_entries=250`) to ensure bounded memory footprints on massive site-wide crawls.
+
+5. **Session Telemetry & Observability**:
+   - Real-time cache performance metrics (page crawl hit rate, AI extraction bypass hits, file download savings, total redundant operations avoided) are printed in Step 6 and exported directly to the run manifest (`artifacts/runs/<run_id>/manifest.json`).
+
+---
+
 ## ⚡ Generic IDE Scraper vs. Enterprise AI Crawler
 
 | Technical Dimension | Generic IDE Crawler (BS4 / Scrapy / Static XPath) | Enterprise AI Crawler (Crawl4AI + Google Gemini 2.5 Flash) | Architectural Advantage |
@@ -985,17 +1012,17 @@ Open **`http://localhost:8000`** in any web browser to:
 
 ## 🧪 Automated Verification & Testing
 
-The repository contains **191 automated unit, regression, edge-case, and end-to-end integration tests** across **22 test modules**, all passing with 100% green status in sub-second execution:
+The repository contains **206 automated unit, regression, edge-case, and end-to-end integration tests** across **23 test modules**, all passing with 100% green status in sub-second execution:
 
 ```bash
-# Run all 191 tests with verbose output
+# Run all 206 tests with verbose output
 python -m unittest discover tests -v
 
 # Run the comprehensive 8-stage pre-commit quality gate (AST, Ruff, Mypy, Secrets, 143-Vendor Config, SQL Schema, Tests, E2E)
 python scripts/pre_commit_check.py
 ```
 
-### Complete Test Suite Structure (22 Test Modules)
+### Complete Test Suite Structure (23 Test Modules)
 | Test Module | Tests | Key Invariants Tested |
 |---|:---:|---|
 | [`tests/test_adapters.py`](tests/test_adapters.py) | 13 | Multi-provider AI adapters (OpenAI, Claude, Azure, AWS Bedrock, Ollama, Gemini), prompt formatting, payload normalization. |
@@ -1015,6 +1042,7 @@ python scripts/pre_commit_check.py
 | [`tests/test_observability.py`](tests/test_observability.py) | 6 | Pipeline metrics collector, LTB 90-day alert detection, webhook alert dispatching, health badges. |
 | [`tests/test_package_init.py`](tests/test_package_init.py) | 2 | Package namespace exports, environment base directory initialization, path configurations. |
 | [`tests/test_pipeline.py`](tests/test_pipeline.py) | 7 | 6-stage lifecycle pipeline, multi-vendor filtering, noise purging, in-vendor deduplication, error resilience. |
+| [`tests/test_run_cache.py`](tests/test_run_cache.py) | 15 | `RunCache` lifecycle, canonical URL normalization (query sorting, fragment stripping), page crawl cache, 0-token AI extraction cache, PDF byte/text/replacement caching, FIFO eviction, thread safety. |
 | [`tests/test_security.py`](tests/test_security.py) | 16 | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense, threat detection. |
 | [`tests/test_server.py`](tests/test_server.py) | 8 | Built-in HTTP dashboard server, REST endpoints (`/api/vendors`, `/api/products`), search/filter handlers. |
 | [`tests/test_setup_key.py`](tests/test_setup_key.py) | 7 | Universal AI provider key setup tool, environment persistence, model validation routines. |

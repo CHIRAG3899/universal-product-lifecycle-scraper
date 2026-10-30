@@ -39,7 +39,7 @@ class TestCLI(unittest.TestCase):
         self.assertIn("140 Top Vendors", output)
         self.assertIn("Universal Multi-Provider AI", output)
 
-    @patch("setup_key.main")
+    @patch("cli.setup_key.main")
     def test_02_setup_key_flag(self, mock_setup_main):
         """Verifies --setup-key launches interactive setup_key module."""
         with patch.object(sys, "argv", ["cli.py", "--setup-key"]):

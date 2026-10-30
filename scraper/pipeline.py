@@ -53,9 +53,14 @@ class LifecyclePipeline:
         enable_prompt_caching: Optional[bool] = None,
         provider: Optional[str] = None,
         api_base: Optional[str] = None,
+        run_cache: Optional[Any] = None,
     ):
         self.config_path = config_path or (BASE_DIR / "configs" / "vendors.yaml")
         self.config = self._load_config()
+
+        # Run-Level Cache
+        from scraper.run_cache import RunCache, get_global_run_cache
+        self.run_cache: RunCache = run_cache or get_global_run_cache()
 
         # Paths
         storage_cfg = self.config.get("storage", {})
@@ -72,9 +77,10 @@ class LifecyclePipeline:
             batch_mode=batch_mode,
             provider=provider,
             api_base=api_base,
+            run_cache=self.run_cache,
         )
         self.gemini = self.extractor  # Backward compatibility alias
-        self.crawler = UniversalAICrawler(gemini_extractor=self.extractor)
+        self.crawler = UniversalAICrawler(gemini_extractor=self.extractor, run_cache=self.run_cache)
         self.storage = MasterStorageManager(self.master_csv, self.output_dir)
         self.artifact_mgr = RunArtifactManager(self.artifacts_dir, run_id=run_id)
         self.checkpoint_mgr = CheckpointManager()
@@ -136,6 +142,17 @@ class LifecyclePipeline:
 
                 if not is_safe_url(url, allowed_domains):
                     print(f"  [!] Security Guard: Blocked untrusted URL or non-whitelisted domain: {url}")
+                    continue
+
+                norm_url = self.run_cache.normalize_url(url)
+                if self.run_cache.has_extracted_products(norm_url):
+                    print(f"  -> [RUN_CACHE HIT] Reusing cached records for entry point '{name}' ({region}): {url}")
+                    cached_records = self.run_cache.get_extracted_products(norm_url) or []
+                    for r in cached_records:
+                        r.vendor_name = vendor_name
+                        if "region" not in r.metadata:
+                            r.metadata["region"] = region
+                    vendor_products.extend(cached_records)
                     continue
 
                 print(f"  -> Crawling verified lifecycle portal '{name}' ({region}): {url}")
@@ -470,11 +487,16 @@ class LifecyclePipeline:
         print(f"  -> Modular Per-Vendor JSON:  {self.output_dir}/<vendor>_lifecycle.json")
         print(f"  -> Run Audit Artifacts:      {self.artifact_mgr.run_dir}")
 
+        cache_stats = self.run_cache.get_stats()
+        print(f"  -> Run Cache Telemetry:     {cache_stats['total_redundant_operations_saved']} redundant operations saved "
+              f"({cache_stats['page_crawl_hits']} crawl hits, {cache_stats['extraction_cache_hits']} AI extraction hits, {cache_stats['file_hits']} file hits)")
+
         metrics = self.metrics_collector.compute_metrics(
             all_products=all_harvested_products,
             new_appended=new_appended,
             refreshed_existing=refreshed
         )
+        metrics["run_cache"] = cache_stats
         self.artifact_mgr.finalize_manifest(metrics)
         AlertDispatcher.dispatch_alert(metrics, webhook_url=self.webhook_url)
 
