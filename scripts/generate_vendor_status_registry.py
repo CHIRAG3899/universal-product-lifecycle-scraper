@@ -429,10 +429,10 @@ def generate_markdown_terminology_catalog(vendors_yaml_path: Path) -> str:
                 for s in info["statuses"]:
                     term_str = f"`{s['term']}`"
                     meaning_str = s["meaning"]
-                    lines.append(f"| **{vname}** | {model_name} | {term_str} | {meaning_str} |")
+                    lines.append(f"| **{vname}** (`{vid}`) | {model_name} | {term_str} | {meaning_str} |")
             else:
                 # Standard enterprise pattern for registry coverage
-                lines.append(f"| **{vname}** | Standard Multi-Stage | `Active` / `Phase-Out (LTB)` / `Discontinued` / `End of Support (EOS)` | Full lifecycle tracking: active ordering, last-time buy notices, parts transition, and complete support retirement. |")
+                lines.append(f"| **{vname}** (`{vid}`) | Standard Multi-Stage | `Active` / `Phase-Out (LTB)` / `Discontinued` / `End of Support (EOS)` | Full lifecycle tracking: active ordering, last-time buy notices, parts transition, and complete support retirement. |")
 
         lines.append("")
 

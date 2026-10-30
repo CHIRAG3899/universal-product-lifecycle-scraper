@@ -45,15 +45,17 @@ def install_hook():
 # ==============================================================================
 set -e
 
-# Detect python executable
-if command -v python3 >/dev/null 2>&1; then
-    PY_BIN="python3"
-elif command -v python >/dev/null 2>&1; then
-    PY_BIN="python"
-elif command -v py >/dev/null 2>&1; then
-    PY_BIN="py"
-else
-    echo "[!] Error: Python not found in PATH. Pre-commit check aborted."
+# Detect working python executable (verify execution to avoid Windows Store stubs)
+PY_BIN=""
+for candidate in python py python3; do
+    if "$candidate" -c "import sys" >/dev/null 2>&1; then
+        PY_BIN="$candidate"
+        break
+    fi
+done
+
+if [ -z "$PY_BIN" ]; then
+    echo "[!] Error: Working Python interpreter not found in PATH. Pre-commit check aborted."
     exit 1
 fi
 
@@ -62,18 +64,14 @@ GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 echo "[*] Running Enterprise Pre-Commit Quality Gate (AST, Ruff, Mypy, Security, 140 Vendors, DB Schema, Tests, E2E Flow)..."
 
 # Search for pre_commit_check.py
-SCRIPT_CANDIDATE_0="$GIT_ROOT/universal-lifecycle-scraper/scripts/pre_commit_check.py"
-SCRIPT_CANDIDATE_1="$GIT_ROOT/AI scraper/scripts/pre_commit_check.py"
-SCRIPT_CANDIDATE_2="$GIT_ROOT/scripts/pre_commit_check.py"
+SCRIPT_CANDIDATE_0="$GIT_ROOT/scripts/pre_commit_check.py"
+SCRIPT_CANDIDATE_1="$GIT_ROOT/universal-lifecycle-scraper/scripts/pre_commit_check.py"
 
 if [ -f "$SCRIPT_CANDIDATE_0" ]; then
     "$PY_BIN" "$SCRIPT_CANDIDATE_0"
     STATUS=$?
 elif [ -f "$SCRIPT_CANDIDATE_1" ]; then
     "$PY_BIN" "$SCRIPT_CANDIDATE_1"
-    STATUS=$?
-elif [ -f "$SCRIPT_CANDIDATE_2" ]; then
-    "$PY_BIN" "$SCRIPT_CANDIDATE_2"
     STATUS=$?
 else
     echo "[!] Notice: pre_commit_check.py not found in working tree. Skipping."

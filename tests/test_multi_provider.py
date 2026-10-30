@@ -256,6 +256,43 @@ class TestMultiProvider(unittest.TestCase):
         self.assertEqual(records[0].vendor_name, "Siemens")
         mock_client.chat.completions.create.assert_called_once()
 
+    def test_pre_commit_config_path_validity(self):
+        """Verifies that .pre-commit-config.yaml references an existing script path without outdated prefixes."""
+        pre_commit_yaml = BASE_DIR / ".pre-commit-config.yaml"
+        self.assertTrue(pre_commit_yaml.exists())
+        content = pre_commit_yaml.read_text(encoding="utf-8")
+        self.assertNotIn("AI scraper", content, "Stale folder 'AI scraper' should not be in .pre-commit-config.yaml")
+        self.assertIn("python scripts/pre_commit_check.py", content)
+
+    def test_requirements_contain_multi_provider_dependencies(self):
+        """Verifies that requirements.txt declares all multi-provider SDKs and runtime tools."""
+        req_file = BASE_DIR / "requirements.txt"
+        self.assertTrue(req_file.exists())
+        content = req_file.read_text(encoding="utf-8").lower()
+        required_packages = [
+            "google-genai",
+            "openai",
+            "litellm",
+            "pydantic",
+            "crawl4ai",
+            "playwright",
+            "requests",
+            "pyyaml",
+            "pandas",
+            "pypdf",
+        ]
+        for pkg in required_packages:
+            self.assertIn(pkg, content, f"Missing {pkg} in requirements.txt")
+
+    def test_ai_extractor_without_google_genai(self):
+        """Verifies that UniversalAIExtractor works when google.genai is absent."""
+        import scraper.ai_extractor as mod
+        with patch.object(mod, "genai", None), patch.object(mod, "types", None):
+            ext = UniversalAIExtractor(provider="openai", api_key="sk-test", model_name="gpt-4o-mini")
+            self.assertEqual(ext.provider, "openai")
+            self.assertIsNone(ext._build_thinking_config())
+            self.assertIsNone(ext.get_or_create_prompt_cache())
+
 
 if __name__ == "__main__":
     unittest.main()

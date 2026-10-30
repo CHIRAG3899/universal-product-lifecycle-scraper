@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: enterprise-integrity-check
         name: Enterprise Scraper Code Integrity & Quality Gate
-        entry: python "AI scraper/scripts/pre_commit_check.py"
+        entry: python scripts/pre_commit_check.py
         language: system
         pass_filenames: false
         always_run: true

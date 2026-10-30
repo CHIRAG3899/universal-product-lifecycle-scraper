@@ -11,8 +11,18 @@ import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None  # type: ignore
+    types = None  # type: ignore
+
+try:
+    from openai import AzureOpenAI, OpenAI
+except ImportError:
+    OpenAI = None  # type: ignore
+    AzureOpenAI = None  # type: ignore
 
 from scraper.config import (
     AI_BATCH_MODE,
@@ -235,45 +245,52 @@ class UniversalAIExtractor:
 
         if self.provider == "gemini":
             if self.api_key and self.api_key != "your_gemini_api_key_here":
-                try:
-                    self.client = genai.Client(api_key=self.api_key)
-                    logger.info(
-                        f"Initialized Google GenAI Client with model: {self.model_name} "
-                        f"(thinking_budget={self.thinking_budget}, prompt_caching={self.enable_prompt_caching}, batch_mode={self.batch_mode})"
-                    )
-                except Exception as e:
-                    logger.warning(f"Could not initialize Google GenAI Client: {e}")
+                if genai is None:
+                    logger.warning("google-genai package is not installed. Operating in deterministic/fallback mode.")
+                else:
+                    try:
+                        self.client = genai.Client(api_key=self.api_key)
+                        logger.info(
+                            f"Initialized Google GenAI Client with model: {self.model_name} "
+                            f"(thinking_budget={self.thinking_budget}, prompt_caching={self.enable_prompt_caching}, batch_mode={self.batch_mode})"
+                        )
+                    except Exception as e:
+                        logger.warning(f"Could not initialize Google GenAI Client: {e}")
             else:
                 logger.info("No valid GEMINI_API_KEY provided. Operating in deterministic/fallback mode.")
         elif self.provider in ("openai", "openrouter", "ollama", "local"):
             if self.is_configured():
-                try:
-                    from openai import OpenAI
-                    base = self.api_base or ("https://openrouter.ai/api/v1" if self.provider == "openrouter" else ("http://localhost:11434/v1" if self.provider in ("ollama", "local") else None))
-                    eff_key = self.api_key or ("ollama" if self.provider in ("ollama", "local") else "")
-                    if eff_key:
-                        self.client = OpenAI(api_key=eff_key, base_url=base, timeout=45)
-                        logger.info(f"Initialized OpenAI client for provider '{self.provider}' (model: {self.model_name}).")
-                except Exception as oe:
-                    logger.warning(f"Could not initialize OpenAI Client: {oe}")
+                if OpenAI is not None:
+                    try:
+                        base = self.api_base or ("https://openrouter.ai/api/v1" if self.provider == "openrouter" else ("http://localhost:11434/v1" if self.provider in ("ollama", "local") else None))
+                        eff_key = self.api_key or ("ollama" if self.provider in ("ollama", "local") else "")
+                        if eff_key:
+                            self.client = OpenAI(api_key=eff_key, base_url=base, timeout=45)
+                            logger.info(f"Initialized OpenAI client for provider '{self.provider}' (model: {self.model_name}).")
+                    except Exception as oe:
+                        logger.warning(f"Could not initialize OpenAI Client: {oe}")
+                else:
+                    logger.info(f"OpenAI package not installed. Will use LiteLLM / REST fallback for '{self.provider}'.")
             else:
                 logger.info(f"No valid API key provided for provider '{self.provider}'. Operating in deterministic/fallback mode.")
         elif self.provider == "azure":
             if self.is_configured():
-                try:
-                    from openai import AzureOpenAI
-                    endpoint = self.api_base or os.getenv("AZURE_OPENAI_ENDPOINT", "")
-                    version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
-                    if self.api_key and endpoint:
-                        self.client = AzureOpenAI(
-                            api_key=self.api_key,
-                            azure_endpoint=endpoint,
-                            api_version=version,
-                            timeout=45,
-                        )
-                        logger.info(f"Initialized AzureOpenAI client for model '{self.model_name}'.")
-                except Exception as ae:
-                    logger.warning(f"Could not initialize AzureOpenAI Client: {ae}")
+                if AzureOpenAI is not None:
+                    try:
+                        endpoint = self.api_base or os.getenv("AZURE_OPENAI_ENDPOINT", "")
+                        version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+                        if self.api_key and endpoint:
+                            self.client = AzureOpenAI(
+                                api_key=self.api_key,
+                                azure_endpoint=endpoint,
+                                api_version=version,
+                                timeout=45,
+                            )
+                            logger.info(f"Initialized AzureOpenAI client for model '{self.model_name}'.")
+                    except Exception as ae:
+                        logger.warning(f"Could not initialize AzureOpenAI Client: {ae}")
+                else:
+                    logger.info("AzureOpenAI client not installed. Will use LiteLLM / REST fallback for Azure.")
             else:
                 logger.info("No valid API key provided for Azure OpenAI. Operating in deterministic/fallback mode.")
         else:
@@ -365,18 +382,21 @@ class UniversalAIExtractor:
         except Exception as e:
             return False, f"{self.provider.upper()} API Error: {e}"
 
-    def _build_thinking_config(self) -> Optional[types.ThinkingConfig]:
+    def _build_thinking_config(self) -> Optional[Any]:
         """
-        Configures thinking token budget for Gemini Flash models.
+        Configures thinking token budget for reasoning models.
         Setting thinking_budget=0 disables internal chain-of-thought generation,
         eliminating unnecessary output token billing on deterministic extraction tasks.
         """
-        if self.thinking_budget is not None and self.thinking_budget >= 0:
+        if types is None or self.thinking_budget is None or self.thinking_budget < 0:
+            return None
+        try:
             return types.ThinkingConfig(
                 thinking_budget=self.thinking_budget,
                 include_thoughts=False
             )
-        return None
+        except Exception:
+            return None
 
     def get_or_create_prompt_cache(self, context_prefix: Optional[str] = None) -> Optional[str]:
         """
@@ -384,7 +404,7 @@ class UniversalAIExtractor:
         Slashes input token price by up to 90% across repeated crawl queries.
         Falls back smoothly if the context is below Gemini's minimum token threshold (32k).
         """
-        if not self.is_configured() or not self.client or not self.enable_prompt_caching:
+        if not self.is_configured() or not self.client or not self.enable_prompt_caching or types is None:
             return None
 
         if self._active_cache_name:
@@ -438,7 +458,9 @@ class UniversalAIExtractor:
         Slashes both input AND output token prices by 50% for non-real-time extraction.
         """
         if not self.is_configured() or not self.client:
-            raise RuntimeError("Gemini API key is not configured for batch job execution.")
+            raise RuntimeError(f"AI API key is not configured for batch job execution on provider '{self.provider}'.")
+        if types is None:
+            raise RuntimeError(f"SDK types unavailable for batch execution on provider '{self.provider}'.")
 
         inlined_requests = []
         for idx, item in enumerate(chunks):
@@ -663,7 +685,7 @@ class UniversalAIExtractor:
 
         cache_name = self.get_or_create_prompt_cache() if self.enable_prompt_caching else None
         thinking_cfg = self._build_thinking_config()
-        if not self.client:
+        if not self.client or types is None:
             return self.fallback_rule_based_extraction(markdown_chunk, source_url=source_url, default_vendor=detected_vendor)
 
         max_api_retries = 2
