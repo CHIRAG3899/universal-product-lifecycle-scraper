@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Universal Multi-Vendor EOL & Lifecycle AI Scraper</title>
-  <meta name="description" content="AI-powered multi-vendor crawler and structured lifecycle intelligence engine supporting Mitsubishi, Siemens, Schneider, Rockwell and any industrial vendor with Crawl4AI and Google Gemini.">
+  <meta name="description" content="AI-powered multi-vendor crawler and structured lifecycle intelligence engine supporting Mitsubishi, Siemens, Schneider, Rockwell and 140 industrial vendors with Crawl4AI and Universal AI (Gemini, OpenAI, Claude, Azure, AWS Bedrock, Ollama).">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
         </div>
         <div class="status-pill ai-pill" id="geminiStatusPill">
           <span class="ai-icon">✦</span>
-          <span class="status-text" id="geminiModelLabel">Gemini 2.5 Flash</span>
+          <span class="status-text" id="geminiModelLabel">AI Engine: Active</span>
         </div>
         <button class="btn btn-secondary btn-sm" id="openComparisonBtn" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-cyan);">
           ⚡ Generic vs AI Comparison
@@ -68,7 +68,7 @@
         <div class="panel-header">
           <div class="panel-title-group">
             <span class="panel-icon">⚙</span>
-            <h3>Universal Crawler & Multi-Vendor Configuration (100 Vendors Supported)</h3>
+            <h3>Universal Crawler & Multi-Vendor Configuration (140 Vendors Supported)</h3>
           </div>
           <button class="btn btn-ghost btn-sm" id="toggleConfigBtn">Show Options</button>
         </div>
@@ -77,13 +77,13 @@
           <div class="form-group">
             <label for="vendorPresetSelect">Enterprise Vendor Preset</label>
             <div class="sector-filter-group" id="sectorFilterGroup">
-              <button class="sector-pill active" data-sector="ALL">All (100)</button>
-              <button class="sector-pill" data-sector="OT">OT (40)</button>
-              <button class="sector-pill" data-sector="IoT">IoT (30)</button>
-              <button class="sector-pill" data-sector="IT">IT (30)</button>
+              <button class="sector-pill active" data-sector="ALL">All (140)</button>
+              <button class="sector-pill" data-sector="OT">OT (54)</button>
+              <button class="sector-pill" data-sector="IoT">IoT (44)</button>
+              <button class="sector-pill" data-sector="IT">IT (42)</button>
             </div>
             <select id="vendorPresetSelect" class="form-select" style="margin-top: 0.4rem;">
-              <option value="">Loading 100 enterprise vendors...</option>
+              <option value="">Loading 140 enterprise vendors...</option>
             </select>
             <label class="site-crawl-toggle">
               <input type="checkbox" id="siteCrawlCheckbox">
@@ -97,9 +97,21 @@
           </div>
 
           <div class="form-group">
+            <label for="aiProviderSelect">AI Intelligence Provider</label>
+            <select id="aiProviderSelect" class="form-select">
+              <option value="gemini" selected>Google Gemini (Prompt Caching / Low Latency)</option>
+              <option value="openai">OpenAI (GPT-4o, GPT-4o-mini, o1, o3)</option>
+              <option value="anthropic">Anthropic Claude (Sonnet 3.5, Haiku)</option>
+              <option value="azure">Microsoft Azure OpenAI</option>
+              <option value="bedrock">Amazon AWS Bedrock</option>
+              <option value="ollama">Ollama / Local (Zero Cloud)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="geminiApiKeyInput">
-              AI Provider API Key
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="helper-link">API Keys ↗</a>
+              <span id="apiKeyLabelText">AI Provider API Key</span>
+              <a id="apiKeyPortalLink" href="https://aistudio.google.com/app/apikey" target="_blank" class="helper-link">API Keys ↗</a>
             </label>
             <div class="input-with-action">
               <input type="password" id="geminiApiKeyInput" class="form-input" placeholder="Paste API Key (Gemini, OpenAI, Anthropic, Azure)...">
@@ -112,12 +124,10 @@
           <div class="form-group">
             <label for="geminiModelSelect">AI Model / Engine</label>
             <select id="geminiModelSelect" class="form-select">
-              <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Production Default)</option>
+              <option value="gemini-3.5-flash-lite" selected>Gemini 3.5 Flash Lite (Fastest & Free)</option>
+              <option value="gemini-3.5-flash">Gemini 3.5 Flash (Production Default)</option>
               <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Fast)</option>
-              <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest)</option>
               <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Reasoning)</option>
-              <option value="gpt-4o-mini">OpenAI GPT-4o Mini</option>
-              <option value="claude-3-5-haiku-20241022">Anthropic Claude 3.5 Haiku</option>
             </select>
           </div>
         </div>
@@ -307,7 +317,7 @@
         </div>
         <div class="modal-body" id="comparisonModalBody">
           <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
-            Comparative analysis of traditional static crawlers (Scrapy, BeautifulSoup, fixed CSS/XPath) versus an Enterprise AI Crawler (Crawl4AI headless Chromium + Google Gemini 2.5 Flash) for heterogeneous OT/IoT/IT lifecycle intelligence.
+            Comparative analysis of traditional static crawlers (Scrapy, BeautifulSoup, fixed CSS/XPath) versus an Enterprise AI Crawler (Crawl4AI headless Chromium + Multi-Provider AI) for heterogeneous OT/IoT/IT lifecycle intelligence.
           </p>
           <div id="comparisonTableContainer">
             <div class="spinner"></div> Loading comparison matrix...

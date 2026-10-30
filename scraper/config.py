@@ -1,5 +1,5 @@
 """
-Configuration management for Mitsubishi EOL AI Scraper.
+Configuration management for Universal Multi-Vendor EOL & Lifecycle AI Scraper.
 Supports environment variables (.env), CLI flags, and sensible defaults.
 """
 
@@ -42,16 +42,22 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
 AWS_REGION_NAME = os.getenv("AWS_REGION_NAME", "us-east-1")
 
-# Gemini Token & Cost Optimization Settings
-# 1. Thinking Budget: 0 disables/minimizes reasoning tokens on Flash models, slashing output token costs
-GEMINI_THINKING_BUDGET = int(os.getenv("GEMINI_THINKING_BUDGET", "0")) if os.getenv("GEMINI_THINKING_BUDGET", "0").isdigit() else 0
-# 2. Prompt Caching: Reuses repetitive extraction instructions/schemas across calls (up to 90% input discount)
-GEMINI_ENABLE_PROMPT_CACHING = os.getenv("GEMINI_ENABLE_PROMPT_CACHING", "true").lower() in ("true", "1", "yes")
-GEMINI_PROMPT_CACHE_TTL = os.getenv("GEMINI_PROMPT_CACHE_TTL", "3600s")
-# 3. Batch Mode: Asynchronous batch API processing with 50% discount on both input and output tokens
-GEMINI_BATCH_MODE = os.getenv("GEMINI_BATCH_MODE", "false").lower() in ("true", "1", "yes")
+# Universal Multi-Provider AI Token & Cost Optimization Settings
+# 1. Thinking Budget: 0 disables/minimizes reasoning tokens on reasoning models, slashing output token costs
+AI_THINKING_BUDGET = int(os.getenv("AI_THINKING_BUDGET", os.getenv("GEMINI_THINKING_BUDGET", "0"))) if (os.getenv("AI_THINKING_BUDGET", os.getenv("GEMINI_THINKING_BUDGET", "0"))).isdigit() else 0
+GEMINI_THINKING_BUDGET = AI_THINKING_BUDGET  # Backward compatibility alias
 
-# Mitsubishi Target EOL Portals
+# 2. Prompt Caching: Reuses repetitive extraction instructions/schemas across calls (up to 90% input discount)
+AI_ENABLE_PROMPT_CACHING = os.getenv("AI_ENABLE_PROMPT_CACHING", os.getenv("GEMINI_ENABLE_PROMPT_CACHING", "true")).lower() in ("true", "1", "yes")
+AI_PROMPT_CACHE_TTL = os.getenv("AI_PROMPT_CACHE_TTL", os.getenv("GEMINI_PROMPT_CACHE_TTL", "3600s"))
+GEMINI_ENABLE_PROMPT_CACHING = AI_ENABLE_PROMPT_CACHING  # Backward compatibility alias
+GEMINI_PROMPT_CACHE_TTL = AI_PROMPT_CACHE_TTL  # Backward compatibility alias
+
+# 3. Batch Mode: Asynchronous batch API processing with 50% discount on both input and output tokens
+AI_BATCH_MODE = os.getenv("AI_BATCH_MODE", os.getenv("GEMINI_BATCH_MODE", "false")).lower() in ("true", "1", "yes")
+GEMINI_BATCH_MODE = AI_BATCH_MODE  # Backward compatibility alias
+
+# Reference Target EOL Portals
 MITSUBISHI_EOL_URLS = [
     # Primary European Factory Automation EOL portal (comprehensive Next.js / GraphQL portal)
     "https://se-fa.mitsubishielectric.com/fa/se_en/support/product-life-cycle-stage-eol",
@@ -68,5 +74,5 @@ REQUEST_TIMEOUT_SEC = 30
 HEADLESS_BROWSER = os.getenv("HEADLESS", "true").lower() in ("true", "1", "yes")
 
 # Default export locations
-DEFAULT_JSON_OUTPUT = OUTPUT_DIR / "mitsubishi_eol_products.json"
-DEFAULT_CSV_OUTPUT = OUTPUT_DIR / "mitsubishi_eol_products.csv"
+DEFAULT_JSON_OUTPUT = OUTPUT_DIR / "all_vendors_lifecycle.json"
+DEFAULT_CSV_OUTPUT = OUTPUT_DIR / "all_vendors_lifecycle.csv"

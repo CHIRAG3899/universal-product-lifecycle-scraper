@@ -13,6 +13,7 @@ Helps users configure, test, and persist API keys for:
 import os
 import sys
 from pathlib import Path
+from typing import Dict, Optional
 
 # Fix Windows console encoding for UTF-8 output
 if sys.platform == "win32":
@@ -34,7 +35,7 @@ from scraper.providers import DEFAULT_MODELS, normalize_provider_name
 
 def print_banner():
     print("=" * 76)
-    print("  GOOGLE GEMINI API KEY SETUP & UNIVERSAL MULTI-PROVIDER AI CONFIGURATOR")
+    print("  UNIVERSAL MULTI-PROVIDER AI KEY SETUP & CONFIGURATOR")
     print("  Enterprise Multi-Vendor Lifecycle AI Scraper (OT / IoT / IT)")
     print("=" * 76)
     print("\n[PLUG-AND-PLAY AI PROVIDERS]")
@@ -49,13 +50,17 @@ def print_banner():
 
 def test_and_save_key(
     api_key: str,
-    model_name: str = "gemini-3.5-flash-lite",
+    model_name: Optional[str] = None,
     provider: str = "gemini",
     api_base: str = "",
+    extra_env: Optional[Dict[str, str]] = None,
 ) -> bool:
     provider = normalize_provider_name(provider)
     model = model_name or DEFAULT_MODELS.get(provider, "gemini-3.5-flash-lite")
     api_key = api_key.strip()
+
+    if not api_key and provider not in ("ollama", "local"):
+        return False
 
     print(f"\n[*] Testing provider '{provider.upper()}' with model '{model}'...")
     extractor = UniversalAIExtractor(
@@ -80,7 +85,7 @@ def test_and_save_key(
             with open(env_path, "r", encoding="utf-8") as f:
                 lines = f.readlines()
 
-        env_vars_to_set = {
+        env_vars_to_set: Dict[str, str] = {
             "AI_PROVIDER": provider,
             "AI_MODEL": resolved_model,
         }
@@ -89,15 +94,26 @@ def test_and_save_key(
             env_vars_to_set["GEMINI_MODEL"] = resolved_model
         elif provider == "openai":
             env_vars_to_set["OPENAI_API_KEY"] = api_key
+            if api_base:
+                env_vars_to_set["OPENAI_BASE_URL"] = api_base
         elif provider == "anthropic":
             env_vars_to_set["ANTHROPIC_API_KEY"] = api_key
         elif provider == "azure":
             env_vars_to_set["AZURE_OPENAI_API_KEY"] = api_key
+            if api_base:
+                env_vars_to_set["AZURE_OPENAI_ENDPOINT"] = api_base
         elif provider == "bedrock":
             env_vars_to_set["AWS_ACCESS_KEY_ID"] = api_key
         elif provider in ("ollama", "local"):
             if api_base:
                 env_vars_to_set["OPENAI_BASE_URL"] = api_base
+
+        if extra_env:
+            env_vars_to_set.update(extra_env)
+
+        # Update os.environ immediately
+        for k, v in env_vars_to_set.items():
+            os.environ[k] = v
 
         new_lines = []
         updated_keys = set()
@@ -133,17 +149,29 @@ def main():
     print_banner()
 
     # CLI args support
-    if len(sys.argv) > 1 and sys.argv[1].startswith("--key="):
-        key = sys.argv[1].split("=", 1)[1]
-        prov = "gemini"
-        model = "gemini-3.5-flash-lite"
-        for arg in sys.argv[2:]:
-            if arg.startswith("--model="):
-                model = arg.split("=", 1)[1]
-        if prov != "gemini":
-            test_and_save_key(key, model, provider=prov)
+    cli_key = None
+    cli_prov = None
+    cli_model = None
+    cli_base = ""
+
+    for arg in sys.argv[1:]:
+        if arg.startswith("--key="):
+            cli_key = arg.split("=", 1)[1]
+        elif arg.startswith("--provider="):
+            cli_prov = arg.split("=", 1)[1]
+        elif arg.startswith("--model="):
+            cli_model = arg.split("=", 1)[1]
+        elif arg.startswith("--base-url=") or arg.startswith("--endpoint="):
+            cli_base = arg.split("=", 1)[1]
+
+    if cli_key is not None:
+        if cli_prov:
+            test_and_save_key(cli_key, cli_model, provider=cli_prov, api_base=cli_base)
         else:
-            test_and_save_key(key, model)
+            if cli_model:
+                test_and_save_key(cli_key, cli_model)
+            else:
+                test_and_save_key(cli_key)
         return
 
     print("Select AI Provider to configure:")
@@ -205,7 +233,31 @@ def main():
         print("No key provided. Exiting.")
         return
 
-    test_and_save_key(user_key, provider=selected_provider)
+    extra_env: Dict[str, str] = {}
+    api_base = ""
+
+    if selected_provider == "azure":
+        try:
+            endpoint = input("Enter Azure OpenAI Endpoint (e.g. https://your-resource.openai.azure.com): ").strip()
+            if endpoint:
+                api_base = endpoint
+                extra_env["AZURE_OPENAI_ENDPOINT"] = endpoint
+        except (KeyboardInterrupt, EOFError):
+            print("\nSetup cancelled.")
+            return
+
+    elif selected_provider == "bedrock":
+        try:
+            secret = input("Enter AWS Secret Access Key: ").strip()
+            if secret:
+                extra_env["AWS_SECRET_ACCESS_KEY"] = secret
+            region = input("Enter AWS Region [default: us-east-1]: ").strip() or "us-east-1"
+            extra_env["AWS_REGION_NAME"] = region
+        except (KeyboardInterrupt, EOFError):
+            print("\nSetup cancelled.")
+            return
+
+    test_and_save_key(user_key, provider=selected_provider, api_base=api_base, extra_env=extra_env)
 
 
 if __name__ == "__main__":

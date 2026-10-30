@@ -36,7 +36,7 @@ class TestSetupKey(unittest.TestCase):
         """Verifies setup_key banner displays helpful setup instructions."""
         setup_key.print_banner()
         output = mock_stdout.getvalue()
-        self.assertIn("GOOGLE GEMINI API KEY SETUP", output)
+        self.assertIn("UNIVERSAL MULTI-PROVIDER AI KEY SETUP", output)
         self.assertIn("aistudio.google.com", output)
 
     def test_02_empty_key_fails(self):
@@ -83,6 +83,59 @@ class TestSetupKey(unittest.TestCase):
                 with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
                     setup_key.main()
                     self.assertIn("cancelled", mock_stdout.getvalue().lower())
+
+    @patch("setup_key.BASE_DIR")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
+    def test_07_save_openai_key(self, mock_test_conn, mock_base_dir):
+        """Verifies saving an OpenAI key persists OPENAI_API_KEY and AI_PROVIDER to .env."""
+        mock_base_dir.__truediv__.return_value = self.mock_env
+        self.mock_env.write_text("AI_PROVIDER=gemini\n", encoding="utf-8")
+        mock_test_conn.return_value = (True, "OpenAI OK")
+
+        result = setup_key.test_and_save_key("sk-my-openai-key-12345", provider="openai", model_name="gpt-4o-mini")
+        self.assertTrue(result)
+
+        saved = self.mock_env.read_text(encoding="utf-8")
+        self.assertIn("OPENAI_API_KEY=sk-my-openai-key-12345", saved)
+        self.assertIn("AI_PROVIDER=openai", saved)
+        self.assertIn("AI_MODEL=gpt-4o-mini", saved)
+
+    @patch("setup_key.BASE_DIR")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
+    def test_08_save_anthropic_key(self, mock_test_conn, mock_base_dir):
+        """Verifies saving an Anthropic key persists ANTHROPIC_API_KEY to .env."""
+        mock_base_dir.__truediv__.return_value = self.mock_env
+        self.mock_env.write_text("", encoding="utf-8")
+        mock_test_conn.return_value = (True, "Anthropic OK")
+
+        result = setup_key.test_and_save_key("sk-ant-testkey789", provider="anthropic", model_name="claude-3-5-haiku-20241022")
+        self.assertTrue(result)
+
+        saved = self.mock_env.read_text(encoding="utf-8")
+        self.assertIn("ANTHROPIC_API_KEY=sk-ant-testkey789", saved)
+        self.assertIn("AI_PROVIDER=anthropic", saved)
+
+    @patch("setup_key.BASE_DIR")
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
+    def test_09_save_azure_key_with_endpoint(self, mock_test_conn, mock_base_dir):
+        """Verifies saving an Azure key persists endpoint and API key to .env."""
+        mock_base_dir.__truediv__.return_value = self.mock_env
+        self.mock_env.write_text("", encoding="utf-8")
+        mock_test_conn.return_value = (True, "Azure OK")
+
+        result = setup_key.test_and_save_key(
+            "azure-key-123",
+            provider="azure",
+            model_name="azure/gpt-4o",
+            api_base="https://mycorp.openai.azure.com",
+            extra_env={"AZURE_OPENAI_ENDPOINT": "https://mycorp.openai.azure.com"}
+        )
+        self.assertTrue(result)
+
+        saved = self.mock_env.read_text(encoding="utf-8")
+        self.assertIn("AZURE_OPENAI_API_KEY=azure-key-123", saved)
+        self.assertIn("AZURE_OPENAI_ENDPOINT=https://mycorp.openai.azure.com", saved)
+        self.assertIn("AI_PROVIDER=azure", saved)
 
 
 if __name__ == "__main__":

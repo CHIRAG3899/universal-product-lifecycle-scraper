@@ -16,7 +16,7 @@ CRAWLER_COMPARISON_MATRIX: List[Dict[str, Any]] = [
     {
         "dimension": "Multi-Vendor Polymorphism (100+ Vendors)",
         "generic_crawler": "Requires writing and maintaining 100+ custom XPath/CSS selector files. Every website layout requires custom scraping code.",
-        "ai_crawler": "Zero-shot schema extraction via Gemini 2.5 Flash. Single unified Pydantic schema maps any vendor layout dynamically.",
+        "ai_crawler": "Zero-shot schema extraction via Universal AI engine (Gemini, OpenAI, Claude, Azure). Single unified Pydantic schema maps any vendor layout dynamically.",
         "ai_advantage": "Scale to 100 vendors in YAML config with 0 code changes."
     },
     {
@@ -58,7 +58,7 @@ CRAWLER_COMPARISON_MATRIX: List[Dict[str, Any]] = [
     {
         "dimension": "Unstructured Document & PDF Bulletin Mining",
         "generic_crawler": "Cannot parse PDF technical bulletins or migration notices without external OCR or manual PDF extraction libraries.",
-        "ai_crawler": "Google Gemini multimodal architecture can ingest technical PDF bulletins directly to extract model replacement mappings.",
+        "ai_crawler": "Multimodal AI architecture can ingest technical PDF bulletins directly to extract model replacement mappings.",
         "ai_advantage": "Extracts successor/replacement advice embedded inside official PDF bulletins."
     },
     {
@@ -73,7 +73,7 @@ CRAWLER_COMPARISON_MATRIX: List[Dict[str, Any]] = [
 def get_comparison_summary() -> str:
     """Returns a formatted terminal markdown table comparing Generic vs AI Crawler."""
     lines = [
-        "| Capability Dimension | Generic / Traditional IDE Crawler | AI Crawler (Crawl4AI + Gemini 2.5 Flash) | AI Advantage |",
+        "| Capability Dimension | Generic / Traditional IDE Crawler | Universal AI Crawler (Crawl4AI + Multi-Provider AI) | AI Advantage |",
         "| :--- | :--- | :--- | :--- |"
     ]
     for row in CRAWLER_COMPARISON_MATRIX:

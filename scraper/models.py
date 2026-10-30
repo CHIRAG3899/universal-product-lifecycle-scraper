@@ -538,11 +538,11 @@ class ProductRecord(BaseModel):
         return self
 
 
-class GeminiProductItem(BaseModel):
+class AIProductItem(BaseModel):
     """
-    Dedicated extraction item schema for Google Gemini Developer API.
-    Uses strictly defined scalar fields with extra='ignore' to avoid
-    'additionalProperties' OpenAPI annotations which are unsupported in Developer API mode.
+    Universal structured extraction item schema for all AI providers
+    (Google Gemini, OpenAI, Anthropic Claude, Azure OpenAI, AWS Bedrock, Ollama).
+    Uses strictly defined scalar fields with extra='ignore' for maximum cross-provider compatibility.
     """
     model_config = ConfigDict(extra="ignore")
 
@@ -558,14 +558,22 @@ class GeminiProductItem(BaseModel):
     notes: Optional[str] = Field(default=None, description="Migration notes or additional context")
 
 
-class GeminiExtractionBatch(BaseModel):
-    """Batch extraction schema for structured responses from Google Gemini."""
+# Backward compatibility alias
+GeminiProductItem = AIProductItem
+
+
+class AIExtractionBatch(BaseModel):
+    """Universal batch extraction schema for structured responses from any AI provider."""
     model_config = ConfigDict(extra="ignore")
 
-    vendor_name: str = Field(default="Mitsubishi Electric", description="Identified vendor name")
+    vendor_name: str = Field(default="Industrial Automation", description="Identified vendor name")
     detected_language: str = Field(default="en", description="Source content language ('en', 'de', 'ja', 'sv')")
-    products: List[GeminiProductItem] = Field(description="Product records, with exactly ONE record per status milestone")
+    products: List[AIProductItem] = Field(description="Product records, with exactly ONE record per status milestone")
     source_summary: Optional[str] = Field(default=None, description="Brief summary in English")
+
+
+# Backward compatibility alias
+GeminiExtractionBatch = AIExtractionBatch
 
 
 class ScrapedDataset(BaseModel):

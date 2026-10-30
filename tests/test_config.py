@@ -48,6 +48,26 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(str(DEFAULT_JSON_OUTPUT).endswith(".json"))
         self.assertTrue(str(DEFAULT_CSV_OUTPUT).endswith(".csv"))
 
+    def test_universal_ai_token_optimization_settings(self):
+        from scraper.config import (
+            AI_BATCH_MODE,
+            AI_ENABLE_PROMPT_CACHING,
+            AI_PROMPT_CACHE_TTL,
+            AI_THINKING_BUDGET,
+            GEMINI_BATCH_MODE,
+            GEMINI_ENABLE_PROMPT_CACHING,
+            GEMINI_PROMPT_CACHE_TTL,
+            GEMINI_THINKING_BUDGET,
+        )
+        self.assertIsInstance(AI_THINKING_BUDGET, int)
+        self.assertIsInstance(AI_ENABLE_PROMPT_CACHING, bool)
+        self.assertIsInstance(AI_PROMPT_CACHE_TTL, str)
+        self.assertIsInstance(AI_BATCH_MODE, bool)
+        self.assertEqual(AI_THINKING_BUDGET, GEMINI_THINKING_BUDGET)
+        self.assertEqual(AI_ENABLE_PROMPT_CACHING, GEMINI_ENABLE_PROMPT_CACHING)
+        self.assertEqual(AI_PROMPT_CACHE_TTL, GEMINI_PROMPT_CACHE_TTL)
+        self.assertEqual(AI_BATCH_MODE, GEMINI_BATCH_MODE)
+
     def test_vendor_yaml_key_uniqueness_and_counts(self):
         """Verifies zero duplicate YAML keys, zero duplicate vendor names, and exact 140 vendor catalog."""
         import re

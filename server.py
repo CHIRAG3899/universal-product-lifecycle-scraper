@@ -20,7 +20,9 @@ sys.path.insert(0, str(BASE_DIR))
 
 from scraper.config import DEFAULT_CSV_OUTPUT, DEFAULT_JSON_OUTPUT, GEMINI_API_KEY, GEMINI_MODEL
 from scraper.pipeline import LifecyclePipeline
+from scraper.providers import resolve_provider_and_model
 from scraper.storage import MasterStorageManager
+from setup_key import test_and_save_key
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("ai_scraper.server")
@@ -113,7 +115,7 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         })
 
     def handle_test_key(self):
-        """Tests and validates a Google Gemini API key."""
+        """Tests and validates an AI API key for any configured provider."""
         content_len = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_len).decode("utf-8") if content_len > 0 else "{}"
         try:
@@ -121,52 +123,74 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         except Exception:
             payload = {}
 
-        api_key = payload.get("api_key") if "api_key" in payload else os.getenv("GEMINI_API_KEY", "")
-        model = payload.get("model") or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        provider = payload.get("provider") or None
+        api_key = payload.get("api_key") if "api_key" in payload else None
+        model = payload.get("model") or None
+        api_base = payload.get("api_base") or payload.get("endpoint") or None
         save_to_env = bool(payload.get("save", False))
 
         from scraper.ai_extractor import UniversalAIExtractor
-        extractor = UniversalAIExtractor(api_key=api_key, model_name=model)
+        extractor = UniversalAIExtractor(
+            provider=provider,
+            api_key=api_key,
+            model_name=model,
+            api_base=api_base,
+        )
         success, message = extractor.test_connection()
 
-        if success and save_to_env and api_key:
-            active_model = extractor.model_name
-            env_path = BASE_DIR / ".env"
-            lines = []
-            if env_path.exists():
-                with open(env_path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
-            new_lines = []
-            key_found = False
-            model_found = False
-            for line in lines:
-                if line.strip().startswith("GEMINI_API_KEY="):
-                    new_lines.append(f"GEMINI_API_KEY={api_key}\n")
-                    key_found = True
-                elif line.strip().startswith("GEMINI_MODEL="):
-                    new_lines.append(f"GEMINI_MODEL={active_model}\n")
-                    model_found = True
-                else:
-                    new_lines.append(line)
-            if not key_found:
-                new_lines.append(f"GEMINI_API_KEY={api_key}\n")
-            if not model_found:
-                new_lines.append(f"GEMINI_MODEL={active_model}\n")
-            with open(env_path, "w", encoding="utf-8") as f:
-                f.writelines(new_lines)
-            os.environ["GEMINI_API_KEY"] = api_key
-            os.environ["GEMINI_MODEL"] = active_model
+        if success and save_to_env:
+            effective_key = api_key or extractor.api_key or ""
+            extra_env = {}
+            if extractor.provider == "azure" and api_base:
+                extra_env["AZURE_OPENAI_ENDPOINT"] = api_base
+            test_and_save_key(
+                api_key=effective_key,
+                model_name=extractor.model_name,
+                provider=extractor.provider,
+                api_base=api_base or "",
+                extra_env=extra_env,
+            )
 
-        self._send_json({"success": success, "message": message})
+        self._send_json({
+            "success": success,
+            "message": message,
+            "provider": extractor.provider,
+            "model": extractor.model_name
+        })
 
     def handle_get_status(self):
-        """Returns crawler & Gemini configuration status."""
-        active_key = os.getenv("GEMINI_API_KEY", GEMINI_API_KEY)
-        has_key = bool(active_key and active_key != "your_gemini_api_key_here")
+        """Returns crawler & multi-provider AI configuration status."""
+        prov, active_model, _ = resolve_provider_and_model()
+
+        gemini_key = os.getenv("GEMINI_API_KEY", GEMINI_API_KEY)
+        has_gemini = bool(gemini_key and gemini_key != "your_gemini_api_key_here")
+
+        openai_key = os.getenv("OPENAI_API_KEY", "")
+        has_openai = bool(openai_key and not openai_key.startswith("your_"))
+
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
+        has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your_"))
+
+        azure_key = os.getenv("AZURE_OPENAI_API_KEY", "")
+        has_azure = bool(azure_key and not azure_key.startswith("your_"))
+
+        aws_key = os.getenv("AWS_ACCESS_KEY_ID", "")
+        has_bedrock = bool(aws_key and not aws_key.startswith("your_"))
+
+        has_any = has_gemini or has_openai or has_anthropic or has_azure or has_bedrock
+
         self._send_json({
             "status": "online",
-            "gemini_configured": has_key,
+            "provider": prov,
+            "model": active_model,
+            "ai_configured": has_any,
+            "gemini_configured": has_gemini,
             "gemini_model": os.getenv("GEMINI_MODEL", GEMINI_MODEL),
+            "openai_configured": has_openai,
+            "anthropic_configured": has_anthropic,
+            "azure_configured": has_azure,
+            "bedrock_configured": has_bedrock,
+            "ollama_configured": True,
             "master_csv_exists": MASTER_CSV.exists(),
             "artifacts_dir_exists": ARTIFACTS_DIR.exists()
         })
@@ -218,12 +242,19 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         vendor = payload.get("vendor") or "all"
         sector = payload.get("sector") or None
         site_crawl = bool(payload.get("site_crawl", False))
+        provider = payload.get("provider") or None
         api_key = payload.get("api_key") or None
-        model = payload.get("model") or GEMINI_MODEL
+        model = payload.get("model") or None
+        api_base = payload.get("api_base") or None
 
-        logger.info(f"Triggering live crawl (url={target_url}, vendor={vendor}, sector={sector}, site_crawl={site_crawl}, model={model})...")
+        logger.info(f"Triggering live crawl (url={target_url}, vendor={vendor}, sector={sector}, site_crawl={site_crawl}, provider={provider}, model={model})...")
         try:
-            pipeline = LifecyclePipeline(api_key=api_key, model=model)
+            pipeline = LifecyclePipeline(
+                provider=provider,
+                api_key=api_key,
+                model=model,
+                api_base=api_base,
+            )
             dataset = asyncio.run(pipeline.execute(
                 vendor_filter=vendor,
                 sector_filter=sector,

@@ -121,7 +121,7 @@ The following matrix documents the latent vulnerabilities identified during adve
 | **GAP 8** | **LLM Markdown Code-Fence Decode Errors** | Gemini intermittently wraps JSON in ````json ... ```` | Added **code-fence stripper** in `GeminiExtractor` extracting inner JSON before calling `json.loads()`. |
 | **GAP 9** | **Numeric / Hex Encoded SSRF Bypasses** | Only checked standard dotted-decimal strings | Enhanced `is_safe_url` to parse **decimal integer IPs (`2130706433`)**, **hex IPs (`0x7f000001`)**, unspecified addresses (`0.0.0.0`, `::`), and native `ip.is_private` flags. |
 | **GAP 10** | **Vendor Registry Attribution Blindspot** | Vendor detection only knew 11 hardcoded profiles | Enhanced `detect_vendor_from_url_or_text` to **dynamically inspect all 140 vendors loaded from `configs/vendors.yaml`**, matching domains and aliases automatically. |
-| **GAP 11** | **Repetitive AI Crawl Token Inefficiency** | Large repetitive system prompts, thinking token billing, and 100% pricing on bulk crawls | Implemented **Thinking Budget Capping (`thinking_budget=0`)**, **Native Google Prompt Caching (up to 90% discount)**, **Asynchronous Batch API (50% discount)**, and **Token-Efficient Markdown Trimming**. |
+| **GAP 11** | **Repetitive AI Crawl Token Inefficiency** | Large repetitive system prompts, thinking token billing, and 100% pricing on bulk crawls | Implemented **Thinking Budget Capping (`thinking_budget=0`)**, **Native Provider Prompt Caching**, **Asynchronous Batch API (50% cost reduction)**, and **Token-Efficient Markdown Trimming**. |
 | **GAP 12** | **Fixed Status Whitelist Limitation** | Forcing all vendor phases into a 3-stage whitelist (EOL/LTB/EOS) | **Zero Status Limitation**: Preserves vendor-exact lifecycle milestones (*Phase-Out Product, Delivery Release, Announced Discontinuation, Product Cancellation, End of Sale, Last Date of Support, Classic, Limited, Obsolete, Active Mature, Stop Shipment, Repair Termination, Maintenance Only*) in both `status` and `vendor_status`. |
 | **GAP 13** | **Catalog Coverage Blindspots & Truncation** | Dropping models without dates, missing paginated sub-pages, unparsed PDF notices, unexpanded suffixes | **100% Crawl Coverage Guarantee**: Automatic **PDF bulletin text extraction via `pypdf`**, **pagination link discovery (`?page=`, `rel="next"`)**, **hybrid DOM + markdown chunk parsing**, **suffix and integer range unpacking** (`FX2N-16MR/ES, -16MT/ES`, `1756-L61 to 1756-L63`), and **mandatory 4-field zero-null invariant** with automatic date hydration. |
 | **GAP 14** | **Vendor YAML Silent Key Overwriting** | PyYAML `safe_load()` silently overwrites duplicated mapping keys without error | Merged all entry points and domains for `keyence`, `danfoss`, `delta_electronics`, and `cognex`. Built **raw-line AST key scanner into Pre-Commit Check 5** and `test_config.py`, enforcing zero duplicated keys, zero duplicated names, and zero duplicated URLs across all 140 vendors. |
@@ -148,10 +148,10 @@ When executing tasks autonomously, AI agents should reference these standardized
 3. Enforce the zero-config defaults policy: omit `default_os` and `default_firmware`.
 4. Validate configuration via Check 5 of `scripts/pre_commit_check.py`.
 
-### Playbook C: When Troubleshooting Gemini API Errors
-1. If the API returns `404 NOT_FOUND` for a model, check [`UniversalAIExtractor.test_connection`](../../scraper/ai_extractor.py).
-2. Ensure the candidate probing list is active: `["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]`.
-3. Run `python setup_key.py` to test and persist the verified working model into `.env`.
+### Playbook C: When Troubleshooting AI Provider API Errors
+1. If the API returns connection or model errors, check [`UniversalAIExtractor.test_connection`](../../scraper/ai_extractor.py).
+2. For Gemini, ensure the candidate probing list is active: `["gemini-3.5-flash-lite", "gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest"]`.
+3. Run `python setup_key.py` to test and persist the verified working model and credentials into `.env`.
 
 ### Playbook D: When Minimizing API Cost & Token Consumption
 1. Cap thinking budget to 0 (`--thinking-budget 0`) on Flash models to eliminate reasoning token billing on schema extraction.

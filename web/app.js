@@ -29,6 +29,9 @@ const configGrid = document.getElementById("configGrid");
 const targetUrlInput = document.getElementById("targetUrlInput");
 const vendorPresetSelect = document.getElementById("vendorPresetSelect");
 const siteCrawlCheckbox = document.getElementById("siteCrawlCheckbox");
+const aiProviderSelect = document.getElementById("aiProviderSelect");
+const apiKeyLabelText = document.getElementById("apiKeyLabelText");
+const apiKeyPortalLink = document.getElementById("apiKeyPortalLink");
 const geminiApiKeyInput = document.getElementById("geminiApiKeyInput");
 const geminiModelSelect = document.getElementById("geminiModelSelect");
 const toggleApiKeyVisibility = document.getElementById("toggleApiKeyVisibility");
@@ -39,6 +42,95 @@ const openComparisonBtn = document.getElementById("openComparisonBtn");
 const comparisonModal = document.getElementById("comparisonModal");
 const closeComparisonBtn = document.getElementById("closeComparisonBtn");
 const comparisonTableContainer = document.getElementById("comparisonTableContainer");
+
+const PROVIDER_METADATA = {
+  gemini: {
+    label: "Google Gemini API Key",
+    linkText: "AI Studio Keys ↗",
+    linkUrl: "https://aistudio.google.com/app/apikey",
+    placeholder: "Paste GEMINI_API_KEY (AIza...)",
+    models: [
+      { value: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash Lite (Fastest & Free)" },
+      { value: "gemini-3.5-flash", label: "Gemini 3.5 Flash (Production Default)" },
+      { value: "gemini-2.0-flash", label: "Gemini 2.0 Flash (Next-Gen Fast)" },
+      { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro (Deep Reasoning)" },
+    ]
+  },
+  openai: {
+    label: "OpenAI API Key",
+    linkText: "OpenAI Keys ↗",
+    linkUrl: "https://platform.openai.com/api-keys",
+    placeholder: "Paste OPENAI_API_KEY (sk-...)",
+    models: [
+      { value: "gpt-4o-mini", label: "OpenAI GPT-4o Mini (Cost-Efficient Default)" },
+      { value: "gpt-4o", label: "OpenAI GPT-4o (High Accuracy Multimodal)" },
+      { value: "o1-mini", label: "OpenAI o1-mini (Reasoning Model)" },
+      { value: "o3-mini", label: "OpenAI o3-mini (Advanced Reasoning)" },
+    ]
+  },
+  anthropic: {
+    label: "Anthropic Claude API Key",
+    linkText: "Anthropic Console ↗",
+    linkUrl: "https://console.anthropic.com/",
+    placeholder: "Paste ANTHROPIC_API_KEY (sk-ant-...)",
+    models: [
+      { value: "claude-3-5-haiku-20241022", label: "Claude 3.5 Haiku (Lightning Fast)" },
+      { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet (State of the Art)" },
+    ]
+  },
+  azure: {
+    label: "Azure OpenAI Key",
+    linkText: "Azure Portal ↗",
+    linkUrl: "https://portal.azure.com/",
+    placeholder: "Paste AZURE_OPENAI_API_KEY...",
+    models: [
+      { value: "azure/gpt-4o-mini", label: "Azure OpenAI: gpt-4o-mini deployment" },
+      { value: "azure/gpt-4o", label: "Azure OpenAI: gpt-4o deployment" },
+    ]
+  },
+  bedrock: {
+    label: "AWS Access Key ID",
+    linkText: "AWS Console ↗",
+    linkUrl: "https://aws.amazon.com/bedrock/",
+    placeholder: "Paste AWS_ACCESS_KEY_ID (AKIA...)",
+    models: [
+      { value: "bedrock/anthropic.claude-3-5-haiku-20241022-v1:0", label: "Bedrock: Claude 3.5 Haiku" },
+      { value: "bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0", label: "Bedrock: Claude 3.5 Sonnet v2" },
+    ]
+  },
+  ollama: {
+    label: "Local Ollama Endpoint",
+    linkText: "Ollama Docs ↗",
+    linkUrl: "https://ollama.ai",
+    placeholder: "Local execution on localhost:11434 (no key needed)",
+    models: [
+      { value: "ollama/llama3.2", label: "Ollama: Llama 3.2 (Local On-Prem)" },
+      { value: "ollama/mistral", label: "Ollama: Mistral 7B (Local On-Prem)" },
+      { value: "ollama/qwen2.5", label: "Ollama: Qwen 2.5 (Local On-Prem)" },
+    ]
+  }
+};
+
+function updateProviderUI(provider) {
+  const meta = PROVIDER_METADATA[provider] || PROVIDER_METADATA.gemini;
+  if (apiKeyLabelText) apiKeyLabelText.textContent = meta.label;
+  if (apiKeyPortalLink) {
+    apiKeyPortalLink.textContent = meta.linkText;
+    apiKeyPortalLink.href = meta.linkUrl;
+  }
+  if (geminiApiKeyInput) {
+    geminiApiKeyInput.placeholder = meta.placeholder;
+  }
+  if (geminiModelSelect) {
+    geminiModelSelect.innerHTML = "";
+    meta.models.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.value;
+      opt.textContent = m.label;
+      geminiModelSelect.appendChild(opt);
+    });
+  }
+}
 
 // Stepper Elements
 const stepItems = [
@@ -147,19 +239,47 @@ function setupEventListeners() {
     toggleConfigBtn.textContent = isHidden ? "Hide Options" : "Show Options";
   });
 
+  // AI Provider dropdown change
+  if (aiProviderSelect) {
+    aiProviderSelect.addEventListener("change", () => {
+      updateProviderUI(aiProviderSelect.value);
+    });
+  }
+
+  // Key auto-detection on paste or input
+  if (geminiApiKeyInput) {
+    geminiApiKeyInput.addEventListener("input", () => {
+      const val = geminiApiKeyInput.value.trim();
+      if (val.startsWith("sk-ant-") && aiProviderSelect && aiProviderSelect.value !== "anthropic") {
+        aiProviderSelect.value = "anthropic";
+        updateProviderUI("anthropic");
+      } else if ((val.startsWith("sk-") || val.startsWith("sess-")) && aiProviderSelect && aiProviderSelect.value !== "openai") {
+        aiProviderSelect.value = "openai";
+        updateProviderUI("openai");
+      } else if (val.startsWith("AIza") && aiProviderSelect && aiProviderSelect.value !== "gemini") {
+        aiProviderSelect.value = "gemini";
+        updateProviderUI("gemini");
+      } else if ((val.startsWith("AKIA") || val.startsWith("ASIA")) && aiProviderSelect && aiProviderSelect.value !== "bedrock") {
+        aiProviderSelect.value = "bedrock";
+        updateProviderUI("bedrock");
+      }
+    });
+  }
+
   // Toggle API Key visibility
   toggleApiKeyVisibility.addEventListener("click", () => {
     geminiApiKeyInput.type = geminiApiKeyInput.type === "password" ? "text" : "password";
   });
 
-  // Test Gemini API Key Button
+  // Test Universal AI API Key Button
   const testKeyBtn = document.getElementById("testKeyBtn");
   const keyValidationStatus = document.getElementById("keyValidationStatus");
   if (testKeyBtn) {
     testKeyBtn.addEventListener("click", async () => {
       const apiKey = geminiApiKeyInput.value.trim();
       const model = geminiModelSelect.value;
-      if (!apiKey) {
+      const provider = aiProviderSelect ? aiProviderSelect.value : "gemini";
+      if (!apiKey && provider !== "ollama") {
         keyValidationStatus.style.display = "block";
         keyValidationStatus.style.color = "var(--accent-rose)";
         keyValidationStatus.textContent = "Please paste an API key first.";
@@ -169,19 +289,22 @@ function setupEventListeners() {
       testKeyBtn.textContent = "...";
       keyValidationStatus.style.display = "block";
       keyValidationStatus.style.color = "var(--accent-cyan)";
-      keyValidationStatus.textContent = "Testing key with AI engine...";
+      keyValidationStatus.textContent = `Testing key with ${provider.toUpperCase()} engine...`;
 
       try {
         const res = await fetch("/api/test-key", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ api_key: apiKey, model: model, save: true })
+          body: JSON.stringify({ provider: provider, api_key: apiKey, model: model, save: true })
         });
         const data = await res.json();
         if (data.success) {
           keyValidationStatus.style.color = "var(--accent-emerald)";
-          keyValidationStatus.textContent = "✓ Key verified & saved! AI engine active.";
+          keyValidationStatus.textContent = `✓ ${provider.toUpperCase()} verified & saved! Engine active.`;
           document.getElementById("geminiStatusPill").style.borderColor = "#10b981";
+          if (geminiModelLabel) {
+            geminiModelLabel.textContent = `${provider.toUpperCase()}: ${data.model || model}`;
+          }
         } else {
           keyValidationStatus.style.color = "var(--accent-rose)";
           keyValidationStatus.textContent = `✗ ${data.message}`;
@@ -276,11 +399,19 @@ async function fetchServerStatus() {
     const res = await fetch("/api/status");
     if (res.ok) {
       const data = await res.json();
-      if (data.gemini_model) {
-        geminiModelLabel.textContent = data.gemini_model;
-        geminiModelSelect.value = data.gemini_model;
+      const provName = (data.provider || "AI").toUpperCase();
+      const modName = data.model || data.gemini_model || "Flash";
+      if (geminiModelLabel) {
+        geminiModelLabel.textContent = `${provName}: ${modName}`;
       }
-      if (data.gemini_configured) {
+      if (data.provider && aiProviderSelect) {
+        aiProviderSelect.value = data.provider;
+        updateProviderUI(data.provider);
+      }
+      if (data.model && geminiModelSelect) {
+        geminiModelSelect.value = data.model;
+      }
+      if (data.ai_configured || data.gemini_configured || data.openai_configured || data.anthropic_configured || data.azure_configured || data.bedrock_configured) {
         document.getElementById("geminiStatusPill").style.borderColor = "#10b981";
       }
     }
@@ -615,6 +746,7 @@ async function runLiveCrawl() {
   }, 7500);
 
   try {
+    const provider = aiProviderSelect ? aiProviderSelect.value : "gemini";
     const response = await fetch("/api/crawl", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -622,6 +754,7 @@ async function runLiveCrawl() {
         url: targetUrl,
         vendor: vendorId,
         site_crawl: isSiteCrawl,
+        provider: provider,
         api_key: apiKey,
         model: model
       })

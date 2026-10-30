@@ -15,14 +15,14 @@ from google import genai
 from google.genai import types
 
 from scraper.config import (
-    GEMINI_BATCH_MODE,
-    GEMINI_ENABLE_PROMPT_CACHING,
-    GEMINI_PROMPT_CACHE_TTL,
-    GEMINI_THINKING_BUDGET,
+    AI_BATCH_MODE,
+    AI_ENABLE_PROMPT_CACHING,
+    AI_PROMPT_CACHE_TTL,
+    AI_THINKING_BUDGET,
 )
 from scraper.models import (
-    GeminiExtractionBatch,
-    GeminiProductItem,
+    AIExtractionBatch,
+    AIProductItem,
     ProductRecord,
     extract_date_from_bulletin_code,
     is_valid_product_model,
@@ -92,7 +92,7 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
 def clean_token_efficient_markdown(raw_text: str) -> str:
     """
     Strips noise, redundant formatting, and padding from crawled markdown
-    to minimize input token consumption by 15-30% before calling Gemini.
+    to minimize input token consumption by 15-30% across LLM provider calls.
     """
     if not raw_text:
         return ""
@@ -113,11 +113,11 @@ def clean_token_efficient_markdown(raw_text: str) -> str:
 
 
 def _ai_item_to_product_record(
-    item: GeminiProductItem,
+    item: AIProductItem,
     default_vendor: str,
     source_url: Optional[str] = None,
 ) -> Optional[ProductRecord]:
-    """Converts a GeminiProductItem from structured extraction into a database-ready ProductRecord."""
+    """Converts an AIProductItem from structured extraction into a database-ready ProductRecord."""
     from scraper.security import clean_and_sanitize_identifier
     vendor = (item.vendor_name or "").strip() or default_vendor
     raw_model = (item.model_name or "").strip()
@@ -171,25 +171,31 @@ def _ai_item_to_product_record(
             metadata=meta,
         )
     except Exception as err:
-        logger.debug(f"Failed to create ProductRecord from Gemini item ({model}): {err}")
+        logger.debug(f"Failed to create ProductRecord from AI item ({model}): {err}")
         return None
+
+
+# Backward compatibility alias
+_gemini_item_to_product_record = _ai_item_to_product_record
 
 
 class UniversalAIExtractor:
     """
-    Interfaces with Google Gemini (e.g. gemini-1.5-flash / gemini-2.0-flash / gemini-3.8-flash)
-    using the official Google GenAI SDK to perform structured schema extraction.
+    Universal Multi-Provider AI Extractor for Multi-Vendor EOL and Lifecycle Intelligence.
+    Interfaces across Google Gemini, OpenAI, Anthropic Claude, Microsoft Azure OpenAI,
+    Amazon AWS Bedrock, and Ollama/Local to perform high-precision structured schema extraction.
 
-    Cost & Token Optimization Features:
-    1. Thinking Budget Capping: Caps thinking tokens to 0 on Flash models, eliminating internal reasoning output token bills.
-    2. Prompt Caching: Leverages native Google GenAI Prompt Caching (system_instruction & client.caches) for up to 90% input discount.
-    3. Asynchronous Batch API: Supports Gemini Batch mode (client.batches) with 50% discount on both input and output tokens.
+    Multi-Provider Token & Cost Optimization Features:
+    1. Thinking Budget Capping: Caps thinking tokens to 0 on reasoning models, eliminating unnecessary output token bills.
+    2. Prompt Caching: Leverages native system instructions and prompt caching for up to 90% input discount.
+    3. Asynchronous Batch Processing: Supports batch processing mode with up to 50% discount on both input and output tokens.
     """
 
-    thinking_budget: Optional[int] = GEMINI_THINKING_BUDGET
-    enable_prompt_caching: bool = GEMINI_ENABLE_PROMPT_CACHING
-    cache_ttl: str = GEMINI_PROMPT_CACHE_TTL
-    batch_mode: bool = GEMINI_BATCH_MODE
+    thinking_budget: Optional[int] = AI_THINKING_BUDGET
+    enable_prompt_caching: bool = AI_ENABLE_PROMPT_CACHING
+    cache_ttl: str = AI_PROMPT_CACHE_TTL
+    batch_mode: bool = AI_BATCH_MODE
+    client: Any = None
 
     def __init__(
         self,
@@ -208,13 +214,13 @@ class UniversalAIExtractor:
             api_key=api_key,
         )
         self.api_base = api_base or os.getenv("OPENAI_BASE_URL", "")
-        self.client = None
+        self.client: Any = None
 
-        # Token & Cost Optimization Settings
-        self.thinking_budget = thinking_budget if thinking_budget is not None else GEMINI_THINKING_BUDGET
-        self.enable_prompt_caching = enable_prompt_caching if enable_prompt_caching is not None else GEMINI_ENABLE_PROMPT_CACHING
-        self.cache_ttl = cache_ttl or GEMINI_PROMPT_CACHE_TTL
-        self.batch_mode = batch_mode if batch_mode is not None else GEMINI_BATCH_MODE
+        # Multi-Provider Token & Cost Optimization Settings
+        self.thinking_budget = thinking_budget if thinking_budget is not None else AI_THINKING_BUDGET
+        self.enable_prompt_caching = enable_prompt_caching if enable_prompt_caching is not None else AI_ENABLE_PROMPT_CACHING
+        self.cache_ttl = cache_ttl or AI_PROMPT_CACHE_TTL
+        self.batch_mode = batch_mode if batch_mode is not None else AI_BATCH_MODE
         self._active_cache_name: Optional[str] = None
 
         self.token_metrics: Dict[str, Any] = {
@@ -239,6 +245,37 @@ class UniversalAIExtractor:
                     logger.warning(f"Could not initialize Google GenAI Client: {e}")
             else:
                 logger.info("No valid GEMINI_API_KEY provided. Operating in deterministic/fallback mode.")
+        elif self.provider in ("openai", "openrouter", "ollama", "local"):
+            if self.is_configured():
+                try:
+                    from openai import OpenAI
+                    base = self.api_base or ("https://openrouter.ai/api/v1" if self.provider == "openrouter" else ("http://localhost:11434/v1" if self.provider in ("ollama", "local") else None))
+                    eff_key = self.api_key or ("ollama" if self.provider in ("ollama", "local") else "")
+                    if eff_key:
+                        self.client = OpenAI(api_key=eff_key, base_url=base, timeout=45)
+                        logger.info(f"Initialized OpenAI client for provider '{self.provider}' (model: {self.model_name}).")
+                except Exception as oe:
+                    logger.warning(f"Could not initialize OpenAI Client: {oe}")
+            else:
+                logger.info(f"No valid API key provided for provider '{self.provider}'. Operating in deterministic/fallback mode.")
+        elif self.provider == "azure":
+            if self.is_configured():
+                try:
+                    from openai import AzureOpenAI
+                    endpoint = self.api_base or os.getenv("AZURE_OPENAI_ENDPOINT", "")
+                    version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+                    if self.api_key and endpoint:
+                        self.client = AzureOpenAI(
+                            api_key=self.api_key,
+                            azure_endpoint=endpoint,
+                            api_version=version,
+                            timeout=45,
+                        )
+                        logger.info(f"Initialized AzureOpenAI client for model '{self.model_name}'.")
+                except Exception as ae:
+                    logger.warning(f"Could not initialize AzureOpenAI Client: {ae}")
+            else:
+                logger.info("No valid API key provided for Azure OpenAI. Operating in deterministic/fallback mode.")
         else:
             if self.is_configured():
                 logger.info(
@@ -253,6 +290,8 @@ class UniversalAIExtractor:
             return bool(self.client and self.api_key and self.api_key != "your_gemini_api_key_here")
         if self.provider in ("ollama", "local"):
             return True
+        if self.provider == "bedrock":
+            return bool((self.api_key or os.getenv("AWS_ACCESS_KEY_ID")) and not (self.api_key or "").startswith("your_"))
         return bool(self.api_key and self.api_key != "your_gemini_api_key_here" and not self.api_key.startswith("your_"))
 
     def test_connection(self) -> Tuple[bool, str]:
@@ -278,7 +317,7 @@ class UniversalAIExtractor:
                 try:
                     response = self.client.models.generate_content(
                         model=mod,
-                        contents="Reply with: 'GEMINI_OK'"
+                        contents="Reply with: 'OK'"
                     )
                     text = (response.text or "").strip()
                     self.model_name = mod
@@ -293,6 +332,21 @@ class UniversalAIExtractor:
                     break
 
             return False, f"Gemini API Error: {last_err}"
+
+        # Direct client probe for OpenAI / Azure / Ollama
+        if self.client and hasattr(self.client, "chat") and hasattr(self.client.chat, "completions"):
+            try:
+                resp = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[{"role": "user", "content": "Reply with: 'OK'"}],
+                    max_tokens=10,
+                    timeout=15,
+                )
+                if resp.choices and resp.choices[0].message.content:
+                    ans = resp.choices[0].message.content.strip()
+                    return True, f"Connection successful! Provider '{self.provider}' model '{self.model_name}' responded: {ans}"
+            except Exception as client_err:
+                logger.debug(f"Direct client test failed ({client_err}); attempting call_llm_completion fallback.")
 
         # Providers: OpenAI, Claude, Azure, AWS Bedrock, Ollama, etc. via call_llm_completion
         try:
@@ -403,7 +457,7 @@ class UniversalAIExtractor:
 
             gen_config_kwargs: Dict[str, Any] = {
                 "response_mime_type": "application/json",
-                "response_schema": GeminiExtractionBatch,
+                "response_schema": AIExtractionBatch,
                 "temperature": 0.1,
                 "system_instruction": EXTRACTION_SYSTEM_INSTRUCTION
             }
@@ -428,7 +482,7 @@ class UniversalAIExtractor:
             config=job_config
         )
         job_name = getattr(batch_job, "name", str(batch_job))
-        logger.info(f"Submitted Gemini Batch Job '{job_name}' with {len(inlined_requests)} requests (50% token cost savings applied).")
+        logger.info(f"Submitted Batch Job '{job_name}' with {len(inlined_requests)} requests (50% token cost reduction applied).")
         self.token_metrics["batch_calls"] += len(inlined_requests)
         return job_name
 
@@ -439,31 +493,31 @@ class UniversalAIExtractor:
         timeout: int = 300
     ) -> List[ProductRecord]:
         """
-        Polls a submitted Gemini Batch Job until completion and returns extracted ProductRecords.
+        Polls a submitted Batch Job until completion and returns extracted ProductRecords.
         """
         if not self.is_configured() or not self.client:
             return []
 
         start_time = time.time()
-        logger.info(f"Polling Gemini Batch Job '{job_name}' (timeout: {timeout}s)...")
+        logger.info(f"Polling Batch Job '{job_name}' (timeout: {timeout}s)...")
 
         while time.time() - start_time < timeout:
             job = self.client.batches.get(name=job_name)
             state_str = str(getattr(job, "state", "")).upper()
 
             if any(kw in state_str for kw in ["SUCCEEDED", "JOB_STATE_SUCCEEDED"]):
-                logger.info(f"Gemini Batch Job '{job_name}' SUCCEEDED. Parsing inlined responses...")
+                logger.info(f"Batch Job '{job_name}' SUCCEEDED. Parsing inlined responses...")
                 return self._parse_batch_job_destination(job)
 
             if any(kw in state_str for kw in ["FAILED", "CANCELLED", "EXPIRED", "JOB_STATE_FAILED"]):
                 err = getattr(job, "error", "Unknown batch failure")
-                logger.error(f"Gemini Batch Job '{job_name}' ended with state '{state_str}': {err}")
+                logger.error(f"Batch Job '{job_name}' ended with state '{state_str}': {err}")
                 return []
 
             logger.debug(f"Batch Job '{job_name}' state: {state_str}. Waiting {poll_interval}s...")
             time.sleep(poll_interval)
 
-        logger.warning(f"Gemini Batch Job '{job_name}' timed out after {timeout} seconds.")
+        logger.warning(f"Batch Job '{job_name}' timed out after {timeout} seconds.")
         return []
 
     def _parse_batch_job_destination(self, job: Any) -> List[ProductRecord]:
@@ -489,9 +543,9 @@ class UniversalAIExtractor:
                         raw_json = re.sub(r'\s*```$', '', raw_json).strip()
 
                 data = json.loads(raw_json)
-                batch = GeminiExtractionBatch.model_validate(data)
+                batch = AIExtractionBatch.model_validate(data)
                 for item in batch.products:
-                    p = _gemini_item_to_product_record(item, default_vendor=batch.vendor_name)
+                    p = _ai_item_to_product_record(item, default_vendor=batch.vendor_name)
                     if p:
                         all_products.append(p)
             except Exception as e:
@@ -578,10 +632,11 @@ class UniversalAIExtractor:
         source_url: Optional[str] = None
     ) -> List[ProductRecord]:
         """
-        Uses Google Gemini to extract structured product records from crawled markdown or text.
+        Uses multi-provider AI (Google Gemini, OpenAI, Claude, Azure, AWS Bedrock, Ollama)
+        to extract structured product records from crawled markdown or text.
         Applies token optimization:
         1. Token-efficient markdown trimming (removes noise/padding)
-        2. Thinking budget cap (0 reasoning overhead on Flash models)
+        2. Thinking budget cap (0 reasoning overhead on reasoning models)
         3. Native prompt caching (system_instruction / cached_content up to 90% discount)
         """
         detected_vendor = detect_vendor_from_url_or_text(source_url or "", markdown_chunk)
@@ -621,7 +676,7 @@ class UniversalAIExtractor:
 
                 gen_config_kwargs: Dict[str, Any] = {
                     "response_mime_type": "application/json",
-                    "response_schema": GeminiExtractionBatch,
+                    "response_schema": AIExtractionBatch,
                     "temperature": 0.1,
                 }
                 if cache_name:
@@ -653,12 +708,12 @@ class UniversalAIExtractor:
                         cleaned_json = re.sub(r'\s*```$', '', cleaned_json).strip()
 
                 data = json.loads(cleaned_json)
-                batch = GeminiExtractionBatch.model_validate(data)
+                batch = AIExtractionBatch.model_validate(data)
 
-                # Convert Gemini items to database-ready ProductRecord instances
+                # Convert AI items to database-ready ProductRecord instances
                 processed_products = []
                 for item in batch.products:
-                    p = _gemini_item_to_product_record(
+                    p = _ai_item_to_product_record(
                         item,
                         default_vendor=detected_vendor,
                         source_url=source_url,
@@ -666,7 +721,7 @@ class UniversalAIExtractor:
                     if p:
                         processed_products.append(p)
 
-                logger.info(f"Gemini successfully extracted {len(processed_products)} per-stage product records.")
+                logger.info(f"{self.provider.upper()} successfully extracted {len(processed_products)} per-stage product records.")
                 return processed_products
 
             except Exception as e:
@@ -736,19 +791,39 @@ class UniversalAIExtractor:
                 + '{"vendor_name": "string", "products": [{"vendor_name": "string", "model_name": "string", "os": "string or null", "firmware": "string or null", "status": "string", "stage_date_utc": "YYYY-MM-DDTHH:MM:SSZ or null", "category": "string", "replacement": "string or null", "notes": "string or null", "bulletin_code": "string or null"}]}'
             )
 
-            raw_text = call_llm_completion(
-                provider=self.provider,
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                api_key=self.api_key,
-                api_base=self.api_base,
-                temperature=0.1,
-                json_mode=True,
-                timeout=45,
-            )
+            raw_text = ""
+            if self.client and hasattr(self.client, "chat") and hasattr(self.client.chat, "completions"):
+                try:
+                    sdk_kwargs: Dict[str, Any] = {
+                        "model": self.model_name,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        "temperature": 0.1,
+                    }
+                    if "openrouter" not in self.provider:
+                        sdk_kwargs["response_format"] = {"type": "json_object"}
+                    resp = self.client.chat.completions.create(**sdk_kwargs)
+                    if resp.choices and resp.choices[0].message.content:
+                        raw_text = resp.choices[0].message.content
+                except Exception as client_err:
+                    logger.debug(f"Direct client extraction attempt failed ({client_err}); falling back to call_llm_completion.")
+
+            if not raw_text:
+                raw_text = call_llm_completion(
+                    provider=self.provider,
+                    model=self.model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    api_key=self.api_key,
+                    api_base=self.api_base,
+                    temperature=0.1,
+                    json_mode=True,
+                    timeout=45,
+                )
 
             if not raw_text.strip():
                 logger.warning(f"Empty response from {self.provider}. Executing fallback extractor.")
@@ -764,7 +839,7 @@ class UniversalAIExtractor:
                     cleaned_json = re.sub(r'\s*```$', '', cleaned_json).strip()
 
             data = json.loads(cleaned_json)
-            batch = GeminiExtractionBatch.model_validate(data)
+            batch = AIExtractionBatch.model_validate(data)
             processed_products = []
             for item in batch.products:
                 p = _ai_item_to_product_record(

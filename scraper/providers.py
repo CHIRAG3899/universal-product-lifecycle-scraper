@@ -110,7 +110,7 @@ def resolve_provider_and_model(
 
     # Step 2: Check AI_PROVIDER from env if still auto
     if req_provider in ("auto", ""):
-        env_prov = normalize_provider_name(os.getenv("AI_PROVIDER", "auto"))
+        env_prov = normalize_provider_name(os.getenv("AI_PROVIDER", os.getenv("LLM_PROVIDER", "auto")))
         if env_prov not in ("auto", ""):
             req_provider = env_prov
 
@@ -120,25 +120,36 @@ def resolve_provider_and_model(
             req_provider = "anthropic"
         elif api_key and (api_key.startswith("sk-") or api_key.startswith("sess-")):
             req_provider = "openai"
+        elif api_key and api_key.startswith("AIza"):
+            req_provider = "gemini"
+        elif api_key and (api_key.startswith("AKIA") or api_key.startswith("ASIA")):
+            req_provider = "bedrock"
         elif api_key:
             req_provider = "gemini"
+        elif os.getenv("OPENAI_API_KEY") and not os.getenv("OPENAI_API_KEY", "").startswith("your_"):
+            req_provider = "openai"
+        elif os.getenv("ANTHROPIC_API_KEY") and not os.getenv("ANTHROPIC_API_KEY", "").startswith("your_"):
+            req_provider = "anthropic"
+        elif os.getenv("AZURE_OPENAI_API_KEY") and not os.getenv("AZURE_OPENAI_API_KEY", "").startswith("your_"):
+            req_provider = "azure"
+        elif os.getenv("AWS_ACCESS_KEY_ID") and not os.getenv("AWS_ACCESS_KEY_ID", "").startswith("your_"):
+            req_provider = "bedrock"
         elif os.getenv("GEMINI_API_KEY") and os.getenv("GEMINI_API_KEY") != "your_gemini_api_key_here":
             req_provider = "gemini"
-        elif os.getenv("OPENAI_API_KEY"):
-            req_provider = "openai"
-        elif os.getenv("ANTHROPIC_API_KEY"):
-            req_provider = "anthropic"
-        elif os.getenv("AZURE_OPENAI_API_KEY"):
-            req_provider = "azure"
-        elif os.getenv("AWS_ACCESS_KEY_ID"):
-            req_provider = "bedrock"
         else:
             req_provider = "gemini"
 
-    # Step 4: Resolve model name
+    # Step 4: Resolve model name and prevent cross-provider model mismatches
     final_model = req_model
+    # If the user passed a Gemini default model into an explicit non-Gemini provider, switch to the provider default
+    if req_provider != "gemini" and final_model and final_model.startswith("gemini-"):
+        final_model = ""
+    # If the user passed a non-Gemini model into Gemini, switch to Gemini default
+    if req_provider == "gemini" and final_model and any(final_model.startswith(p) for p in ("gpt-", "o1-", "o3-", "claude-", "azure/", "bedrock/", "ollama/")):
+        final_model = ""
+
     if not final_model:
-        env_model = (os.getenv("AI_MODEL", "")).strip()
+        env_model = (os.getenv("AI_MODEL", os.getenv("LLM_MODEL", ""))).strip()
         if env_model:
             inferred_prov = detect_provider_from_model(env_model)
             if inferred_prov == req_provider or not inferred_prov:
@@ -163,6 +174,10 @@ def resolve_provider_and_model(
             final_key = os.getenv("AZURE_OPENAI_API_KEY", "")
         elif req_provider == "bedrock":
             final_key = os.getenv("AWS_ACCESS_KEY_ID", "")
+        elif req_provider in ("ollama", "local"):
+            final_key = os.getenv("OPENAI_API_KEY", "ollama")
+        elif req_provider == "openrouter":
+            final_key = os.getenv("OPENROUTER_API_KEY", os.getenv("OPENAI_API_KEY", ""))
 
     return req_provider, final_model, final_key
 
@@ -187,7 +202,55 @@ def call_llm_completion(
     """
     prov = normalize_provider_name(provider)
 
-    # Strategy 1: Attempt LiteLLM if available
+    # Strategy 1: Native Provider SDK (OpenAI, Azure)
+    if prov in ("openai", "openrouter"):
+        try:
+            from openai import OpenAI
+
+            effective_key = api_key or os.getenv("OPENAI_API_KEY", "")
+            base = api_base or ("https://openrouter.ai/api/v1" if prov == "openrouter" else None)
+            if effective_key:
+                client = OpenAI(api_key=effective_key, base_url=base, timeout=timeout)
+                sdk_kwargs: Dict[str, Any] = {
+                    "model": model,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                }
+                if json_mode and "openrouter" not in prov:
+                    sdk_kwargs["response_format"] = {"type": "json_object"}
+                resp = client.chat.completions.create(**sdk_kwargs)
+                if resp.choices and resp.choices[0].message.content:
+                    return resp.choices[0].message.content
+        except Exception as sdk_err:
+            logger.debug(f"Native OpenAI SDK attempt failed ({sdk_err}). Trying LiteLLM / REST.")
+
+    elif prov == "azure":
+        try:
+            from openai import AzureOpenAI
+
+            effective_key = api_key or os.getenv("AZURE_OPENAI_API_KEY", "")
+            endpoint = api_base or os.getenv("AZURE_OPENAI_ENDPOINT", "")
+            version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+            if effective_key and endpoint:
+                client = AzureOpenAI(
+                    api_key=effective_key,
+                    azure_endpoint=endpoint,
+                    api_version=version,
+                    timeout=timeout,
+                )
+                resp = client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                )
+                if resp.choices and resp.choices[0].message.content:
+                    return resp.choices[0].message.content
+        except Exception as az_err:
+            logger.debug(f"Native AzureOpenAI SDK attempt failed ({az_err}). Trying LiteLLM / REST.")
+
+    # Strategy 2: Attempt LiteLLM if available
     try:
         import litellm
         litellm.suppress_debug_info = True
@@ -214,7 +277,7 @@ def call_llm_completion(
     except Exception as lite_err:
         logger.debug(f"LiteLLM completion bypassed or failed ({lite_err}). Falling back to native HTTP REST.")
 
-    # Strategy 2: Direct Native HTTP REST via requests
+    # Strategy 3: Direct Native HTTP REST via requests
     import requests
 
     headers = {"Content-Type": "application/json"}

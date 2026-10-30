@@ -159,6 +159,22 @@ class TestServerAPI(unittest.TestCase):
         self.assertTrue(payload["success"])
         self.assertIn("Successfully deleted", payload["message"])
 
+    @patch("scraper.ai_extractor.UniversalAIExtractor.test_connection")
+    def test_11_post_test_key_with_openai_provider(self, mock_test_conn):
+        """Verifies POST /api/test-key works seamlessly with OpenAI provider."""
+        mock_test_conn.return_value = (True, "OpenAI OK")
+        status, headers, data = self._post("/api/test-key", {
+            "provider": "openai",
+            "api_key": "sk-my-custom-key-12345",
+            "model": "gpt-4o-mini",
+            "save": False
+        })
+        self.assertEqual(status, 200)
+        payload = json.loads(data.decode("utf-8"))
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["provider"], "openai")
+        self.assertEqual(payload["model"], "gpt-4o-mini")
+
 
 if __name__ == "__main__":
     unittest.main()

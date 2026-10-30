@@ -296,7 +296,7 @@ class UniversalAICrawler:
         return tables
 
     def apollo_tables_to_markdown_blocks(self, tables: List[Dict[str, Any]]) -> List[str]:
-        """Converts extracted Apollo tables into structured markdown blocks optimal for Gemini."""
+        """Converts extracted Apollo tables into structured markdown blocks optimal for AI extraction."""
         blocks = []
         for i, tbl in enumerate(tables):
             lines = []
@@ -338,7 +338,7 @@ class UniversalAICrawler:
 
     async def run(self, target_url: str, chunk_size: int = 15) -> List[ProductRecord]:
         """
-        Coordinates full crawl, markdown processing, and Gemini AI multi-vendor extraction.
+        Coordinates full crawl, markdown processing, and multi-provider AI lifecycle extraction.
         """
         vendor = detect_vendor_from_url_or_text(target_url)
         logger.info(f"Detected target vendor: {vendor} from URL: {target_url}")
@@ -378,11 +378,12 @@ class UniversalAICrawler:
 
         if dom_tables:
             table_blocks = self.apollo_tables_to_markdown_blocks(dom_tables)
-            print(f"  -> Discovered {len(table_blocks)} structured lifecycle tables. Processing with Gemini AI...")
-            logger.info(f"Processing {len(table_blocks)} product lifecycle tables with Gemini AI...")
+            prov_name = getattr(self.extractor, "provider", "AI").upper()
+            print(f"  -> Discovered {len(table_blocks)} structured lifecycle tables. Processing with AI engine ({prov_name})...")
+            logger.info(f"Processing {len(table_blocks)} product lifecycle tables with AI engine ({prov_name})...")
 
-            if getattr(self.gemini, "batch_mode", False) and self.gemini.is_configured() and len(table_blocks) > chunk_size:
-                logger.info(f"Using Gemini Batch API (50% token discount) across {len(table_blocks)} tables...")
+            if getattr(self.extractor, "batch_mode", False) and self.extractor.is_configured() and len(table_blocks) > chunk_size:
+                logger.info(f"Using asynchronous Batch API (50% token cost reduction) across {len(table_blocks)} tables...")
                 batch_chunks = [
                     {
                         "markdown_chunk": "\n\n---\n\n".join(table_blocks[i:i + chunk_size]),
@@ -391,12 +392,12 @@ class UniversalAICrawler:
                     }
                     for i in range(0, len(table_blocks), chunk_size)
                 ]
-                extracted = self.gemini.extract_batch(batch_chunks)
+                extracted = self.extractor.extract_batch(batch_chunks)
                 all_products.extend(extracted)
             else:
                 for i in range(0, len(table_blocks), chunk_size):
                     chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
-                    extracted = self.gemini.extract_from_markdown(
+                    extracted = self.extractor.extract_from_markdown(
                         markdown_chunk=chunk_text,
                         context=f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
                         source_url=target_url
@@ -417,9 +418,9 @@ class UniversalAICrawler:
                         "source_url": target_url
                     })
 
-            if getattr(self.gemini, "batch_mode", False) and self.gemini.is_configured() and len(md_chunks) > 1:
-                logger.info(f"Using Gemini Batch API across {len(md_chunks)} markdown chunks...")
-                extracted = self.gemini.extract_batch(md_chunks)
+            if getattr(self.extractor, "batch_mode", False) and self.extractor.is_configured() and len(md_chunks) > 1:
+                logger.info(f"Using asynchronous Batch API across {len(md_chunks)} markdown chunks...")
+                extracted = self.extractor.extract_batch(md_chunks)
                 all_products.extend(extracted)
             else:
                 max_chunks = getattr(self, "max_markdown_chunks", 0)

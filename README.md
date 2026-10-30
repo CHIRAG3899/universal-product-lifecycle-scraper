@@ -168,17 +168,17 @@ extractor_ollama = UniversalAIExtractor(
 
 ---
 
-### 💰 Cost & Token Optimization Strategies (Google Gemini)
+### 💰 Universal Multi-Provider Token & Cost Optimization Strategies
 
 > [!TIP]
-> When operating on Google Gemini, enterprise crawling utilizes native cloud primitives to slash API token costs:
+> The platform applies cross-provider token, latency, and cost-reduction primitives across all supported AI backends (Google Gemini, OpenAI, Anthropic Claude, Azure OpenAI, AWS Bedrock, and Ollama):
 
-| Strategy | Cost Impact | How It Works | Command Flag / Env |
-|---|---|---|---|
-| **Thinking Budget Capping** | **60–80% Output Token Savings** | Caps internal reasoning tokens to 0 on Flash models (`gemini-3.5-flash-lite`, `gemini-3.5-flash`), eliminating costly chain-of-thought generation on simple schema extraction. | `--thinking-budget 0`<br/>`GEMINI_THINKING_BUDGET=0` |
-| **Native Prompt Caching** | **Up to 90% Input Token Discount** | Pre-caches invariant extraction schemas and prompts via `client.caches.create()` across repetitive site structures. | `--prompt-caching`<br/>`GEMINI_ENABLE_PROMPT_CACHING=true` |
-| **Asynchronous Batch API** | **50% Overall Token Discount** | Submits non-interactive crawls via `client.batches.create()` with `InlinedRequest`, cutting input and output pricing by half. | `--batch-mode`<br/>`GEMINI_BATCH_MODE=true` |
-| **Token-Efficient Trimming** | **15–30% Input Token Reduction** | Strips HTML comments, repetitive table dividers, and duplicate whitespaces before sending text to any LLM. | Built-in by default |
+| Strategy | Supported Providers | Cost / Token Impact | How It Works | Command Flag / Env |
+|---|---|---|---|---|
+| **Thinking Budget Capping** | Gemini, OpenAI (o1/o3), Claude | **60–80% Output Token Savings** | Caps internal reasoning tokens to 0 on deterministic schema extraction tasks, eliminating reasoning output token bills. | `--thinking-budget 0`<br/>`AI_THINKING_BUDGET=0` |
+| **Native Prompt Caching** | Gemini, Anthropic Claude, OpenAI | **Up to 90% Input Token Discount** | Automatically leverages system instructions and prompt prefix caching across repetitive vendor portal layouts and tables. | `--prompt-caching`<br/>`AI_ENABLE_PROMPT_CACHING=true` |
+| **Asynchronous Batch API** | Gemini, OpenAI Batch, Azure | **50% Overall Token Discount** | Executes non-interactive background extractions via native provider batch APIs, cutting input and output pricing by half. | `--batch-mode`<br/>`AI_BATCH_MODE=true` |
+| **Token-Efficient Trimming** | All Providers (Universal) | **15–30% Input Token Reduction** | Strips HTML comments, redundant table dividers, padding, and duplicate whitespaces before dispatching context to any AI provider. | Built-in by default |
 
 ---
 
@@ -497,8 +497,9 @@ python scripts/standalone_vendor_terminology.py --markdown
 | | | | `End of Support (EOS / EoL)` | Complete technical TAC support retired; hardware unit decommissioned. |
 
 > [!TIP]
-> **Generate / Inspect Full 140-Vendor Terminology Catalog**:
-> To generate and inspect the exhaustive status terminology across all 140 vendors:
+> **Exhaustive 140-Vendor Status Terminology Registry**:
+> The complete manufacturer-exact terminology for every single one of the 140 enterprise vendors is documented in detail in [`configs/README.md`](configs/README.md).
+> You can also generate and inspect it dynamically in terminal or markdown format:
 > ```bash
 > python scripts/generate_vendor_status_registry.py --print
 > ```
@@ -851,13 +852,13 @@ python cli.py --vendor siemens --site-crawl --max-pages 50 --max-depth 3
 # 10. Sector-specific batch execution
 python cli.py --sector OT
 
-# 11. Token cost optimization: Cap thinking budget on Flash models
+# 11. Token cost optimization: Cap reasoning thinking budget
 python cli.py --vendor siemens --thinking-budget 0
 
-# 12. Token cost optimization: Native Google Prompt Caching
+# 12. Token cost optimization: Native Provider Prompt Caching
 python cli.py --sector OT --prompt-caching
 
-# 13. Token cost optimization: Asynchronous Batch Mode (50% token discount)
+# 13. Token cost optimization: Asynchronous Batch Mode (50% cost reduction)
 python cli.py --all-vendors --batch-mode
 
 # 14. Purge temporary review artifacts

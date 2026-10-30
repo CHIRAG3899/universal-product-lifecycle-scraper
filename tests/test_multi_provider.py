@@ -185,6 +185,77 @@ class TestMultiProvider(unittest.TestCase):
             call_url = mock_post.call_args[0][0]
             self.assertIn("api.anthropic.com", call_url)
 
+    def test_auto_detection_from_key_format(self):
+        prov_ant, _, key_ant = resolve_provider_and_model(api_key="sk-ant-testkey123")
+        self.assertEqual(prov_ant, "anthropic")
+        self.assertEqual(key_ant, "sk-ant-testkey123")
+
+        prov_oai, _, key_oai = resolve_provider_and_model(api_key="sk-proj-testkey456")
+        self.assertEqual(prov_oai, "openai")
+        self.assertEqual(key_oai, "sk-proj-testkey456")
+
+        prov_gem, _, key_gem = resolve_provider_and_model(api_key="AIzaSyTestKey789")
+        self.assertEqual(prov_gem, "gemini")
+        self.assertEqual(key_gem, "AIzaSyTestKey789")
+
+        prov_bed, _, key_bed = resolve_provider_and_model(api_key="AKIAIOSFODNN7EXAMPLE")
+        self.assertEqual(prov_bed, "bedrock")
+        self.assertEqual(key_bed, "AKIAIOSFODNN7EXAMPLE")
+
+    def test_azure_and_bedrock_configuration(self):
+        ext_az = UniversalAIExtractor(
+            provider="azure",
+            api_key="azure-test-key",
+            api_base="https://myresource.openai.azure.com",
+            model_name="azure/gpt-4o",
+        )
+        self.assertEqual(ext_az.provider, "azure")
+        self.assertTrue(ext_az.is_configured())
+
+        ext_bed = UniversalAIExtractor(
+            provider="bedrock",
+            api_key="AKIAIOSFODNN7EXAMPLE",
+            model_name="bedrock/anthropic.claude-3-5-haiku-20241022-v1:0",
+        )
+        self.assertEqual(ext_bed.provider, "bedrock")
+        self.assertTrue(ext_bed.is_configured())
+
+    def test_direct_openai_client_extraction_mock(self):
+        import json
+        mock_client = MagicMock()
+        mock_choice = MagicMock()
+        mock_payload = {
+            "vendor_name": "Siemens",
+            "products": [
+                {
+                    "vendor_name": "Siemens",
+                    "model_name": "6ES7511-1AK02-0AB0",
+                    "status": "Phase-Out Product",
+                    "stage_date_utc": "2026-09-30T00:00:00Z",
+                    "category": "PLC CPU",
+                    "replacement": "6ES7511-1AL03-0AB0",
+                    "notes": "Migration bulletin available",
+                    "bulletin_code": "SIEP-2026-09",
+                }
+            ],
+        }
+        mock_choice.message.content = json.dumps(mock_payload)
+        mock_resp = MagicMock()
+        mock_resp.choices = [mock_choice]
+        mock_client.chat.completions.create.return_value = mock_resp
+
+        ext = UniversalAIExtractor(provider="openai", api_key="sk-test", model_name="gpt-4o-mini")
+        ext.client = mock_client
+
+        records = ext.extract_from_markdown(
+            markdown_chunk="Siemens 6ES7511-1AK02-0AB0 Phase-Out Product on 2026-09-30.",
+            source_url="https://sieportal.siemens.com/lifecycle",
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0].model_name, "6ES7511-1AK02-0AB0")
+        self.assertEqual(records[0].vendor_name, "Siemens")
+        mock_client.chat.completions.create.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

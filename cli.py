@@ -24,7 +24,6 @@ if sys.platform == "win32":
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from scraper.config import GEMINI_MODEL
 from scraper.crawler_comparison import get_comparison_summary
 from scraper.pipeline import LifecyclePipeline
 
@@ -52,11 +51,11 @@ async def main():
     parser.add_argument("--provider", default=None, choices=["gemini", "openai", "anthropic", "claude", "azure", "aws", "bedrock", "ollama", "local", "openrouter", "auto"], help="AI Provider: gemini, openai, anthropic, azure, bedrock, ollama (default: auto-detected from environment)")
     parser.add_argument("--api-key", default=None, help="AI Provider API key (Google Gemini, OpenAI, Anthropic Claude, Azure, AWS Bedrock)")
     parser.add_argument("--api-base", default=None, help="Custom API Base URL for local models or proxies (e.g. http://localhost:11434/v1)")
-    parser.add_argument("--model", default=GEMINI_MODEL, help="AI Model name (default: GEMINI_MODEL)")
+    parser.add_argument("--model", default=None, help="AI Model name (default: auto-resolved based on active provider)")
     parser.add_argument("--webhook-url", default=None, help="Webhook URL for enterprise alerting (Slack/Teams)")
     parser.add_argument("--compare-modes", action="store_true", help="Display deep technical comparison between Generic IDE Crawler and AI Crawler")
     parser.add_argument("--list-vendors", action="store_true", help="List all 140 supported enterprise vendors across OT, IoT, and IT")
-    parser.add_argument("--setup-key", action="store_true", help="Launch interactive Gemini API Key setup, validation, and .env configuration")
+    parser.add_argument("--setup-key", action="store_true", help="Launch interactive Universal Multi-Provider AI Key setup, validation, and .env configuration")
     parser.add_argument("--clean-artifacts", action="store_true", help="Purge all temporary run artifacts and orphaned temp files after review")
     parser.add_argument("--thinking-budget", type=int, default=None, help="Cap thinking token budget on Flash models (default: 0 to eliminate reasoning output token costs)")
     parser.add_argument("--prompt-caching", action="store_true", default=None, help="Enable Google Prompt Caching for repetitive site layouts (up to 90%% input discount)")

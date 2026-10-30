@@ -43,7 +43,7 @@ class TestCrawlerComparison(unittest.TestCase):
         summary = get_comparison_summary()
         self.assertIsInstance(summary, str)
         self.assertIn("Generic / Traditional IDE Crawler", summary)
-        self.assertIn("AI Crawler (Crawl4AI + Gemini 2.5 Flash)", summary)
+        self.assertIn("Universal AI Crawler (Crawl4AI + Multi-Provider AI)", summary)
         self.assertIn("AI Advantage", summary)
 
 

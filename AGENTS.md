@@ -253,12 +253,12 @@ python server.py 8000
 
 ### 6. Token & Cost Optimization Workflows
 ```bash
-# Cap thinking budget on Flash models (eliminates reasoning token billing)
+# Cap thinking budget (eliminates reasoning token billing on deterministic extraction)
 python cli.py --vendor siemens --thinking-budget 0
 
-# Native Prompt Caching (up to 90% input token discount on repeated context)
+# Native Prompt Caching (reduces input token cost on repeated context)
 python cli.py --sector OT --prompt-caching
 
-# Asynchronous Batch Mode (50% discount on BOTH input and output tokens for bulk runs)
+# Asynchronous Batch Mode (50% token cost reduction on bulk runs)
 python cli.py --all-vendors --batch-mode
 ```
