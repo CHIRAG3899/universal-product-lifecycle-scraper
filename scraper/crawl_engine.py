@@ -26,6 +26,57 @@ from scraper.vendors import detect_vendor_from_url_or_text
 
 logger = logging.getLogger("ai_scraper.crawler")
 
+JUNK_EXTENSIONS = {
+    ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp", ".ico", ".bmp", ".tiff",
+    ".css", ".js", ".mjs", ".json", ".map", ".xml",
+    ".zip", ".tar", ".gz", ".tgz", ".7z", ".rar", ".exe", ".bin", ".msi", ".dmg", ".pkg", ".iso",
+    ".mp4", ".mp3", ".wav", ".avi", ".mov", ".wmv", ".webm",
+    ".woff", ".woff2", ".ttf", ".eot", ".otf"
+}
+
+JUNK_PATH_PATTERNS = re.compile(
+    r'(?:/login|/signin|/sign-in|/auth/|/logout|/register|/signup|/cart|/checkout|/basket|'
+    r'/careers|/jobs|/investors|/annual-report|/privacy|/cookie|/terms-of|/gdpr|/imprint|'
+    r'/impressum|/datenschutz|/blog/|/events/|/webinars/|/podcasts/|/contact-us|/locations|'
+    r'mailto:|tel:|javascript:)',
+    re.IGNORECASE
+)
+
+
+def is_junk_url(url: str) -> bool:
+    """Checks if a URL points to non-content media/binary files or administrative/auth paths."""
+    if not url or not isinstance(url, str):
+        return True
+    u_lower = url.strip().lower()
+    if JUNK_PATH_PATTERNS.search(u_lower):
+        return True
+    # Strip query parameters for extension check
+    path = u_lower.split("?")[0].split("#")[0]
+    for ext in JUNK_EXTENSIONS:
+        if path.endswith(ext):
+            return True
+    return False
+
+
+def sanitize_crawl_url(raw_url: str) -> str:
+    """Cleans and normalizes URLs to eliminate 400 Bad Request errors from malformed input."""
+    if not raw_url or not isinstance(raw_url, str):
+        return ""
+    cleaned = raw_url.strip().strip("'\"<>(),;[]")
+    if not cleaned:
+        return ""
+    if not cleaned.startswith(("http://", "https://")):
+        cleaned = "https://" + cleaned
+    # Percent-encode invalid characters in query or path
+    try:
+        parts = urllib.parse.urlsplit(cleaned)
+        safe_path = urllib.parse.quote(urllib.parse.unquote(parts.path), safe="/:@!$&'()*+,;=-_.~")
+        safe_query = urllib.parse.quote(urllib.parse.unquote(parts.query), safe="=&:@!$'()*+,;=-_.~")
+        cleaned = urllib.parse.urlunsplit((parts.scheme, parts.netloc, safe_path, safe_query, ""))
+    except Exception:
+        pass
+    return cleaned
+
 
 class UniversalAICrawler:
     """
@@ -230,8 +281,8 @@ class UniversalAICrawler:
 
     def fetch_http_fallback(self, target_url: str) -> Dict[str, Any]:
         """
-        Lightweight, resilient HTTP fallback using requests with realistic Chrome headers,
-        automatic decompression, and retries for sites that block headless browsers or when Chromium is unavailable.
+        Lightweight, stealthy, resilient HTTP fallback with anti-bot evasion headers,
+        automatic decompression, cookie priming, and retries for sites that challenge headless browsers.
         """
         if os.getenv("SCRAPER_TEST_MODE") == "1" and any(k in target_url for k in ("fail", "missing", "example.com")):
             return {
@@ -241,10 +292,15 @@ class UniversalAICrawler:
                 "status_code": 500,
                 "extracted_content": None
             }
+        import random
+        import time
+        from urllib.parse import urlparse
+
         import requests
         from requests.adapters import HTTPAdapter
         from urllib3.util.retry import Retry
 
+        clean_url = sanitize_crawl_url(target_url) or target_url
         session = requests.Session()
         retries = Retry(
             total=3,
@@ -257,11 +313,11 @@ class UniversalAICrawler:
         session.mount("http://", adapter)
 
         headers = {
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9,ja;q=0.8,de;q=0.7",
             "Accept-Encoding": "gzip, deflate, br",
-            "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+            "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
             "Sec-Ch-Ua-Mobile": "?0",
             "Sec-Ch-Ua-Platform": '"Windows"',
             "Sec-Fetch-Dest": "document",
@@ -272,12 +328,41 @@ class UniversalAICrawler:
         }
 
         try:
-            resp = session.get(target_url, headers=headers, timeout=25, allow_redirects=True)
+            resp = session.get(clean_url, headers=headers, timeout=25, allow_redirects=True)
             status = resp.status_code
+
+            # If challenged by Cloudflare/Akamai (403), attempt cookie-priming from root
+            if status == 403:
+                parsed = urlparse(clean_url)
+                origin = f"{parsed.scheme}://{parsed.netloc}/"
+                try:
+                    logger.debug(f"Priming session cookies on origin {origin} to bypass anti-bot on {clean_url}...")
+                    session.get(origin, headers=headers, timeout=10)
+                    time.sleep(random.uniform(0.5, 1.2))
+                    retry_headers = dict(headers)
+                    retry_headers["Referer"] = origin
+                    retry_headers["Sec-Fetch-Site"] = "same-origin"
+                    resp = session.get(clean_url, headers=retry_headers, timeout=20, allow_redirects=True)
+                    status = resp.status_code
+                except Exception as prime_err:
+                    logger.debug(f"Origin cookie priming notice: {prime_err}")
+
+            # If still 403, attempt mobile user agent pass-through
+            if status == 403:
+                mobile_headers = dict(headers)
+                mobile_headers["User-Agent"] = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
+                mobile_headers["Sec-Ch-Ua-Mobile"] = "?1"
+                mobile_headers["Sec-Ch-Ua-Platform"] = '"Android"'
+                try:
+                    resp = session.get(clean_url, headers=mobile_headers, timeout=20, allow_redirects=True)
+                    status = resp.status_code
+                except Exception:
+                    pass
+
             if status >= 400:
-                logger.warning(f"Resilient HTTP fallback got HTTP {status} for {target_url}")
+                logger.warning(f"Resilient HTTP fallback got HTTP {status} for {clean_url}")
                 return {
-                    "url": target_url,
+                    "url": clean_url,
                     "markdown": "",
                     "html": resp.text if resp.text else "",
                     "status_code": status,
@@ -286,22 +371,22 @@ class UniversalAICrawler:
 
             html_text = resp.text
             soup = BeautifulSoup(html_text, "html.parser")
-            for s in soup(["script", "style", "nav", "footer", "header", "noscript", "svg"]):
+            for s in soup(["script", "style", "nav", "footer", "header", "noscript", "svg", "aside"]):
                 s.decompose()
             text = soup.get_text(separator="\n", strip=True)
 
-            logger.info(f"Resilient HTTP fallback succeeded for {target_url} ({len(html_text)} bytes, {len(text)} chars text).")
+            logger.info(f"Resilient HTTP fallback succeeded for {clean_url} ({len(html_text)} bytes, {len(text)} chars text).")
             return {
-                "url": target_url,
+                "url": clean_url,
                 "markdown": text,
                 "html": html_text,
                 "status_code": status,
                 "extracted_content": None
             }
         except Exception as fallback_err:
-            logger.debug(f"Resilient HTTP fallback unavailable for {target_url}: {fallback_err}")
+            logger.debug(f"Resilient HTTP fallback unavailable for {clean_url}: {fallback_err}")
             return {
-                "url": target_url,
+                "url": clean_url,
                 "markdown": "",
                 "html": "",
                 "status_code": 500,
@@ -472,21 +557,55 @@ class UniversalAICrawler:
             table_blocks = self.apollo_tables_to_markdown_blocks(dom_tables)
             prov_name = getattr(self.extractor, "provider", "AI").upper()
             logger.info(f"Discovered {len(table_blocks)} structured lifecycle tables on {target_url} ({prov_name}).")
-            for i in range(0, len(table_blocks), chunk_size):
-                chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
-                chunks_to_extract.append({
-                    "markdown_chunk": chunk_text,
-                    "context": f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
-                    "source_url": target_url
-                })
+
+            # Direct Zero-Token Table Extraction: Deterministic rule extraction skips LLM billing
+            table_md = "\n\n---\n\n".join(table_blocks)
+            try:
+                table_products = self.extractor.fallback_rule_based_extraction(
+                    table_md,
+                    source_url=target_url,
+                    default_vendor=vendor
+                )
+                if table_products:
+                    logger.info(f"[ZERO-TOKEN EXTRACTION] Directly extracted {len(table_products)} structured products from DOM tables without LLM billing.")
+                    pre_extracted.extend(table_products)
+            except Exception as rule_err:
+                logger.debug(f"Direct rule extraction notice: {rule_err}")
+
+            # If rule-based extraction didn't yield records (complex unstructured layout), pass to LLM
+            if not pre_extracted:
+                for i in range(0, len(table_blocks), chunk_size):
+                    chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
+                    chunks_to_extract.append({
+                        "markdown_chunk": chunk_text,
+                        "context": f"{vendor} Lifecycle EOL - Section {i//chunk_size + 1}",
+                        "source_url": target_url
+                    })
 
         # 3. Process crawled body markdown (if no tables present or to capture unlisted items)
         if markdown and (not dom_tables or len(pre_extracted) == 0):
-            lines = markdown.split("\n")
-            step = 800
-            for i in range(0, len(lines), step):
-                chunk_md = "\n".join(lines[i:i + step])
-                if len(chunk_md.strip()) >= 50:
+            filtered_lines = []
+            if len(markdown) < 2000:
+                filtered_lines = [line_str.strip() for line_str in markdown.split("\n") if line_str.strip()]
+            else:
+                lifecycle_signal = re.compile(
+                    r'(?:lifecycle|eol|ltb|eos|eosl|ldos|eoa|discontinu|obsolesc|phase[-_\s]?out|phaseout|'
+                    r'last[-_\s]?time[-_\s]?buy|final[-_\s]?order|last[-_\s]?order|repair|support|service|'
+                    r'abk[uü]ndigung|auslauf|生産終了|製造中止|販売終了|保守終了|修理対応|\d{4}[-/]\d{1,2}|'
+                    r'\b(?:19|20)\d{2}\b|\||\-|\*)',
+                    re.IGNORECASE
+                )
+                for line in markdown.split("\n"):
+                    l_str = line.strip()
+                    if not l_str or len(l_str) < 3:
+                        continue
+                    if l_str.startswith("#") or lifecycle_signal.search(l_str):
+                        filtered_lines.append(l_str)
+
+            step = 300
+            for i in range(0, len(filtered_lines), step):
+                chunk_md = "\n".join(filtered_lines[i:i + step])
+                if len(chunk_md.strip()) >= 15 and re.search(r'[A-Za-z0-9]{2,}', chunk_md):
                     chunks_to_extract.append({
                         "markdown_chunk": chunk_md,
                         "context": f"{vendor} Discontinued Products Catalog - Section {i//step + 1}",
@@ -839,7 +958,10 @@ class UniversalAICrawler:
         queued_urls: set = set()
 
         def add_to_queue(url: str, depth: int, priority: int = 2):
-            clean_url = self.run_cache.normalize_url(url)
+            sanitized = sanitize_crawl_url(url)
+            if not sanitized or is_junk_url(sanitized):
+                return
+            clean_url = self.run_cache.normalize_url(sanitized)
             if not clean_url:
                 return
 

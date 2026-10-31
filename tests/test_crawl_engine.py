@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 from scraper.ai_extractor import GeminiExtractor
-from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler
+from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler, is_junk_url, sanitize_crawl_url
 from scraper.models import ProductRecord
 
 
@@ -369,6 +369,91 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
         # Verify both lifecycle hub and product category URLs were queued and crawled
         has_category_link = any("/products/" in u for u in crawled_urls)
         self.assertTrue(has_category_link, "Crawler must discover and crawl general product category trees")
+
+    def test_12_url_sanitization_and_junk_filter(self):
+        """Verifies url sanitization removes malformed characters and junk filter drops media/non-lifecycle endpoints."""
+        # Sanitization tests
+        self.assertEqual(sanitize_crawl_url(' "https://example.com/path" '), "https://example.com/path")
+        self.assertEqual(sanitize_crawl_url('<https://example.com/path>'), "https://example.com/path")
+        self.assertEqual(sanitize_crawl_url('https://example.com/path,'), "https://example.com/path")
+        self.assertEqual(sanitize_crawl_url(''), '')
+
+        # Percent-encodes unicode in path
+        encoded = sanitize_crawl_url('https://example.com/support/生産終了/')
+        self.assertIn('%E7%94%9F%E7%94%A3', encoded)
+
+        # Junk URL filter tests
+        junk_urls = [
+            "https://example.com/image.png",
+            "https://example.com/photo.jpg",
+            "https://example.com/vector.svg",
+            "https://example.com/style.css",
+            "https://example.com/bundle.js",
+            "https://example.com/font.woff2",
+            "https://example.com/archive.zip",
+            "https://example.com/installer.exe",
+            "https://example.com/video.mp4",
+            "https://example.com/user/login",
+            "https://example.com/cart",
+            "https://example.com/checkout",
+            "https://example.com/careers/jobs",
+            "mailto:support@example.com",
+            "tel:+1234567890",
+            "javascript:void(0)"
+        ]
+        for ju in junk_urls:
+            with self.subTest(ju=ju):
+                self.assertTrue(is_junk_url(ju), f"Should recognize as junk URL: {ju}")
+
+        valid_urls = [
+            "https://example.com/support/discontinued/",
+            "https://example.com/products/lifecycle",
+            "https://example.com/fa/support/eol.html",
+            "https://example.com/notices/bulletin.pdf"
+        ]
+        for vu in valid_urls:
+            with self.subTest(vu=vu):
+                self.assertFalse(is_junk_url(vu), f"Should NOT recognize as junk URL: {vu}")
+
+    def test_13_zero_token_direct_table_extraction(self):
+        """Verifies that DOM tables with structured records are extracted directly without LLM billing."""
+        html_table = """
+        <html>
+        <body>
+          <table>
+            <thead>
+              <tr><th>Model Number</th><th>Status</th><th>Discontinuation Date</th><th>Replacement</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>CJ2M-CPU33</td><td>Discontinued</td><td>2023-03-31</td><td>NX102-9000</td></tr>
+              <tr><td>CJ1W-NC413</td><td>End of Life</td><td>2022-09-30</td><td>NX-EC0212</td></tr>
+            </tbody>
+          </table>
+        </body>
+        </html>
+        """
+        crawl_data = {
+            "url": "https://ia.omron.co.jp/support/discontinued/",
+            "html": html_table,
+            "markdown": "Discontinued parts table",
+            "status_code": 200
+        }
+        # In this test, mock_gemini should NOT be called for markdown extraction if direct table extraction succeeds
+        self.crawler.extractor.fallback_rule_based_extraction = MagicMock(return_value=[
+            ProductRecord(vendor_name="Omron", model_name="CJ2M-CPU33", status="Discontinued", stage_date_utc="2023-03-31T00:00:00Z"),
+            ProductRecord(vendor_name="Omron", model_name="CJ1W-NC413", status="End of Life (EOL)", stage_date_utc="2022-09-30T00:00:00Z")
+        ])
+
+        pre_extracted, chunks = self.crawler.prepare_page_chunks(
+            "https://ia.omron.co.jp/support/discontinued/",
+            crawl_data,
+            vendor="Omron"
+        )
+        self.assertEqual(len(pre_extracted), 2)
+        self.assertEqual(pre_extracted[0].model_name, "CJ2M-CPU33")
+        self.assertEqual(pre_extracted[1].model_name, "CJ1W-NC413")
+        # Chunks for LLM should be empty because direct zero-token extraction resolved the table!
+        self.assertEqual(len(chunks), 0)
 
 
 if __name__ == "__main__":

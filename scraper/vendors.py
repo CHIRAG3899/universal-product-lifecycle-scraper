@@ -78,16 +78,28 @@ STAGE_TRANSLATIONS: Dict[str, str] = {
     "einstellung der reparatur": "End of Service (EOS)",
     "ersatzteilende": "End of Service (EOS)",
     "lieferstopp": "Discontinued",
+    "nachfolgeprodukt": "Replacement Model",
+    "ersatztyp": "Replacement Model",
+    "abkündigungstermin": "Discontinuation Date",
+    "serviceende": "End of Service (EOS)",
 
-    # Japanese (Mitsubishi, Omron, Keyence, Fanuc, Yaskawa)
+    # Japanese (Mitsubishi, Omron, Keyence, Fanuc, Yaskawa, JTEKT, Fuji Electric)
     "生産終了": "End of Life (EOL)",
     "販売終了": "End of Life (EOL)",
     "製造中止": "Discontinued",
     "最終受注": "Last Time Buy (LTB)",
     "最終注文": "Last Time Buy (LTB)",
+    "最終出荷": "Last Time Ship (LTS)",
     "保守終了": "End of Service (EOS)",
     "修理対応終了": "End of Service (EOS)",
+    "修理対応期間": "Maintenance / Repair Period",
+    "修理対応終了予定": "Scheduled End of Support",
+    "補修用性能部品保有期間終了": "End of Spare Parts Retention",
     "補修部品供給終了": "End of Service (EOS)",
+    "代替品": "Replacement Model",
+    "代替推奨品": "Recommended Replacement",
+    "後継機種": "Successor Model",
+    "現行品": "Active / In Production",
 
     # Swedish / Nordic (Mitsubishi Scandinavian branch, ABB)
     "utgående produkt": "End of Life (EOL)",
@@ -100,18 +112,105 @@ STAGE_TRANSLATIONS: Dict[str, str] = {
     # French (Schneider Electric)
     "fin de vie": "End of Life (EOL)",
     "arrêt de commercialisation": "End of Life (EOL)",
+    "fin de commercialisation": "End of Sale",
     "dernière commande": "Last Time Buy (LTB)",
     "fin de support": "End of Service (EOS)",
     "fin de maintenance": "End of Service (EOS)",
     "obsolescence": "End of Life (EOL)",
+    "produit de remplacement": "Replacement Model",
+    "substitut": "Replacement Model",
+
+    # Chinese (Delta Electronics, Inovance, Moxa, Advantech)
+    "停产": "Discontinued",
+    "停售": "End of Sale",
+    "停产公告": "End of Life (EOL)",
+    "最后订购": "Last Time Buy (LTB)",
+    "最后订购日": "Last Time Buy (LTB)",
+    "最后发货日": "Last Time Ship (LTS)",
+    "终止服务": "End of Service (EOS)",
+    "终止支持": "End of Support",
+    "替代型号": "Replacement Model",
+    "推荐替代": "Recommended Replacement",
 
     # Spanish / Italian
     "fine vita": "End of Life (EOL)",
+    "fuori produzione": "Discontinued",
     "fine servizio": "End of Service (EOS)",
+    "fine supporto": "End of Support",
     "fin de vida": "End of Life (EOL)",
+    "fin de comercialización": "End of Sale",
     "última compra": "Last Time Buy (LTB)",
-    "fin de soporte": "End of Service (EOS)"
+    "fin de soporte": "End of Support",
+    "fin de servicio": "End of Service (EOS)",
+    "producto de reemplazo": "Replacement Model",
+
+    # Korean (LS Electric, Hanwha)
+    "단종": "Discontinued",
+    "생산종료": "End of Life (EOL)",
+    "판매종료": "End of Sale",
+    "지원종료": "End of Support",
+    "최종주문": "Last Time Buy (LTB)",
+    "대체모델": "Replacement Model"
 }
+
+# Regional equipment classification and technical term translation map
+REGIONAL_CATEGORY_MAP: Dict[str, str] = {
+    # Japanese
+    "プログラマブルコントローラ": "Programmable Logic Controller (PLC)",
+    "プログラマブル表示器": "HMI (Human-Machine Interface)",
+    "表示器": "HMI (Human-Machine Interface)",
+    "タッチパネル": "Touch Panel / HMI",
+    "インバータ": "Inverter / Drive",
+    "サーボモータ": "Servo Motor",
+    "サーボアンプ": "Servo Amplifier / Drive",
+    "産業用pc": "Industrial PC (IPC)",
+    "産業用ロボット": "Industrial Robot",
+    "センサ": "Sensor",
+    "スイッチ": "Switch",
+    "温度調節器": "Temperature Controller",
+    "電源": "Power Supply",
+    # German
+    "speicherprogrammierbare steuerung": "Programmable Logic Controller (PLC)",
+    "bedien- und beobachtungssysteme": "HMI (Human-Machine Interface)",
+    "bediengerät": "HMI (Human-Machine Interface)",
+    "frequenzumrichter": "Inverter / Drive",
+    "servoverstärker": "Servo Amplifier / Drive",
+    "industrie-pc": "Industrial PC (IPC)",
+    "schaltgeräte": "Switchgear",
+    "sensoren": "Sensor",
+    "stromversorgungen": "Power Supply",
+    # French
+    "automate programmable industriel": "Programmable Logic Controller (PLC)",
+    "interface homme-machine": "HMI (Human-Machine Interface)",
+    "variateur de vitesse": "Inverter / Drive",
+    "servovariateur": "Servo Drive",
+    "pc industriel": "Industrial PC (IPC)",
+    "capteurs": "Sensor",
+    "alimentation": "Power Supply",
+    # Chinese
+    "可编程逻辑控制器": "Programmable Logic Controller (PLC)",
+    "人机界面": "HMI (Human-Machine Interface)",
+    "触摸屏": "Touch Panel / HMI",
+    "变频器": "Inverter / Drive",
+    "伺服驱动器": "Servo Drive",
+    "工控机": "Industrial PC (IPC)",
+    "工业机器人": "Industrial Robot",
+    "传感器": "Sensor",
+    "交换机": "Industrial Switch",
+    "电源": "Power Supply"
+}
+
+
+def translate_regional_text(text: Optional[str]) -> str:
+    """Translates regional category names, status descriptions, or notes to clean English."""
+    if not text or not isinstance(text, str):
+        return ""
+    cleaned = text.strip()
+    c_lower = cleaned.lower()
+    for reg_key, en_val in REGIONAL_CATEGORY_MAP.items():
+        if reg_key.lower() in c_lower:
+            return en_val
+    return cleaned
 
 # Known Major Industrial Vendors (Defaults removed per specification: OS and Firmware must be dynamically found)
 VENDOR_PROFILES: Dict[str, Dict[str, Any]] = {

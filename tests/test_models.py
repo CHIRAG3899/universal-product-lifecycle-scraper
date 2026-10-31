@@ -87,7 +87,35 @@ class TestModels(unittest.TestCase):
             "Download document EOL-123",
             "[GT25-WLAN](https://example.com/gt25)",
             "https://se-fa.mitsubishielectric.com/fa/se_en",
-            "http://example.com/notice.pdf"
+            "http://example.com/notice.pdf",
+            "This product has been discontinued, please contact your sales representative",
+            "For further information regarding replacement units please refer to support",
+            "Model Number",
+            "Product Name",
+            "Part No.",
+            "Replacement Model",
+            "Inhaltsverzeichnis",
+            "目次",
+            "お問い合わせ",
+            "Table des matières",
+            "Skip to main content",
+            "Shopping Cart",
+            "View Details",
+            # Status words masquerading as models
+            "Discontinued",
+            "End of Life",
+            "End of Sale",
+            "Phase-Out",
+            "Obsolete",
+            "Last Time Buy",
+            "生産終了",
+            "販売終了",
+            "Produktabkündigung",
+            # Pure dates masquerading as models
+            "2023-03-31",
+            "2022/09/30",
+            "15-May-2024",
+            "2024"
         ]
         for item in bad_inputs:
             with self.subTest(item=item):

@@ -10,7 +10,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.vendors import detect_vendor_from_url_or_text, normalize_stage_name
+from scraper.vendors import detect_vendor_from_url_or_text, normalize_stage_name, translate_regional_text
 
 
 class TestVendors(unittest.TestCase):
@@ -91,6 +91,38 @@ class TestVendors(unittest.TestCase):
         for raw, expected in cases:
             with self.subTest(raw=raw):
                 self.assertEqual(normalize_stage_name(raw), expected)
+
+    def test_chinese_and_korean_normalization(self):
+        cases = [
+            ("停产", "Discontinued"),
+            ("停售", "End of Sale"),
+            ("停产公告", "End of Life (EOL)"),
+            ("最后订购", "Last Time Buy (LTB)"),
+            ("终止服务", "End of Service (EOS)"),
+            ("단종", "Discontinued"),
+            ("생산종료", "End of Life (EOL)"),
+            ("판매종료", "End of Sale"),
+            ("최종주문", "Last Time Buy (LTB)")
+        ]
+        for raw, expected in cases:
+            with self.subTest(raw=raw):
+                self.assertEqual(normalize_stage_name(raw), expected)
+
+    def test_regional_category_translation(self):
+        cases = [
+            ("プログラマブルコントローラ", "Programmable Logic Controller (PLC)"),
+            ("インバータ", "Inverter / Drive"),
+            ("産業用pc", "Industrial PC (IPC)"),
+            ("Speicherprogrammierbare Steuerung", "Programmable Logic Controller (PLC)"),
+            ("Frequenzumrichter", "Inverter / Drive"),
+            ("Automate programmable industriel", "Programmable Logic Controller (PLC)"),
+            ("可编程逻辑控制器", "Programmable Logic Controller (PLC)"),
+            ("变频器", "Inverter / Drive"),
+            ("Standard English Unchanged", "Standard English Unchanged")
+        ]
+        for raw, expected in cases:
+            with self.subTest(raw=raw):
+                self.assertEqual(translate_regional_text(raw), expected)
 
     def test_stage_normalization_edge_cases(self):
         # Empty and None values

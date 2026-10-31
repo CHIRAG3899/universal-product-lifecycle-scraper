@@ -54,15 +54,72 @@ COOKIE_AND_POLICY_SUBSTRINGS = {
     "performance cookies", "cookie notice", "manage consent preferences", "consent preferences",
     "strictly necessary cookies", "functional cookies", "targeting cookies", "cookies settings",
     "cookie policy", "cookie", "privacy policy", "terms of use", "terms and conditions",
-    "all rights reserved"
+    "terms of service", "all rights reserved", "privacy statement", "legal notice",
+    "cookie preferences", "manage cookies", "copyright notice"
 }
 
 EXACT_DISALLOWED_MODEL_TOKENS = {
+    # Geographic / Regional
     "global", "americas", "asia-pacific", "europe", "europe, cis, middle east & africa",
-    "follow us", "about", "sustainability", "news", "contact us", "site map", "disclaimer", "copyright",
-    "search", "home", "products", "solutions", "support", "downloads", "training",
-    "main series", "complete series", "expansion units", "all models", "n/a", "none",
-    "series", "model", "models", "part number", "part numbers", "product", "item", "description"
+    "north america", "latin america", "japan", "china", "germany", "france", "united states",
+    # Website Navigation / Web Chrome
+    "follow us", "about", "about us", "sustainability", "news", "newsroom", "contact us",
+    "site map", "sitemap", "disclaimer", "copyright", "search", "home", "products", "all products",
+    "solutions", "support", "downloads", "training", "documentation", "resources", "overview",
+    "specifications", "features", "details", "comments", "notes", "action", "status", "stage",
+    "category", "family", "series", "main series", "complete series", "expansion units",
+    "all models", "n/a", "none", "null", "nan", "unknown", "tbd", "undefined",
+    "model", "models", "part number", "part numbers", "product", "item", "description",
+    "catalog number", "order number", "order code", "article number", "type code",
+    "model number", "model name", "product name", "product number", "part no", "part no.",
+    "effective date", "discontinuation date", "end of life date", "last time buy date",
+    "end of support date", "end of service date", "replacement model", "replacement part",
+    "recommended replacement", "successor", "successor model", "migration path",
+    "skip to content", "skip to main content", "menu", "back to top", "read more", "learn more",
+    "view details", "see all", "click here", "show more", "load more", "page not found",
+    "shopping cart", "cart", "checkout", "sign in", "log in", "register", "my account",
+    "feedback", "newsletter", "subscribe", "share", "print",
+    # Multilingual UI tokens (Japanese, German, French, Chinese)
+    "目次", "お問い合わせ", "製品情報", "サイト利用規約", "個人情報保護方針", "サイトマップ", "詳細はこちら",
+    "ダウンロード", "サポート", "ホーム", "製品", "形名", "形式", "型番", "品名", "生産終了日",
+    "修理対応終了日", "代替品", "代替推奨品", "標準価格", "納期", "備考", "仕様", "概要",
+    "inhaltsverzeichnis", "kontakt", "kontaktieren sie uns", "impressum", "datenschutz",
+    "weitere informationen", "startseite", "produkte", "artikelnummer", "bestellnummer",
+    "nachfolgeprodukt", "auslaufdatum", "ersatzteil", "hinweise", "technische daten",
+    "table des matières", "contactez-nous", "mentions légales", "politique de confidentialité",
+    "plan du site", "en savoir plus", "téléchargements", "accueil", "référence",
+    "produit de remplacement", "date d'arrêt", "remarques", "caractéristiques",
+    "目录", "联系我们", "隐私政策", "网站地图", "了解更多", "下载中心", "首页", "产品型号",
+    "订货号", "停产日期", "替代型号", "产品概述", "技术规格"
+}
+
+CONVERSATIONAL_STOP_WORDS = {
+    "this", "that", "these", "those", "have", "been", "will", "would", "could", "should",
+    "please", "contact", "refer", "customer", "support", "service", "available", "subject",
+    "change", "without", "notice", "information", "regarding", "following", "replaced",
+    "discontinued", "successor", "representative", "distributor", "further", "assistance",
+    "bulletin", "technical", "announcement", "effective", "immediately"
+}
+
+LIFECYCLE_STATUS_TOKENS = {
+    "discontinued", "discontinued model", "discontinued product",
+    "end of life", "end of life (eol)", "eol",
+    "end of sale", "end of sales", "end of service", "end of service (eos)", "eos",
+    "end of service life", "end of service life (eosl)", "eosl",
+    "end of support", "last date of support", "ldos",
+    "end of availability", "end of availability (eoa)", "eoa",
+    "last time buy", "last time buy (ltb)", "ltb", "last order date", "final order date",
+    "phase out", "phase-out", "phaseout", "phase-out product", "phase-out announced",
+    "obsolete", "active", "active mature", "classic", "limited", "stop shipment",
+    "product cancellation", "product discontinuation", "announced discontinuation",
+    "delivery release", "maintenance only", "in production", "active / in production",
+    # Multilingual status terms
+    "生産終了", "販売終了", "製造中止", "最終受注", "最終注文", "最終出荷", "修理対応終了", "保守終了",
+    "auslauftyp", "abkündigung", "produktabkündigung", "lieferstopp", "serviceende",
+    "fin de vie", "fin de support", "fin de commercialisation", "arrêt de commercialisation",
+    "utgående produkt", "sista orderdatum", "service upphör",
+    "停产", "停售", "停产公告", "终止服务", "终止支持", "最后订购",
+    "단종", "생산종료", "판매종료", "지원종료"
 }
 
 
@@ -107,8 +164,25 @@ def is_valid_product_model(name: Optional[str]) -> bool:
             return False
     if c_lower in EXACT_DISALLOWED_MODEL_TOKENS:
         return False
+    # Reject lifecycle statuses masquerading as product models
+    if c_lower in LIFECYCLE_STATUS_TOKENS:
+        return False
+    # Reject pure date strings (e.g. 2023-03-31, 2023/03/31, 31.03.2023, 15-May-2024, or 4-digit years)
+    if re.match(r'^(?:(?:19|20)\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|\d{1,2}[-/\s]+[A-Za-z]{3,9}[-/\s]+(?:19|20)\d{2}|(?:19|20)\d{2}[-/.]\d{1,2})$', check_str):
+        return False
+    if re.match(r'^(?:19|20)\d{2}$', check_str):
+        return False
     # Reject strings that start with conversational / instructional text
-    if any(c_lower.startswith(p) for p in ("consult ", "see ", "official ", "click ", "read ", "download ", "view ", "affects ")):
+    if any(c_lower.startswith(p) for p in ("consult ", "see ", "official ", "click ", "read ", "download ", "view ", "affects ", "please ", "refer ")):
+        return False
+
+    # Reject strings with conversational sentence structure (3+ conversational stop words)
+    tokens = set(re.findall(r'\b[a-z]{3,}\b', c_lower))
+    if len(tokens.intersection(CONVERSATIONAL_STOP_WORDS)) >= 3:
+        return False
+
+    # Reject overly long strings without digits (prose or narrative headings)
+    if len(check_str) > 50 and not re.search(r'\d', check_str) and not is_well_known_os_or_software(model_name=check_str):
         return False
 
     # Must contain at least one alphanumeric character

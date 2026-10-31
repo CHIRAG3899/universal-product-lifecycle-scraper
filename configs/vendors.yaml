@@ -25,7 +25,12 @@ vendors:
     - mitsubishielectric.com
     - contentstack.com
     - mitsubishielectricfa.com
+    - mitsubishielectric.co.jp
     entry_points:
+    - name: Mitsubishi_Japan_Product_Lifecycle
+      url: https://www.mitsubishielectric.co.jp/fa/support/product-life-cycle/
+      region: Japan
+      crawler_type: dom_table
     - name: Europe_FA_EOL_Portal
       url: https://se-fa.mitsubishielectric.com/fa/se_en/support/product-life-cycle-stage-eol
       region: Europe
@@ -75,6 +80,10 @@ vendors:
     - sieportal.siemens.com
     - industry.siemens.com
     entry_points:
+    - name: Siemens_German_Product_Support
+      url: https://support.industry.siemens.com/cs/de/de/ps
+      region: Germany
+      crawler_type: dom_table
     - name: Siemens_SiePortal_Lifecycle
       url: https://sieportal.siemens.com/en-ww/support/product-lifecycle
       region: Global
@@ -117,6 +126,10 @@ vendors:
     - schneider-electric.com
     - apc.com
     entry_points:
+    - name: Schneider_Electric_France_EOL
+      url: https://www.se.com/fr/fr/work/support/resources-and-tools/product-end-of-life/
+      region: France
+      crawler_type: dom_table
     - name: Schneider_Product_End_of_Life_Hub
       url: https://www.se.com/ww/en/work/support/resources-and-tools/product-end-of-life/
       region: Global
@@ -190,7 +203,13 @@ vendors:
     allowed_domains:
     - omron.com
     - ia.omron.com
+    - ia.omron.co.jp
+    - omron.co.jp
     entry_points:
+    - name: Omron_Japan_Discontinued_Portal
+      url: https://ia.omron.co.jp/support/discontinued/
+      region: Japan
+      crawler_type: dom_table
     - name: Omron_Discontinued_Products_Hub
       url: https://ia.omron.com/support/discontinued/
       region: Global
@@ -287,6 +306,10 @@ vendors:
     allowed_domains:
     - beckhoff.com
     entry_points:
+    - name: Beckhoff_Germany_Abkuendigungen
+      url: https://www.beckhoff.com/de-de/support/abkuendigungen/
+      region: Germany
+      crawler_type: dom_table
     - name: Beckhoff_Discontinued_Products
       url: https://www.beckhoff.com/en-en/products/discontinued-products/
       region: Global
@@ -311,6 +334,10 @@ vendors:
     allowed_domains:
     - phoenixcontact.com
     entry_points:
+    - name: Phoenix_Contact_Germany_Products
+      url: https://www.phoenixcontact.com/de-de/produkte
+      region: Germany
+      crawler_type: dom_table
     - name: Phoenix_Contact_Discontinued_Products
       url: https://www.phoenixcontact.com/en-us/products/discontinued-products
       region: Global
@@ -351,7 +378,12 @@ vendors:
     allowed_domains:
     - fanuc.com
     - fanucamerica.com
+    - fanuc.co.jp
     entry_points:
+    - name: Fanuc_Japan_Service_Portal
+      url: https://www.fanuc.co.jp/ja/service/
+      region: Japan
+      crawler_type: dom_table
     - name: FANUC_CNC_Obsolete_Parts_Repair
       url: https://www.fanucamerica.com/services/cnc-repair/obsolete-parts
       region: Global
@@ -371,7 +403,13 @@ vendors:
     website: https://www.yaskawa.com
     allowed_domains:
     - yaskawa.com
+    - e-mechatronics.com
+    - yaskawa.co.jp
     entry_points:
+    - name: Yaskawa_Japan_Discon_Portal
+      url: https://www.e-mechatronics.com/support/discon/
+      region: Japan
+      crawler_type: dom_table
     - name: Yaskawa_AC_Drives_Legacy_Products
       url: https://www.yaskawa.com/products/drives/industrial-ac-drives/legacy-drives
       region: Global
@@ -444,6 +482,10 @@ vendors:
     - keyence.com
     - keyence.co.jp
     entry_points:
+    - name: Keyence_Japan_Discontinued
+      url: https://www.keyence.co.jp/support/user/discontinued/
+      region: Japan
+      crawler_type: dom_table
     - name: Keyence_Discontinued_Products
       url: https://www.keyence.com/support/user/discontinue/
       region: Global

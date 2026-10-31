@@ -55,6 +55,8 @@ async def main():
     parser.add_argument("--model", default=None, help="AI Model name (default: auto-resolved based on active provider)")
     parser.add_argument("--webhook-url", default=None, help="Webhook URL for enterprise alerting (Slack/Teams)")
     parser.add_argument("--compare-modes", action="store_true", help="Display deep technical comparison between Generic IDE Crawler and AI Crawler")
+    parser.add_argument("--compare-csv", nargs="+", default=None, metavar=("BASELINE", "CANDIDATE"), help="Compare legacy scraper CSV with candidate CSV (e.g. --compare-csv legacy.csv [output/all_vendors_lifecycle.csv])")
+    parser.add_argument("--benchmark", action="store_true", help="Run head-to-head live benchmark between legacy scraper and Crawl4AI")
     parser.add_argument("--list-vendors", action="store_true", help="List all 140 supported enterprise vendors across OT, IoT, and IT")
     parser.add_argument("--setup-key", action="store_true", help="Launch interactive Universal Multi-Provider AI Key setup, validation, and .env configuration")
     parser.add_argument("--clean-artifacts", action="store_true", help="Purge all temporary run artifacts and orphaned temp files after review")
@@ -107,6 +109,33 @@ async def main():
         print("\n=== TECHNICAL COMPARISON: GENERIC IDE CRAWLER vs. ENTERPRISE AI CRAWLER ===")
         print(get_comparison_summary())
         print("\n=================================================================================\n")
+        return
+
+    if args.compare_csv:
+        from scraper.crawler_comparison import compare_csv_datasets, format_dataset_comparison_markdown
+        baseline_file = args.compare_csv[0]
+        candidate_file = args.compare_csv[1] if len(args.compare_csv) > 1 else str(Path(__file__).resolve().parent / "output" / "all_vendors_lifecycle.csv")
+        summary = compare_csv_datasets(baseline_file, candidate_file)
+        print("\n" + format_dataset_comparison_markdown(summary) + "\n")
+        return
+
+    if args.benchmark:
+        from scraper.crawler_comparison import benchmark_url_head_to_head
+        test_url = args.url or "https://ia.omron.co.jp/support/discontinued/"
+        v_name = args.vendor or "Generic"
+        res = benchmark_url_head_to_head(test_url, vendor=v_name)
+        print("\n" + "-" * 75)
+        print("  HEAD-TO-HEAD BENCHMARK RESULTS")
+        print("-" * 75)
+        print(f"Target URL:         {res['target_url']}")
+        print(f"Legacy Latency:     {res['legacy_scraper']['elapsed_ms']} ms")
+        print(f"AI Latency:         {res['crawl4ai_universal_ai']['elapsed_ms']} ms")
+        print(f"Legacy Records:     {res['legacy_scraper']['records_extracted']} models")
+        print(f"AI Records:         {res['crawl4ai_universal_ai']['records_extracted']} models")
+        print(f"Zero-Token Bypass:  {res['crawl4ai_universal_ai']['zero_token_direct_extracted']} records parsed directly without LLM tokens")
+        print(f"Tokens Saved:       ~{res['crawl4ai_universal_ai']['approx_tokens_saved']:,} tokens (${res['crawl4ai_universal_ai']['cost_saved_usd']:.5f})")
+        print(f"Verdict:            {res['efficiency_verdict']}")
+        print("-" * 75 + "\n")
         return
 
     pipeline_kwargs = {
