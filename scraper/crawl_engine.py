@@ -3,6 +3,7 @@ AI Crawler Engine using Crawl4AI and intelligent Next.js / DOM parsing.
 Universal, multi-vendor support for industrial lifecycle portals.
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -10,7 +11,7 @@ import re
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # Ensure Crawl4AI stores cache/db inside workspace (prevents PermissionError on Windows/sandbox)
 os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(Path(__file__).resolve().parent.parent / ".cache"))
@@ -65,6 +66,10 @@ def sanitize_crawl_url(raw_url: str) -> str:
     cleaned = raw_url.strip().strip("'\"<>(),;[]")
     if not cleaned:
         return ""
+    # Strip trailing punctuation often appended in prose or markdown
+    cleaned = cleaned.rstrip(".,;: ")
+    # Decode XML/HTML entity escaped ampersands commonly found in href attributes
+    cleaned = cleaned.replace("&amp;", "&")
     if not cleaned.startswith(("http://", "https://")):
         cleaned = "https://" + cleaned
     # Percent-encode invalid characters in query or path
@@ -339,6 +344,17 @@ class UniversalAICrawler:
             resp = session.get(clean_url, headers=headers, timeout=25, allow_redirects=True)
             status = resp.status_code
 
+            # If rate-limited (429), respect Retry-After or apply jittered backoff
+            if status == 429:
+                retry_after_str = resp.headers.get("Retry-After")
+                try:
+                    wait_sec = float(retry_after_str) if retry_after_str else random.uniform(1.0, 2.5)
+                except ValueError:
+                    wait_sec = random.uniform(1.0, 2.5)
+                time.sleep(wait_sec)
+                resp = session.get(clean_url, headers=headers, timeout=20, allow_redirects=True)
+                status = resp.status_code
+
             # If challenged by Cloudflare/Akamai (403), attempt cookie-priming from root
             if status == 403:
                 parsed = urlparse(clean_url)
@@ -563,8 +579,8 @@ class UniversalAICrawler:
             if cached is not None:
                 return cached
 
-        # Fast HTTP Tier 1
-        fast_data = self.fetch_http_fallback(target_url)
+        # Fast HTTP Tier 1: run in worker thread to prevent event-loop socket blocking
+        fast_data = await asyncio.to_thread(self.fetch_http_fallback, target_url)
         status = fast_data.get("status_code", 500)
         html = fast_data.get("html", "")
         markdown = fast_data.get("markdown", "")
@@ -1166,49 +1182,43 @@ class UniversalAICrawler:
         queue.sort(key=lambda item: item[2])
         logger.info(f"[CRAWLER] Discovered {len(queue)} candidate URLs across website network map for {base_url}")
 
-        # 3. BFS traversal
+        # 3. High-Throughput Concurrent BFS traversal
         all_products: List[ProductRecord] = []
         accumulated_chunks: List[Dict[str, Any]] = []
         accumulated_pre_extracted: List[ProductRecord] = []
         pages_crawled = 0
+        concurrency = max(1, int(os.getenv("MAX_CONCURRENT_PAGES", "6")))
 
-        while queue and (not max_pages or max_pages <= 0 or pages_crawled < max_pages):
-            u, current_depth, pri = queue.pop(0)
-            norm_u = self.run_cache.normalize_url(u)
-            if norm_u in visited_urls or self.run_cache.is_visited(norm_u):
-                if self.run_cache.has_extracted_products(norm_u):
-                    cached_records = self.run_cache.get_extracted_products(norm_u)
-                    if cached_records:
-                        all_products.extend(cached_records)
-                continue
-            visited_urls.add(norm_u)
-            self.run_cache.mark_visited(norm_u)
-            pages_crawled += 1
-
-            page_label = f"{pages_crawled}/{pages_limit_str}"
+        async def crawl_worker_task(u: str, current_depth: int, pri: int, page_num: int) -> Dict[str, Any]:
+            page_label = f"{page_num}/{pages_limit_str}"
             logger.info(f"[CRAWLER] Crawling network map portal ({page_label}, depth={current_depth}): {u}")
-            crawl_data = {}
+            w_products: List[ProductRecord] = []
+            w_chunks: List[Dict[str, Any]] = []
+            w_pre: List[ProductRecord] = []
+            w_crawl_data: Dict[str, Any] = {}
+            norm_u = self.run_cache.normalize_url(u)
+
             try:
                 if accumulate_batches:
-                    crawl_data = await self.crawl_page(u)
-                    pre_recs, chunks = self.prepare_page_chunks(u, crawl_data, site_vendor)
-                    accumulated_pre_extracted.extend(pre_recs)
-                    accumulated_chunks.extend(chunks)
+                    w_crawl_data = await self.crawl_page(u)
+                    pre_recs, chunks = self.prepare_page_chunks(u, w_crawl_data, site_vendor)
+                    w_pre.extend(pre_recs)
+                    w_chunks.extend(chunks)
                 else:
                     page_products = await self.run(u)
-                    all_products.extend(page_products)
-                    crawl_data = self.run_cache.get_crawled_page(norm_u) or {}
+                    w_products.extend(page_products)
+                    w_crawl_data = self.run_cache.get_crawled_page(norm_u) or {}
             except Exception as pe:
                 logger.warning(f"Error crawling portal {u}: {pe}")
 
-            # If depth allowed and queue budget allows, recursively discover links
+            # Sub-portal link discovery
+            discovered_links: List[Tuple[str, int, int]] = []
             depth_allowed = (not max_depth or max_depth <= 0 or current_depth < max_depth)
-            queue_budget_allowed = (not max_pages or max_pages <= 0 or len(queue) < max_pages * 2)
-            if depth_allowed and queue_budget_allowed:
+            if depth_allowed:
                 try:
-                    if not crawl_data:
-                        crawl_data = self.run_cache.get_crawled_page(norm_u) or await self.crawl_page(u)
-                    sub_html = crawl_data.get("html", "")
+                    if not w_crawl_data:
+                        w_crawl_data = self.run_cache.get_crawled_page(norm_u) or await self.crawl_page(u)
+                    sub_html = w_crawl_data.get("html", "")
                     if sub_html:
                         sub_soup = BeautifulSoup(sub_html, "html.parser")
                         for a in sub_soup.find_all("a", href=True):
@@ -1216,15 +1226,68 @@ class UniversalAICrawler:
                             resolved = urllib.parse.urljoin(u, href)
                             link_text = a.get_text(strip=True)
                             if lifecycle_keywords.search(resolved) or lifecycle_keywords.search(link_text):
-                                add_to_queue(resolved, depth=current_depth + 1, priority=1)
+                                discovered_links.append((resolved, current_depth + 1, 1))
                             elif product_catalog_keywords.search(resolved) or product_catalog_keywords.search(link_text):
-                                add_to_queue(resolved, depth=current_depth + 1, priority=2)
+                                discovered_links.append((resolved, current_depth + 1, 2))
 
                         sub_pag = self.discover_pagination_urls(sub_soup, u, allowed_domains)
                         for p_url in sub_pag:
-                            add_to_queue(p_url, depth=current_depth + 1, priority=1)
+                            discovered_links.append((p_url, current_depth + 1, 1))
                 except Exception as sub_err:
                     logger.debug(f"Sub-portal link discovery notice for {u}: {sub_err}")
+
+            return {
+                "url": u,
+                "products": w_products,
+                "chunks": w_chunks,
+                "pre_recs": w_pre,
+                "discovered": discovered_links
+            }
+
+        active_tasks: Set[asyncio.Task] = set()
+
+        while (queue or active_tasks) and (not max_pages or max_pages <= 0 or pages_crawled < max_pages):
+            # Spawn worker tasks up to concurrency capacity and max_pages budget
+            while queue and len(active_tasks) < concurrency:
+                if max_pages and max_pages > 0 and (pages_crawled + len(active_tasks)) >= max_pages:
+                    break
+                u, current_depth, pri = queue.pop(0)
+                norm_u = self.run_cache.normalize_url(u)
+                if norm_u in visited_urls or self.run_cache.is_visited(norm_u):
+                    if self.run_cache.has_extracted_products(norm_u):
+                        cached_records = self.run_cache.get_extracted_products(norm_u)
+                        if cached_records:
+                            all_products.extend(cached_records)
+                    continue
+                visited_urls.add(norm_u)
+                self.run_cache.mark_visited(norm_u)
+
+                page_idx = pages_crawled + len(active_tasks) + 1
+                t = asyncio.create_task(crawl_worker_task(u, current_depth, pri, page_idx))
+                active_tasks.add(t)
+
+            if not active_tasks:
+                break
+
+            # Await completion of at least one task
+            done, active_tasks = await asyncio.wait(active_tasks, return_when=asyncio.FIRST_COMPLETED)
+            for t in done:
+                pages_crawled += 1
+                try:
+                    res = t.result()
+                    all_products.extend(res["products"])
+                    accumulated_pre_extracted.extend(res["pre_recs"])
+                    accumulated_chunks.extend(res["chunks"])
+
+                    queue_budget_allowed = (not max_pages or max_pages <= 0 or len(queue) < max_pages * 2)
+                    if queue_budget_allowed:
+                        for cand_u, c_depth, c_pri in res["discovered"]:
+                            add_to_queue(cand_u, depth=c_depth, priority=c_pri)
+                except Exception as worker_err:
+                    logger.warning(f"Crawl worker task error: {worker_err}")
+
+            # Re-sort queue by priority after adding newly discovered URLs
+            queue.sort(key=lambda item: item[2])
 
         # Batch AI Extraction if accumulate_batches mode was active
         if accumulate_batches and (accumulated_chunks or accumulated_pre_extracted):

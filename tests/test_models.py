@@ -121,6 +121,98 @@ class TestModels(unittest.TestCase):
             with self.subTest(item=item):
                 self.assertFalse(is_valid_product_model(item), f"Should reject non-model: '{item}'")
 
+    def test_reject_table_header_tokens(self):
+        """Verifies rejection of table header labels in English, German, French, Japanese, and Chinese."""
+        headers = [
+            "Part Number", "Part Numbers", "Part No", "Part No.", "Part #",
+            "Catalog Number", "Catalog No", "Catalog No.", "Catalog #",
+            "Order Number", "Order No", "Order Code", "Ordering Code",
+            "Model Name", "Model Number", "Model No", "Model #",
+            "Item Number", "Item No", "Item Description",
+            "Product Name", "Product Line", "Product Code", "Product Family",
+            "Discontinued Model", "Discontinued Product", "Replacement Model",
+            "Replacement Part", "Successor Model", "Successor Part", "Alternate Model",
+            "Discontinuation Date", "Effective Date", "Series Name", "Lifecycle Status",
+            "Quantity", "Unit Price", "List Price", "Availability",
+            # Multilingual
+            "形名", "形式", "型番", "品名", "品目", "仕様", "概要", "代替品", "代替推奨品",
+            "Artikelnummer", "Bestellnummer", "Typbezeichnung", "Nachfolgeprodukt",
+            "Référence", "Reference", "Désignation", "Code article",
+            "产品型号", "订货号", "产品名称", "替代型号"
+        ]
+        for h in headers:
+            with self.subTest(header=h):
+                self.assertFalse(is_valid_product_model(h), f"Should reject table header token: '{h}'")
+
+    def test_reject_pure_engineering_specifications(self):
+        """Verifies rejection of electrical, mechanical, and ingress ratings mistakenly parsed as models."""
+        specs = [
+            # Voltage / Power / Frequency / Current
+            "24VDC", "24 VDC", "12VDC", "48VDC", "5VDC",
+            "100-240VAC", "100-240 VAC", "115VAC", "230VAC", "24V",
+            "50/60Hz", "50Hz", "60Hz", "100kHz",
+            "0.75kW", "1.5kW", "2.2kW", "100W", "250W",
+            "4-20mA", "0-20mA", "0-10V", "10A", "16A", "100mA",
+            "120ohm", "100kohm", "1000rpm", "3000rpm",
+            "10bar", "100psi", "250g", "1.5kg", "100mm",
+            # Enclosure / Ingress Protection
+            "IP20", "IP54", "IP65", "IP67", "IP68", "IP69K", "NEMA 4X", "NEMA 12",
+            # Physical dimensions
+            "100x50x25mm", "100 x 50 x 25 mm", "50x50mm",
+            # Connector / Protocol standards
+            "RJ45", "M12", "M8", "RS-485", "RS-232", "USB-C"
+        ]
+        for s in specs:
+            with self.subTest(spec=s):
+                self.assertFalse(is_valid_product_model(s), f"Should reject pure specification: '{s}'")
+
+    def test_reject_price_and_commercial_terms(self):
+        """Verifies rejection of currency amounts, stock levels, and commercial ordering notes."""
+        terms = [
+            "$1,200", "$450.00", "€350", "£99.99", "¥50,000",
+            "USD 300", "EUR 450", "300 USD", "450.00 EUR", "1250.00",
+            "In Stock", "Out of Stock", "Available", "Unavailable",
+            "On Backorder", "Call for price", "Request quote",
+            "Lead time: 4 weeks", "Qty: 10", "Quantity: 5", "MOQ: 100"
+        ]
+        for t in terms:
+            with self.subTest(term=t):
+                self.assertFalse(is_valid_product_model(t), f"Should reject price/commercial term: '{t}'")
+
+    def test_reject_ui_breadcrumbs_and_pagination(self):
+        """Verifies rejection of breadcrumb trails, pagination buttons, and search UI noise."""
+        ui_noise = [
+            "Home > Products > PLCs",
+            "Support > Discontinued > Controllers",
+            "Products » Inverters » Compact",
+            "Page 1 of 5", "Page 2 of 10", "Next Page", "Previous Page",
+            "Showing 1-20 of 150", "Results 1 to 25",
+            "Click Here", "Read More", "Learn More", "View Details",
+            "Download PDF", "Download Now", "Search Results", "Back to Top"
+        ]
+        for n in ui_noise:
+            with self.subTest(noise=n):
+                self.assertFalse(is_valid_product_model(n), f"Should reject UI noise: '{n}'")
+
+    def test_reject_row_index_numbers(self):
+        """Verifies rejection of table row sequence indices like 1, 2, 99, #1."""
+        indices = ["1", "2", "3", "10", "99", "100", "#1", "#2", "#25"]
+        for idx in indices:
+            with self.subTest(index=idx):
+                self.assertFalse(is_valid_product_model(idx), f"Should reject row index: '{idx}'")
+
+    def test_accept_genuine_industrial_models(self):
+        """Verifies genuine industrial hardware/software models across vendors are strictly preserved."""
+        genuine = [
+            "GT25-WLAN", "6ES7516-3AN02-0AB0", "FX5-16MR/ES", "1756-L83E",
+            "C9300-48P", "PowerEdge R740", "PowerFlex 525", "TM221CE16R",
+            "CP1E-N30DR-A", "ACS880-01-04A6-2", "TRD-J", "MI3321G-W",
+            "MELSEC-iQ-R", "Ubuntu 22.04 LTS", "Windows Server 2019"
+        ]
+        for m in genuine:
+            with self.subTest(model=m):
+                self.assertTrue(is_valid_product_model(m), f"Should accept genuine model: '{m}'")
+
     def test_reject_empty_or_length_bounds(self):
         self.assertFalse(is_valid_product_model(None))
         self.assertFalse(is_valid_product_model(""))
@@ -484,6 +576,17 @@ class TestModels(unittest.TestCase):
             stage_date_utc="2023-08-17"
         )
         self.assertEqual(rec.aliases, "GOT2000 Wireless LAN Communication Unit")
+
+    def test_aliases_filters_invalid_models_and_specs(self):
+        """Verifies that invalid tokens (table headers, electrical specs, noise) are filtered from aliases."""
+        rec = ProductRecord(
+            vendor_name="Mitsubishi Electric",
+            model_name="GT25-WLAN",
+            aliases=["GOT2000 Wireless LAN Unit", "24VDC", "Part Number", "Page 1 of 5", "GT25 WLAN Adapter"],
+            status="Discontinued",
+            stage_date_utc="2023-08-17"
+        )
+        self.assertEqual(rec.aliases, "GOT2000 Wireless LAN Unit, GT25 WLAN Adapter")
 
 
 if __name__ == "__main__":

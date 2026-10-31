@@ -119,8 +119,97 @@ LIFECYCLE_STATUS_TOKENS = {
     "fin de vie", "fin de support", "fin de commercialisation", "arrêt de commercialisation",
     "utgående produkt", "sista orderdatum", "service upphör",
     "停产", "停售", "停产公告", "终止服务", "终止支持", "最后订购",
-    "단종", "생산종료", "판매종료", "지원종료"
+    "단종", "생산종料", "판매종료", "지원종료"
 }
+
+TABLE_HEADER_TOKENS = {
+    "model", "models", "model name", "model no", "model no.", "model number", "model #",
+    "part", "parts", "part name", "part no", "part no.", "part number", "part numbers", "part #",
+    "catalog no", "catalog no.", "catalog number", "catalog #",
+    "order no", "order no.", "order number", "order code", "ordering code",
+    "article no", "article no.", "article number", "article code", "type code", "type designation",
+    "item", "items", "item no", "item no.", "item number", "item #", "item description",
+    "product name", "product line", "product code", "product family", "product description",
+    "discontinued model", "discontinued models", "discontinued product", "discontinued products",
+    "discontinued part", "discontinued parts", "discontinued items",
+    "replacement model", "replacement models", "replacement part", "replacement parts",
+    "replacement product", "replacement products", "recommended replacement",
+    "successor", "successor model", "successor models", "successor part", "successor parts",
+    "alternate model", "substitute model",
+    "discontinuation date", "effective date", "announcement date", "phase out date",
+    "last order date", "last time buy date", "final order date", "end of support date", "end of service date",
+    "series name", "product series", "lifecycle status", "current status", "stage", "category",
+    "quantity", "qty", "unit price", "list price", "price", "total", "subtotal",
+    "availability", "stock status", "lead time", "action", "actions", "details",
+    "datasheet", "manual", "specifications", "features", "overview",
+    # Japanese
+    "形名", "形式", "型番", "品名", "品目", "仕様", "概要", "代替品", "代替推奨品",
+    "標準価格", "納期", "備考", "後継品", "後継機種", "対象機種", "対象形名", "旧機種", "現行機種",
+    # German
+    "artikelnummer", "bestellnummer", "typbezeichnung", "nachfolgeprodukt", "auslaufdatum",
+    "ersatztyp", "bezeichnung", "produktlinie", "warengruppe", "nachfolger", "lieferstopp",
+    # French
+    "référence", "reference", "désignation", "designation", "code article", "produit de remplacement",
+    "date d'arrêt", "successeur", "caractéristiques",
+    # Chinese
+    "产品型号", "订货号", "产品名称", "替代型号", "停产型号", "推荐替代", "产品描述", "物料编码",
+    # Spanish / Italian
+    "código", "codigo", "número de parte", "numero de parte", "modelo sustituto", "referencia", "descripción",
+    "codice", "codice articolo", "modello", "prodotto sostitutivo"
+}
+
+# Pure electrical, mechanical, or physical engineering ratings/units masquerading as model numbers
+SPECIFICATION_PATTERN = re.compile(
+    r'^(?:'
+    # Engineering units: e.g. 24VDC, 100-240VAC, 50/60Hz, 0.75kW, 4-20mA, 10A, 250g, 100mm, 10bar, 100psi, 120ohm
+    r'\d+(?:\.\d+)?(?:\s*[-~/]\s*\d+(?:\.\d+)?)?\s*(?:vac|vdc|vac/vdc|vdc/vac|v\s*ac|v\s*dc|v|a|ma|w|kw|mw|hp|hz|khz|mhz|ghz|ohm|kohm|mohm|rpm|bar|psi|kg|g|mg|mm|cm|m)'
+    r'|'
+    # Ingress Protection or NEMA enclosures: IP67, IP20, NEMA 4X, NEMA 12
+    r'(?:ip\s*[0-6][0-9][a-z]?|nema\s*\d+[a-z]?)'
+    r'|'
+    # Physical dimensions: 100x50x25mm, 100 x 50 mm, 50x50mm
+    r'\d+(?:\.\d+)?\s*[xX*]\s*\d+(?:\.\d+)?(?:\s*[xX*]\s*\d+(?:\.\d+)?)?\s*(?:mm|cm|m|in|inch)?'
+    r'|'
+    # Standalone connector / serial interfaces: RJ45, M12, M8, RS-485, USB-C
+    r'(?:rj45|rj11|rj12|m12|m8|m5|rs-?232[a-z]?|rs-?485[a-z]?|rs-?422[a-z]?|usb[- ]?[a-c]|usb[- ]?[1-3](?:\.[0-2])?)'
+    r')$',
+    re.IGNORECASE
+)
+
+# Commercial prices, currency values, stock, availability, and order quantity terms
+PRICE_AND_COMMERCIAL_PATTERN = re.compile(
+    r'^(?:'
+    r'[$€£¥₹]\s*[\d,]+(?:\.\d+)?'
+    r'|'
+    r'(?:usd|eur|gbp|jpy|cny|inr|cad|aud|chf)\s*[\d,]+(?:\.\d+)?'
+    r'|'
+    r'[\d,]+(?:\.\d+)?\s*(?:usd|eur|gbp|jpy|cny|inr|cad|aud|chf)'
+    r'|'
+    r'[\d,]+\.\d{2}'
+    r'|'
+    r'in\s+stock|out\s+of\s+stock|available|unavailable|backorder|on\s+backorder|'
+    r'call\s+for\s+price|contact\s+factory|contact\s+us|request\s+quote|rfq|'
+    r'lead\s*time\b.*|qty\b.*|quantity\b.*|moq\b.*'
+    r')$',
+    re.IGNORECASE
+)
+
+# UI Navigation artifacts: breadcrumb trails, pagination markers, search noise, button texts
+UI_AND_BREADCRUMB_PATTERN = re.compile(
+    r'^(?:'
+    r'.*(?:\s+[>»]\s+|\s+->\s+).*'
+    r'|'
+    r'page\s+\d+(?:\s*(?:of|/)\s*\d+)?|next\s+page|previous\s+page|first\s+page|last\s+page|'
+    r'showing\s+\d+.*|results\s+\d+.*|viewing\s+\d+.*'
+    r'|'
+    r'click\s+here|read\s+more|learn\s+more|view\s+details|see\s+details|'
+    r'download\s+pdf|download\s+now|search\s+results|back\s+to\s+top|go\s+to\s+top'
+    r')$',
+    re.IGNORECASE
+)
+
+# Table row index numbers: 1, 2, 99, 100, #1, #25 (table row numbers, not product models)
+ROW_INDEX_PATTERN = re.compile(r'^#?\d{1,3}$')
 
 
 def is_valid_product_model(name: Optional[str]) -> bool:
@@ -163,6 +252,21 @@ def is_valid_product_model(name: Optional[str]) -> bool:
         if sub in c_lower:
             return False
     if c_lower in EXACT_DISALLOWED_MODEL_TOKENS:
+        return False
+    # Reject table header and column labels masquerading as product models
+    if c_lower in TABLE_HEADER_TOKENS:
+        return False
+    # Reject table row index numbers (e.g. 1, 2, 99, 100, #1, #25)
+    if ROW_INDEX_PATTERN.match(check_str):
+        return False
+    # Reject pure engineering specifications (electrical, mechanical, ingress, connector standards)
+    if SPECIFICATION_PATTERN.match(check_str):
+        return False
+    # Reject commercial pricing, currency values, stock, and order terms
+    if PRICE_AND_COMMERCIAL_PATTERN.match(check_str):
+        return False
+    # Reject UI navigation, breadcrumb paths, pagination markers, button noise
+    if UI_AND_BREADCRUMB_PATTERN.match(check_str):
         return False
     # Reject lifecycle statuses masquerading as product models
     if c_lower in LIFECYCLE_STATUS_TOKENS:
@@ -542,6 +646,8 @@ class ProductRecord(BaseModel):
             if not itm or itm.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown"):
                 continue
             inspect_security_threats(itm, field_name="aliases", raise_error=True)
+            if not is_valid_product_model(itm):
+                continue
             valid_items.append(itm)
         deduped = list(dict.fromkeys(valid_items))
         return ", ".join(deduped) if deduped else None

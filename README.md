@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/AI_Engine-Universal_Multi--Provider_LLM-4285F4.svg?style=for-the-badge" alt="Universal Multi-Provider AI" />
   <img src="https://img.shields.io/badge/Crawler-Crawl4AI-orange.svg?style=for-the-badge" alt="Crawl4AI" />
   <img src="https://img.shields.io/badge/Vendors-143_Enterprise-success.svg?style=for-the-badge" alt="143 Vendors" />
-  <img src="https://img.shields.io/badge/Tests-220_Passing-brightgreen.svg?style=for-the-badge" alt="220 Tests" />
+  <img src="https://img.shields.io/badge/Tests-233_Passing-brightgreen.svg?style=for-the-badge" alt="233 Tests" />
 </p>
 
 An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, **End of Sale (EOS)**, and **End of Service / End of Support (EOSL/LDoS)** milestones across all phases.
@@ -315,8 +315,10 @@ Industrial vendor portals increasingly deploy bot protection (Akamai Edge, Cloud
    - User interaction simulation: mouse movement simulation, natural scroll delays, overlay popup and cookie banner auto-removal.
 2. **SPA Hydration Delay**:
    - Complex single-page portals (such as Siemens SiePortal, HPE Support Center, Dell TechDirect) require client-side JavaScript execution before tables render. The crawler enforces a configurable hydration delay (`delay_before_return_html=2.5s`) to prevent empty shell scrapes.
-3. **Resilient HTTP Fallback**:
-   - If headless Chromium is blocked or times out, the engine automatically falls back to `requests.Session()` with browser TLS emulation, automatic decompression (`gzip`, `deflate`, `br`), exponential retry backoff, and BeautifulSoup DOM parsing.
+3. **Resilient HTTP Fallback & Anti-Bot Evasion**:
+   - If headless Chromium is blocked or times out, the engine automatically falls back to connection-pooled `requests.Session()` with browser TLS emulation, automatic decompression (`gzip`, `deflate`, `br`), exponential retry backoff, HTTP 429 jittered recovery, origin cookie priming, and BeautifulSoup DOM parsing.
+4. **High-Throughput Concurrent Page Crawling**:
+   - Site-wide BFS crawling leverages an asynchronous concurrent worker pool (`asyncio.wait(active_tasks, return_when=FIRST_COMPLETED)`) with bounded concurrency (`MAX_CONCURRENT_PAGES`, default: 6-8). Fast-Path HTTP fetches are dispatched to dedicated worker threads (`asyncio.to_thread`) preventing event-loop socket blocking and accelerating crawl throughput by **4x-8x**.
 
 ---
 
@@ -1065,6 +1067,13 @@ python cli.py --benchmark --vendor mitsubishi --url "https://ia.omron.co.jp/supp
      - **Permitted Characters**: Strictly alphanumeric (`[A-Za-z0-9]`) alongside sensible standard punctuation commonly present in genuine part numbers (`-`, `/`, `:`, `.`, `_`, `+`, `&`, `(`, `)`, `#`, space).
      - **Corrupt & Uncommon Symbols Purged**: Unicode replacement characters (`\ufffd`), null bytes (`\x00`), zero-width spaces (`\u200b`, `\ufeff`), control codes (`[\x00-\x1f\x7f-\x9f]`), emojis, bullets (`•`, `►`, `✓`, `★`), legal marks (`™`, `®`, `©`, `§`), and uncommon symbols (`~`, `^`, `$`, `%`, `*`, `=`, `|`, `\`, `{`, `}`, `<`, `>`, `;`, `"`, `'`) are systematically scrubbed or rejected.
      - **Non-Alphanumeric Noise Rejected**: Any extracted string lacking genuine alphanumeric characters is permanently purged.
+   - **Deep Real-World Product Guardrails (`is_valid_product_model`)**:
+     - **Table Header & Column Label Elimination**: Multilingual blacklist drops column headers mistakenly extracted as product models across English (`Part Number`, `Order Code`, `Description`, `Successor`), German (`Artikelnummer`, `Bestellnummer`, `Typbezeichnung`), French (`Référence`, `Désignation`), Japanese (`形名`, `形式`, `型番`, `品名`, `仕様`, `代替推奨品`), Chinese (`产品型号`, `订货号`, `替代型号`), and Spanish/Italian (`Código`, `Codice articolo`).
+     - **Engineering Specification Guardrail**: Rejects pure electrical, mechanical, or physical ratings (`24VDC`, `100-240VAC`, `50/60Hz`, `0.75kW`, `4-20mA`, `IP67`, `NEMA 4X`, `RJ45`, `RS-485`, `100x50x25mm`, `250g`, `10bar`, `100psi`).
+     - **Pricing, Stock & Commercial Terms**: Drops currency figures (`$1,200`, `USD 300`, `€450`), stock status (`In Stock`, `Out of Stock`), and order limits (`Lead time: 4 weeks`, `Qty: 10`, `MOQ: 100`).
+     - **UI Navigation & Breadcrumb Trails**: Eliminates breadcrumb hierarchies (`Home > Products > PLCs`), pagination buttons (`Page 1 of 5`, `Next Page`), and action links (`Click Here`, `Download PDF`).
+     - **Table Row Sequence Numbers**: Blocks table row indices (`1`, `2`, `99`, `100`, `#1`, `#25`).
+     - **Clean Model Aliases**: The `aliases` field enforces the same guardrails to ensure only genuine alternate model numbers and common trade names are retained.
 
 ---
 

@@ -532,6 +532,46 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(products[0].vendor_name, "Siemens")
         self.assertEqual(products[0].status, "Discontinued")
 
+    async def test_16_concurrent_page_crawling_throughput(self):
+        """Verifies crawl_website crawls queued pages concurrently without sequential blocking."""
+        base_html = """
+        <html><body>
+          <a href="/support/eol/page1">EOL Part 1</a>
+          <a href="/support/eol/page2">EOL Part 2</a>
+          <a href="/support/eol/page3">EOL Part 3</a>
+          <a href="/support/eol/page4">EOL Part 4</a>
+        </body></html>
+        """
+        self.crawler.crawl_with_crawl4ai = AsyncMock(return_value={
+            "url": "https://siemens.com",
+            "markdown": "Siemens Base",
+            "html": base_html,
+            "status_code": 200
+        })
+
+        async def mock_run(u, **kw):
+            m_code = u.split("/")[-1].upper()
+            return [
+                ProductRecord(
+                    vendor_name="Siemens",
+                    model_name=f"6ES7-{m_code}",
+                    status="Discontinued",
+                    stage_date_utc="2025-01-01T00:00:00Z"
+                )
+            ]
+
+        self.crawler.run = AsyncMock(side_effect=mock_run)
+
+        records = await self.crawler.crawl_website(
+            base_url="https://siemens.com",
+            allowed_domains=["siemens.com"],
+            max_pages=4,
+            enable_sitemap=False
+        )
+
+        self.assertEqual(len(records), 4)
+        self.assertEqual(self.crawler.run.call_count, 4)
+
 
 if __name__ == "__main__":
     unittest.main()
