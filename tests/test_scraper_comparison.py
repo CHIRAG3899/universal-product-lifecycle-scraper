@@ -49,22 +49,22 @@ class TestScraperComparison(unittest.TestCase):
         with open(candidate_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow([
-                "vendor_name", "model_name", "status", "stage_date_utc", "source_url",
+                "vendor_name", "model_name", "aliases", "status", "stage_date_utc", "source_url",
                 "os", "firmware", "category", "replacement", "metadata"
             ])
             # Overlapping model with date & replacement
             writer.writerow([
-                "Siemens", "6ES7516-3AN02-0AB0", "End of Life", "2024-10-01T00:00:00Z",
+                "Siemens", "6ES7516-3AN02-0AB0", "CPU 1516-3", "End of Life", "2024-10-01T00:00:00Z",
                 "https://siemens.com", "", "", "PLC", "6ES7516-3AN03-0AB0", "{}"
             ])
             # Overlapping model where candidate found actual replacement & standardized date
             writer.writerow([
-                "Siemens", "6ES7511-1AK02-0AB0", "Phase-Out", "2024-05-15T00:00:00Z",
+                "Siemens", "6ES7511-1AK02-0AB0", "CPU 1511-1", "Phase-Out", "2024-05-15T00:00:00Z",
                 "https://siemens.com", "", "", "PLC", "6ES7511-1AK03-0AB0", "{}"
             ])
             # Candidate-exclusive model discovered
             writer.writerow([
-                "Siemens", "6ES7513-1AL02-0AB0", "End of Life", "2024-12-31T00:00:00Z",
+                "Siemens", "6ES7513-1AL02-0AB0", "", "End of Life", "2024-12-31T00:00:00Z",
                 "https://siemens.com", "", "", "PLC", "6ES7513-1AL03-0AB0", "{}"
             ])
 

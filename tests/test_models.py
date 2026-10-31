@@ -442,5 +442,49 @@ class TestModels(unittest.TestCase):
         self.assertIsNone(win_undated.stage_date_utc)
 
 
+
+    def test_aliases_string_and_list_normalization(self):
+        """Verifies aliases accept strings or lists, clean whitespace, and deduplicate."""
+        rec1 = ProductRecord(
+            vendor_name="Siemens",
+            model_name="6ES7516-3AN02-0AB0",
+            aliases=["SIMATIC S7-1500 CPU 1516-3 PN/DP", "CPU 1516-3", "CPU 1516-3"],
+            status="End of Life",
+            stage_date_utc="2024-10-01"
+        )
+        self.assertEqual(rec1.aliases, "SIMATIC S7-1500 CPU 1516-3 PN/DP, CPU 1516-3")
+
+        rec2 = ProductRecord(
+            vendor_name="Cisco",
+            model_name="C9300-48P",
+            aliases="Catalyst 9300; Cat9300-48P; Catalyst 9300",
+            status="End of Sale",
+            stage_date_utc="2025-10-31"
+        )
+        self.assertEqual(rec2.aliases, "Catalyst 9300, Cat9300-48P")
+
+    def test_aliases_removes_exact_model_self_reference(self):
+        """Verifies that if an alias is identical to model_name, it is stripped."""
+        rec = ProductRecord(
+            vendor_name="Rockwell Automation",
+            model_name="1756-L83E",
+            aliases="ControlLogix 5580, 1756-L83E, 1756-L83E Controller",
+            status="Active",
+            stage_date_utc="2028-12-31"
+        )
+        self.assertEqual(rec.aliases, "ControlLogix 5580, 1756-L83E Controller")
+
+    def test_aliases_from_metadata(self):
+        """Verifies that aliases are recovered from metadata if omitted in top-level fields."""
+        rec = ProductRecord(
+            vendor_name="Mitsubishi Electric",
+            model_name="GT25-WLAN",
+            metadata={"common_name": "GOT2000 Wireless LAN Communication Unit"},
+            status="Discontinued",
+            stage_date_utc="2023-08-17"
+        )
+        self.assertEqual(rec.aliases, "GOT2000 Wireless LAN Communication Unit")
+
+
 if __name__ == "__main__":
     unittest.main()

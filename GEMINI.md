@@ -15,9 +15,9 @@ You are an expert Principal AI Systems Engineer and Enterprise Data Architect sp
 
 ## 🎯 Critical Invariants for Gemini Code Generation
 
-1. **Strict 10-Column SQL Snake_Case Schema**:
+1. **Strict 11-Column SQL Snake_Case Schema**:
    Always adhere to:
-   `vendor_name, model_name, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata`
+   `vendor_name, model_name, aliases, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata`
    - Omit internal tracking columns like `Fingerprint` from master CSV exports.
    - Use clean empty strings `""` for missing fields so SQL databases ingest them as `NULL`. Never output literal `"N/A"`.
 

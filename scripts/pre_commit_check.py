@@ -280,9 +280,9 @@ def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
         reader = csv.DictReader(f)
         fields = reader.fieldnames or []
 
-        # Required 10 database columns
+        # Required 11 database columns
         expected_cols = [
-            "vendor_name", "model_name", "status", "stage_date_utc", "source_url",
+            "vendor_name", "model_name", "aliases", "status", "stage_date_utc", "source_url",
             "os", "firmware", "category", "replacement", "metadata"
         ]
 
@@ -340,7 +340,7 @@ def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
     if invalid_rows:
         return False, f"Found {len(invalid_rows)} schema violations in master CSV:\n" + "\n".join(f"    - {r}" for r in invalid_rows)
 
-    return True, f"Master CSV ({row_count} records) complies with 10-column SQL database schema (100% non-null mandatory fields)."
+    return True, f"Master CSV ({row_count} records) complies with 11-column SQL database schema (100% non-null mandatory fields)."
 
 
 def check_7_full_test_suite() -> Tuple[bool, str]:
@@ -447,7 +447,8 @@ def check_8_e2e_synthetic_flow() -> Tuple[bool, str]:
         with open(pipeline.master_csv, "r", encoding="utf-8-sig") as f:
             reader = csv.reader(f)
             header = next(reader)
-            if "fingerprint" in header or len(header) != 10:
+            expected_header = ["vendor_name", "model_name", "aliases", "status", "stage_date_utc", "source_url", "os", "firmware", "category", "replacement", "metadata"]
+            if "fingerprint" in header or header != expected_header:
                 return False, f"Export CSV schema mismatch in synthetic flow: {header}"
 
         return True, "End-to-end 6-stage lifecycle flow executed flawlessly (Discovery, Normalisation, Deduplication, Export)."

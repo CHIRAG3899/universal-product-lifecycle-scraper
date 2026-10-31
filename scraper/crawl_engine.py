@@ -516,9 +516,17 @@ class UniversalAICrawler:
                                 brand_name = brand.get("name", default_vendor) if isinstance(brand, dict) else str(brand or default_vendor)
                                 cat = str(p_data.get("category", "General Automation"))
 
+                                candidate_aliases = []
+                                for alt_key in ["name", "mpn", "sku", "productID", "alternateName"]:
+                                    alt_val = p_data.get(alt_key)
+                                    if isinstance(alt_val, str) and alt_val.strip() and alt_val.strip().upper() != model_str.upper():
+                                        candidate_aliases.append(alt_val.strip())
+                                alias_str = ", ".join(dict.fromkeys(candidate_aliases)) if candidate_aliases else None
+
                                 rec = ProductRecord(
                                     vendor_name=brand_name or default_vendor,
                                     model_name=model_str,
+                                    aliases=alias_str,
                                     status=status,
                                     stage=status,
                                     vendor_status=status,

@@ -198,6 +198,7 @@ vendors:
             expected_header = [
                 "vendor_name",
                 "model_name",
+                "aliases",
                 "status",
                 "stage_date_utc",
                 "source_url",
@@ -225,13 +226,13 @@ vendors:
 
             # Verify UTC date format or empty in stage_date_utc column (index 3)
             for r in rows:
-                dt_val = r[3]
+                dt_val = r[4]
                 if dt_val:
                     self.assertTrue(dt_val.endswith("Z") and "T" in dt_val, f"Non-UTC date in CSV: {dt_val}")
 
             # Verify metadata JSON parses cleanly (index 9)
             for r in rows:
-                meta_raw = r[9]
+                meta_raw = r[10]
                 if meta_raw:
                     meta_dict = json.loads(meta_raw)
                     self.assertIsInstance(meta_dict, dict)

@@ -435,6 +435,7 @@ class ProductRecord(BaseModel):
     fingerprint: Optional[str] = Field(default=None, description="Deterministic SHA-256 hash for DB upsert/append operations")
     vendor_name: str = Field(min_length=1, description="Manufacturer / Vendor name in English (MANDATORY, NO NULL ALLOWED)")
     model_name: str = Field(min_length=1, description="Individual product part number or model name (MANDATORY, NO NULL ALLOWED)")
+    aliases: Optional[str] = Field(default=None, description="Comma-separated model aliases, marketing codes, or alternative common names pointing to model_name")
     os: Optional[str] = Field(default=None, description="Operating system / software runtime or None")
     firmware: Optional[str] = Field(default=None, description="Semantic firmware version (e.g. '1.0.0', '2.1.0') or None for hardware")
     status: str = Field(default="Discontinued", min_length=1, description="Unified lifecycle status representing exact official vendor terminology without limitation (MANDATORY, NO NULL ALLOWED)")
@@ -526,6 +527,25 @@ class ProductRecord(BaseModel):
             raise ValueError(f"Disallowed or invalid model name: '{cleaned}'")
         return cleaned
 
+    @field_validator("aliases", mode="before")
+    def clean_aliases(cls, v):
+        if not v:
+            return None
+        if isinstance(v, list):
+            items = [str(x).strip() for x in v if str(x).strip()]
+        elif isinstance(v, str):
+            items = [x.strip() for x in re.split(r'[,;]+', v) if x.strip()]
+        else:
+            items = [str(v).strip()]
+        valid_items = []
+        for itm in items:
+            if not itm or itm.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown"):
+                continue
+            inspect_security_threats(itm, field_name="aliases", raise_error=True)
+            valid_items.append(itm)
+        deduped = list(dict.fromkeys(valid_items))
+        return ", ".join(deduped) if deduped else None
+
     @field_validator("status", mode="before")
     def validate_status(cls, v):
         if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan"):
@@ -600,6 +620,28 @@ class ProductRecord(BaseModel):
         else:
             self.replacement = None
 
+        # Synchronize aliases from metadata if not explicitly provided
+        if not self.aliases:
+            meta = self.metadata or {}
+            meta_al = meta.get("aliases") or meta.get("model_aliases") or meta.get("common_name")
+            if meta_al:
+                if isinstance(meta_al, list):
+                    items = [str(x).strip() for x in meta_al if str(x).strip()]
+                else:
+                    items = [x.strip() for x in re.split(r'[,;]+', str(meta_al)) if x.strip()]
+                clean_items = [x for x in items if x.lower() not in ("n/a", "none", "null", "-", "--", "nan", "unknown")]
+                if clean_items:
+                    self.aliases = ", ".join(dict.fromkeys(clean_items))
+
+        # Filter out aliases that match model_name exactly (case-insensitive)
+        if self.aliases and self.model_name:
+            m_norm = self.model_name.strip().upper()
+            filtered = [
+                a.strip() for a in self.aliases.split(",")
+                if a.strip() and a.strip().upper() != m_norm
+            ]
+            self.aliases = ", ".join(filtered) if filtered else None
+
         # Generate deterministic fingerprint: SHA-256(vendor|model/os|status|date)
         model_part = (self.model_name or self.os or "").strip().upper()
         key = f"{self.vendor_name.strip().upper()}|{model_part}|{self.status.strip().upper()}|{(self.stage_date_utc or '').strip()}"
@@ -622,6 +664,7 @@ class AIProductItem(BaseModel):
 
     vendor_name: Optional[str] = Field(default="", description="Manufacturer or brand name in English")
     model_name: str = Field(description="Individual product part number or model name (never bundled)")
+    aliases: Optional[str] = Field(default=None, description="Comma-separated model aliases, marketing codes, or alternative common names pointing to model_name")
     status: Optional[str] = Field(default="Discontinued", description="Exact vendor lifecycle status / phase without limitation")
     stage_date_utc: Optional[str] = Field(default=None, description="Milestone date in ISO 8601 UTC (YYYY-MM-DDTHH:MM:SSZ) or null if unspecified")
     category: Optional[str] = Field(default="General Automation", description="Product category (e.g. PLC, HMI, Inverter, Camera, Switch)")

@@ -101,6 +101,8 @@ class MasterStorageManager:
                 model = str(row_dict.get("model_name") or row_dict.get("Model Name") or "").strip()
                 status = str(row_dict.get("status") or row_dict.get("Status") or row_dict.get("Stage") or row_dict.get("Vendor Status") or "").strip()
                 d_utc = str(row_dict.get("stage_date_utc") or row_dict.get("Stage Date (UTC)") or "").strip()
+                aliases = str(row_dict.get("aliases") or row_dict.get("model_aliases") or "").strip()
+                row_dict["aliases"] = aliases
 
                 cat = str(row_dict.get("category") or "").strip()
                 os_val = str(row_dict.get("os") or "").strip()
@@ -227,11 +229,15 @@ class MasterStorageManager:
                 replacement = str(raw_repl).strip()
             category = p.category or p.product_category or "General Automation"
 
-            # 10 streamlined columns in Database Snake Case as requested by user
+            raw_aliases = p.aliases or meta.get("aliases") or ""
+            clean_aliases = str(raw_aliases).strip() if raw_aliases else ""
+
+            # 11 streamlined columns in Database Snake Case as requested by user
             flat_record = {
                 "Fingerprint": fp,
                 "vendor_name": sanitize_csv_cell(v_name),
                 "model_name": sanitize_csv_cell(m_name),
+                "aliases": sanitize_csv_cell(clean_aliases),
                 "status": sanitize_csv_cell(status_val),
                 "stage_date_utc": sanitize_csv_cell(d_utc),
                 "source_url": sanitize_csv_cell(source_url),
@@ -248,6 +254,11 @@ class MasterStorageManager:
                 # If new replacement is empty but existing had a genuine replacement, preserve it
                 if not replacement and existing_repl and not any(kw in existing_repl.lower() for kw in ["consult", "representative"]):
                     flat_record["replacement"] = existing_repl
+
+                # If new aliases is empty but existing had aliases, preserve it
+                existing_aliases = str(existing_rec.get("aliases") or "").strip()
+                if not clean_aliases and existing_aliases:
+                    flat_record["aliases"] = existing_aliases
 
                 # Update existing record: preserve first_discovered in metadata if present
                 existing_meta = {}
@@ -273,6 +284,7 @@ class MasterStorageManager:
         desired_columns = [
             "vendor_name",
             "model_name",
+            "aliases",
             "status",
             "stage_date_utc",
             "source_url",

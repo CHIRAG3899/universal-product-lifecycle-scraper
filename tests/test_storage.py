@@ -71,6 +71,7 @@ class TestStorage(unittest.TestCase):
         expected_cols = [
             "vendor_name",
             "model_name",
+            "aliases",
             "status",
             "stage_date_utc",
             "source_url",
@@ -324,3 +325,21 @@ class TestStorage(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+
+    def test_aliases_persistence_and_matching(self):
+        """Verifies that model aliases / common names are saved and preserved in master CSV."""
+        storage = MasterStorageManager(master_csv_path=self.master_csv, output_dir=self.output_dir)
+        products = [
+            ProductRecord(
+                vendor_name="Siemens",
+                model_name="6ES7516-3AN02-0AB0",
+                aliases="SIMATIC S7-1500 CPU 1516-3 PN/DP, CPU 1516-3",
+                status="End of Life",
+                stage_date_utc="2024-10-01T00:00:00Z"
+            )
+        ]
+        storage.upsert_and_persist(products)
+        records = storage.load_existing_records()
+        self.assertEqual(len(records), 1)
+        rec = list(records.values())[0]
+        self.assertIn("SIMATIC S7-1500 CPU 1516-3 PN/DP", rec.get("aliases", ""))

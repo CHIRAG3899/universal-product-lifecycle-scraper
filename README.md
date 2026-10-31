@@ -47,7 +47,7 @@ The platform natively supports **143 global enterprise vendors** across **Operat
 17. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
 18. [Scraper Comparison & Empirical Benchmarking Engine (`scripts/compare_scrapers.py`)](#-scraper-comparison--empirical-benchmarking-engine-scriptscompare_scraperspy)
 19. [Zero-Defaults Policy & Strict Garbage Elimination](#-zero-defaults-policy--dynamic-terminology)
-20. [Data Model & 10-Column SQL Schema](#-data-model--10-column-sql-schema)
+20. [Data Model & 11-Column SQL Schema](#-data-model--11-column-sql-schema)
 21. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
 22. [Automated Verification & Testing](#-automated-verification--testing)
 23. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
@@ -60,7 +60,7 @@ The platform natively supports **143 global enterprise vendors** across **Operat
 graph LR
     A["Raw Portals & Bulletins<br/>(HTML, SPAs, PDFs)"] --> B["Crawl4AI & HTTP Fallback<br/>(Async Headless Chromium)"]
     B --> C["Universal Multi-Provider AI<br/>(Gemini, OpenAI, Claude, Azure, AWS, Ollama)"]
-    D --> E["Master CSV & JSON<br/>(10-Column SQL Ready)"]
+    D --> E["Master CSV & JSON<br/>(11-Column SQL Ready)"]
     C --> D["Sanitisation & Normalisation<br/>(Zero Defaults & Non-Null)"]
 
     style A fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
@@ -539,7 +539,7 @@ graph TD
     S3["Stage 3: Normalisation<br/>• Unpack Model Suffixes & Ranges<br/>• Hydrate Bulletin Milestone Dates<br/>• ISO 8601 UTC Standardization<br/>• Manufacturer-Exact Terminology"]
     S4["Stage 4: Sanitisation & Security<br/>• 4 Mandatory Non-Null Fields<br/>• Cookie Banner & Nav Purging<br/>• CSV Formula Injection Shield<br/>• Zero-Defaults Policy Enforcement"]
     S5["Stage 5: Deduplication & Merge<br/>• Load Master CSV into Memory<br/>• SHA-256 Record Fingerprinting<br/>• Non-Overwriting Incremental Merge"]
-    S6["Stage 6: Export & Observability<br/>• Export 10-Column Clean CSV<br/>• Modular Per-Vendor JSON Export<br/>• Audit Artifacts & Webhook Alerts"]
+    S6["Stage 6: Export & Observability<br/>• Export 11-Column Clean CSV<br/>• Modular Per-Vendor JSON Export<br/>• Audit Artifacts & Webhook Alerts"]
 
     S1 --> S2
     S2 --> S3
@@ -1068,16 +1068,17 @@ python cli.py --benchmark --vendor mitsubishi --url "https://ia.omron.co.jp/supp
 
 ---
 
-## 📊 Data Model & 10-Column SQL Schema
+## 📊 Data Model & 11-Column SQL Schema
 
 ### Consolidated Master CSV (`output/all_vendors_lifecycle.csv`)
 
-The exported master CSV strictly follows the **10-column database snake_case schema**:
+The exported master CSV strictly follows the **11-column database snake_case schema**:
 
 | Column Name | SQL Type | Invariant | Description | Practical Example |
 |---|---|:---:|---|---|
 | **`vendor_name`** | `VARCHAR(100)` | **MANDATORY (NO NULL)** | Clean manufacturer name | `JTEKT Toyoda` |
 | **`model_name`** | `VARCHAR(120)` | **MANDATORY (NO NULL)** | Discrete part number or model code | `PC3JX-CPU` |
+| **`aliases`** | `VARCHAR(255)` | Optional | Comma-separated model aliases, marketing codes, or alternative common names pointing to model_name | `TOYOPUC-PC3JX, PC3JX` |
 | **`status`** | `VARCHAR(80)` | **MANDATORY (NO NULL)** | Manufacturer-exact lifecycle status | `Discontinued` |
 | **`stage_date_utc`** | `TIMESTAMP WITH TIME ZONE` | **Preserved (Non-Dropping)** | ISO 8601 UTC milestone timestamp or empty string if date is unspecified by vendor | `2026-09-30T00:00:00Z` |
 | **`source_url`** | `VARCHAR(500)` | Optional | Canonical portal URL where extracted | `https://toyoda.jtekt.co.jp/...` |
@@ -1164,10 +1165,10 @@ Open **`http://localhost:8000`** in any web browser to:
 
 ## 🧪 Automated Verification & Testing
 
-The repository contains **222 automated unit, regression, edge-case, and end-to-end integration tests** across **25 test modules**, all passing with 100% green status in sub-second execution:
+The repository contains **225 automated unit, regression, edge-case, and end-to-end integration tests** across **25 test modules**, all passing with 100% green status in sub-second execution:
 
 ```bash
-# Run all 222 tests with verbose output
+# Run all 225 tests with verbose output
 python -m unittest discover tests -v
 
 # Run the comprehensive 8-stage pre-commit quality gate (AST, Ruff, Mypy, Secrets, 143-Vendor Config, SQL Schema, Tests, E2E)
@@ -1189,7 +1190,7 @@ python scripts/pre_commit_check.py
 | [`tests/test_dlq.py`](tests/test_dlq.py) | 2 | Dead Letter Queue failure recording, HTTP status code attribution, per-vendor forensic failure filtering. |
 | [`tests/test_e2e_pipeline.py`](tests/test_e2e_pipeline.py) | 2 | Complete synthetic 6-stage pipeline execution, schema compliance, formula sanitization, non-duplicating append. |
 | [`tests/test_framework_capability.py`](tests/test_framework_capability.py) | 7 | Loading of all 143 enterprise vendors (54 OT, 45 IoT, 44 IT), zero hardcoded config defaults, SSRF domain coverage. |
-| [`tests/test_models.py`](tests/test_models.py) | 23 | 10-column database schema sync, OS/Software lifecycles, date clamping, mandatory non-null guards, Zero-Dropped-EOL rule, lifecycle status & date model guardrails. |
+| [`tests/test_models.py`](tests/test_models.py) | 26 | 11-column database schema sync, OS/Software lifecycles, date clamping, mandatory non-null guards, Zero-Dropped-EOL rule, lifecycle status & date model guardrails, model aliases normalization. |
 | [`tests/test_multi_provider.py`](tests/test_multi_provider.py) | 16 | Cross-provider switching, API key resolution, HTTP REST fallback, rate-limit retry handling. |
 | [`tests/test_observability.py`](tests/test_observability.py) | 3 | Pipeline metrics collector, LTB 90-day alert detection, webhook alert dispatching, health badges. |
 | [`tests/test_package_init.py`](tests/test_package_init.py) | 1 | Package namespace exports, environment base directory initialization, path configurations. |
@@ -1200,7 +1201,7 @@ python scripts/pre_commit_check.py
 | [`tests/test_server.py`](tests/test_server.py) | 11 | Built-in HTTP dashboard server, REST endpoints (`/api/vendors`, `/api/products`), search/filter handlers. |
 | [`tests/test_setup_key.py`](tests/test_setup_key.py) | 9 | Universal AI provider key setup tool, environment persistence, model validation routines. |
 | [`tests/test_stealth_and_batch_crawl.py`](tests/test_stealth_and_batch_crawl.py) | 6 | Anti-bot stealth browser configuration, SPA hydration delay, prepare_page_chunks extraction, and batch extraction dispatch. |
-| [`tests/test_storage.py`](tests/test_storage.py) | 8 | `MasterStorageManager`, non-destructive multi-run incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap, genuine lifecycle filter. |
+| [`tests/test_storage.py`](tests/test_storage.py) | 9 | `MasterStorageManager`, non-destructive multi-run incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap, genuine lifecycle filter, aliases persistence. |
 | [`tests/test_vendors.py`](tests/test_vendors.py) | 11 | Dynamic 143-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction, multi-stage keyword normalization. |
 
 ---
@@ -1209,7 +1210,7 @@ python scripts/pre_commit_check.py
 
 The repository includes a complete AI Agent Harness enabling autonomous development, testing, and operation by AI coding assistants:
 
-- **Universal Agent Instructions**: [`AGENTS.md`](AGENTS.md) defines core constraints, 10-column database schema invariants, SSRF security guards, and standard workflows.
+- **Universal Agent Instructions**: [`AGENTS.md`](AGENTS.md) defines core constraints, 11-column database schema invariants, SSRF security guards, and standard workflows.
 - **Cognitive Runbook Skills ([`.agents/skills/`](.agents/skills/))**:
   - [`pre-commit-gatekeeper`](.agents/skills/pre-commit-gatekeeper/SKILL.md): 8-stage pre-commit gatekeeper with Ruff, Mypy, and strict commit-abort policy.
   - [`lifecycle-data-qa`](.agents/skills/lifecycle-data-qa/SKILL.md): Data QA runbook for the mandatory 4-field zero-null invariant and UTC ISO timestamps.

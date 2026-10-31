@@ -42,14 +42,15 @@ It provides native out-of-the-box support for **140 top enterprise vendors** acr
 When generating code, modifying schemas, or running pipeline operations, you MUST strictly enforce these 10 core invariants:
 
 <details open>
-<summary><b>Invariant 1: Database 10-Column Snake_Case Schema</b> (Click to collapse)</summary>
+<summary><b>Invariant 1: Database 11-Column Snake_Case Schema</b> (Click to collapse)</summary>
 
-The exported master dataset (`output/all_vendors_lifecycle.csv`) must match this exact 10-column schema:
+The exported master dataset (`output/all_vendors_lifecycle.csv`) must match this exact 11-column schema:
 ```text
-vendor_name, model_name, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata
+vendor_name, model_name, aliases, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata
 ```
 - **`vendor_name`**: Clean English manufacturer name (e.g. `Mitsubishi Electric`, `JTEKT Toyoda`) - **MANDATORY, NO NULL ALLOWED**.
 - **`model_name`**: Discrete hardware part number or software SKU (never bundled, e.g. `MI3321G-W`) - **MANDATORY, NO NULL ALLOWED**.
+- **`aliases`**: Comma-separated model aliases, marketing codes, or alternative common names pointing to model_name.
 - **`status`**: Unified lifecycle milestone status reflecting exact vendor terminology - **MANDATORY, NO NULL ALLOWED**.
 - **`stage_date_utc`**: Strict UTC ISO 8601 timestamp (`YYYY-MM-DDTHH:MM:SSZ`) - **MANDATORY, NO NULL ALLOWED**.
 - **`source_url`**: Canonical URL where the intelligence was extracted.

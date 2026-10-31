@@ -528,6 +528,7 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(products), 1)
         self.assertEqual(products[0].model_name, "6ES7516-3AN02-0AB0")
+        self.assertEqual(products[0].aliases, "SIMATIC S7-1500 CPU 1516-3 PN/DP")
         self.assertEqual(products[0].vendor_name, "Siemens")
         self.assertEqual(products[0].status, "Discontinued")
 

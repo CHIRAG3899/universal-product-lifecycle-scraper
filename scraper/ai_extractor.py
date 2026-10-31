@@ -84,6 +84,8 @@ Analyze the provided crawled web content or technical notice and extract all pro
      * 'raw_stage_label': original unnormalized stage text
      * 'detected_language': source language
      * 'notes': migration instructions or notes
+7. **MODEL ALIASES & COMMON NAMES**:
+   - If a product has alternate part numbers, marketing names, short codes, or common trade names (e.g., 'SIMATIC S7-1500 CPU 1516-3 PN/DP' for '6ES7516-3AN02-0AB0', or 'Catalyst 9300' for 'C9300-48P', or unhyphenated part number), record them as a clean comma-separated string in 'aliases'.
 """
 
 
@@ -191,6 +193,7 @@ def _ai_item_to_product_record(
         return ProductRecord(
             vendor_name=vendor,
             model_name=model,
+            aliases=getattr(item, "aliases", None),
             os=item.os,
             firmware=item.firmware,
             status=raw_status,
@@ -1148,6 +1151,7 @@ class UniversalAIExtractor:
                         products.append(ProductRecord(
                             vendor_name=default_vendor,
                             model_name=model_name,
+                            aliases=current_series if current_series and current_series != model_name else None,
                             os=os_val,
                             firmware=firmware_val,
                             status=raw_label[:100] if raw_label else norm_stage,
@@ -1393,6 +1397,7 @@ class UniversalAIExtractor:
                                         products.append(ProductRecord(
                                             vendor_name=default_vendor,
                                             model_name=r_mod,
+                                            aliases=row_series if row_series and row_series != r_mod else None,
                                             os=None,
                                             firmware=None,
                                             status=n_stage,
@@ -1440,6 +1445,7 @@ class UniversalAIExtractor:
                                     products.append(ProductRecord(
                                         vendor_name=default_vendor,
                                         model_name=r_mod,
+                                        aliases=row_series if row_series and row_series != r_mod else None,
                                         os=None,
                                         firmware=None,
                                         status=stg_val[:100] if stg_val else n_stage,

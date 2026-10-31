@@ -153,7 +153,7 @@ jobs:
           | **Per-Vendor JSONs** | `{len(vendor_jsons)}` JSON files |
           
           ### 🛡️ Schema & Security Compliance
-          - ✅ **Database 10-Column Snake_Case Schema**: `vendor_name, model_name, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata`
+          - ✅ **Database 11-Column Snake_Case Schema**: `vendor_name, model_name, aliases, status, stage_date_utc, source_url, os, firmware, category, replacement, metadata`
           - ✅ **Fingerprint Omission**: Strictly omitted from CSV export while preserving in-memory SHA-256 deduplication.
           - ✅ **Sanitization & Security**: CSV formula injection prevention (`=,+,-,@`), model sanity verification, SSRF whitelisting.
           - ✅ **Traceability Artifacts**: Run manifest and per-vendor traces generated in `artifacts/runs/{latest_run_id}`.

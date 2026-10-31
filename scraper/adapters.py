@@ -151,11 +151,12 @@ class FrameworkAdapter:
         for fp, r in raw_records.items():
             r_vendor = str(r.get("vendor_name") or "").lower()
             r_model = str(r.get("model_name") or "").lower()
+            r_aliases = str(r.get("aliases") or "").lower()
             r_status = str(r.get("status") or r.get("vendor_status") or "").lower()
 
             if v_filter and v_filter not in r_vendor:
                 continue
-            if m_filter and m_filter not in r_model:
+            if m_filter and (m_filter not in r_model and m_filter not in r_aliases):
                 continue
             if s_filter and s_filter not in r_status:
                 continue
@@ -176,6 +177,7 @@ class FrameworkAdapter:
                     fingerprint=fp,
                     vendor_name=r.get("vendor_name") or "",
                     model_name=r.get("model_name") or "",
+                    aliases=r.get("aliases"),
                     os=r.get("os"),
                     firmware=r.get("firmware"),
                     status=r.get("status") or "Discontinued",
