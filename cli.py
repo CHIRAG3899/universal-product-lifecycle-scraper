@@ -171,7 +171,7 @@ async def main():
         else:
             by_sc = summary.get("by_status_code", {})
             by_vendor = summary.get("by_vendor", {})
-            sc_line = " | ".join(f"{k}: {v}" for k, v in sorted(by_sc.items()))
+            sc_line = " | ".join(f"{str(k)}: {v}" for k, v in sorted(by_sc.items(), key=lambda x: str(x[0])))
             print(f"  Status Code Breakdown: {sc_line}")
             top_v = ", ".join(f"{k}: {v}" for k, v in list(by_vendor.items())[:6])
             print(f"  Top Failing Vendors:   {top_v}")

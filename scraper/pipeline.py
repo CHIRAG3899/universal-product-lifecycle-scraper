@@ -592,7 +592,7 @@ class LifecyclePipeline:
 
         if failure_summary["total_failures"] > 0:
             sc_map = failure_summary["by_status_code"]
-            sc_str = ", ".join(f"{k}: {v}" for k, v in sorted(sc_map.items()))
+            sc_str = ", ".join(f"{str(k)}: {v}" for k, v in sorted(sc_map.items(), key=lambda x: str(x[0])))
             print(f"  -> Failure Forensic Telemetry: {failure_summary['total_failures']} failed URLs mapped to {self.output_dir / 'crawl_failures.json'}")
             print(f"     * Breakdown: {sc_str}")
 

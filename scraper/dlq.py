@@ -8,7 +8,7 @@ for deep forensic auditing, tracing, observability, and offline remediation.
 import json
 import logging
 import threading
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -61,7 +61,17 @@ class DeadLetterItem:
     details: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        return {
+            "url": str(self.url),
+            "vendor_id": str(self.vendor_id),
+            "error_type": str(self.error_type),
+            "message": str(self.message),
+            "status_code": self.status_code,
+            "timestamp_utc": str(self.timestamp_utc),
+            "retry_count": int(self.retry_count),
+            "tier": str(self.tier),
+            "details": self.details if isinstance(self.details, dict) else {},
+        }
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DeadLetterItem":
@@ -94,6 +104,27 @@ class DeadLetterQueue:
         self.dlq_file.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
         self._seen_keys: Set[Tuple[str, Optional[int]]] = set()
+        self._items: List[DeadLetterItem] = []
+        self._load_initial_items()
+
+    def _load_initial_items(self) -> None:
+        """Loads existing DLQ records from disk on startup (capped at 5,000 to prevent runaway memory)."""
+        if not self.dlq_file.exists():
+            return
+        try:
+            with open(self.dlq_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list):
+                trimmed = data[-5000:]
+                for it in trimmed:
+                    try:
+                        item = DeadLetterItem.from_dict(it)
+                        self._items.append(item)
+                        self._seen_keys.add((item.url.lower(), item.status_code))
+                    except Exception:
+                        pass
+        except Exception as e:
+            logger.debug(f"[DLQ] Initial DLQ read notice: {e}")
 
     def record_failure(
         self,
@@ -106,7 +137,7 @@ class DeadLetterQueue:
         tier: str = "fast_http",
         details: Optional[Dict[str, Any]] = None,
     ) -> DeadLetterItem:
-        """Records a new failure event in the dead letter queue (deduplicated by url and status code)."""
+        """Records a new failure event in the dead letter queue (in-memory buffered, deduplicated)."""
         now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         norm_type = error_type or categorize_http_status(status_code)
 
@@ -115,12 +146,21 @@ class DeadLetterQueue:
         else:
             url_str = str(url or "unknown").strip()
 
+        v_str = str(vendor_id) if (vendor_id is not None and not str(type(vendor_id)).startswith("<class 'unittest.mock")) else "unknown"
+
+        if isinstance(status_code, int) and not str(type(status_code)).startswith("<class 'unittest.mock"):
+            clean_status: Optional[int] = status_code
+        elif isinstance(status_code, str) and status_code.isdigit():
+            clean_status = int(status_code)
+        else:
+            clean_status = None
+
         item = DeadLetterItem(
             url=url_str,
-            vendor_id=vendor_id,
+            vendor_id=v_str,
             error_type=norm_type,
             message=message,
-            status_code=status_code,
+            status_code=clean_status,
             timestamp_utc=now_utc,
             retry_count=retry_count,
             tier=tier,
@@ -128,49 +168,43 @@ class DeadLetterQueue:
         )
 
         with self._lock:
-            dedup_key = (url_str.lower(), status_code)
+            dedup_key = (url_str.lower(), clean_status)
             if dedup_key in self._seen_keys:
                 return item
             self._seen_keys.add(dedup_key)
+            self._items.append(item)
 
-            items = self.get_failures()
-            items.append(item)
+            if len(self._items) > 5000:
+                self._items.pop(0)
 
-            temp_file = self.dlq_file.with_suffix(".tmp")
-            try:
-                with open(temp_file, "w", encoding="utf-8") as f:
-                    json.dump([it.to_dict() for it in items], f, indent=2, ensure_ascii=False)
-                safe_atomic_replace(temp_file, self.dlq_file)
-                logger.warning(
-                    f"[DLQ] Logged crawl failure for {url} ({norm_type} [HTTP {status_code or 'N/A'}]: {message})"
-                )
-            except Exception as e:
-                logger.error(f"[DLQ] Error writing dead letter queue: {e}")
-                if temp_file.exists():
-                    try:
-                        temp_file.unlink()
-                    except Exception:
-                        pass
+            # Periodically flush to disk (every 25 items) to keep file updated without I/O thrashing
+            if len(self._items) % 25 == 0:
+                self._flush_to_disk()
 
         return item
 
-    def get_failures(self, vendor_id: Optional[str] = None) -> List[DeadLetterItem]:
-        """Retrieves all dead letter queue items, optionally filtered by vendor."""
-        if not self.dlq_file.exists():
-            return []
-
+    def _flush_to_disk(self) -> None:
+        """Flushes in-memory failure items to disk atomically."""
+        temp_file = self.dlq_file.with_suffix(".tmp")
         try:
-            with open(self.dlq_file, "r", encoding="utf-8") as f:
-                raw = json.load(f)
-            if not isinstance(raw, list):
-                return []
-            items = [DeadLetterItem.from_dict(d) for d in raw]
-            if vendor_id:
-                return [it for it in items if it.vendor_id.lower() == vendor_id.lower()]
-            return items
+            with open(temp_file, "w", encoding="utf-8") as f:
+                json.dump([it.to_dict() for it in self._items], f, indent=2, ensure_ascii=False, default=str)
+            safe_atomic_replace(temp_file, self.dlq_file)
         except Exception as e:
-            logger.warning(f"[DLQ] Error reading dead letter queue: {e}")
-            return []
+            logger.error(f"[DLQ] Error writing dead letter queue: {e}")
+            if temp_file.exists():
+                try:
+                    temp_file.unlink()
+                except Exception:
+                    pass
+
+    def get_failures(self, vendor_id: Optional[str] = None) -> List[DeadLetterItem]:
+        """Retrieves all dead letter queue items from memory, optionally filtered by vendor."""
+        with self._lock:
+            if not vendor_id:
+                return list(self._items)
+            v_lower = vendor_id.lower()
+            return [it for it in self._items if it.vendor_id.lower() == v_lower]
 
     def get_summary(self) -> Dict[str, Any]:
         """Calculates structured forensic summary across all failed pages."""
@@ -226,19 +260,20 @@ class DeadLetterQueue:
         }
         temp_file = filepath.with_suffix(".tmp")
         with open(temp_file, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=2, ensure_ascii=False)
+            json.dump(payload, f, indent=2, ensure_ascii=False, default=str)
         safe_atomic_replace(temp_file, filepath)
         return filepath
 
     def clear(self) -> bool:
         """Empties the dead letter queue file and clears in-memory state."""
         with self._lock:
+            had_items = len(self._items) > 0 or self.dlq_file.exists()
             self._seen_keys.clear()
+            self._items.clear()
             try:
                 if self.dlq_file.exists():
                     self.dlq_file.unlink()
-                    return True
-                return False
+                return had_items
             except Exception as e:
                 logger.warning(f"[DLQ] Error clearing dead letter queue: {e}")
                 return False

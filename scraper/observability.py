@@ -185,7 +185,7 @@ class AlertDispatcher:
         crawl_failures = metrics.get("crawl_failures", {})
         if crawl_failures.get("total_failures", 0) > 0:
             sc_map = crawl_failures.get("by_status_code", {})
-            sc_str = ", ".join(f"{k}: {v}" for k, v in sorted(sc_map.items()))
+            sc_str = ", ".join(f"{str(k)}: {v}" for k, v in sorted(sc_map.items(), key=lambda x: str(x[0])))
             lines.append(f"  Failures Mapped: {crawl_failures['total_failures']} URLs ({sc_str}) -> check output/crawl_failures.json")
 
         if alerts["urgent_ltb_count"] > 0:

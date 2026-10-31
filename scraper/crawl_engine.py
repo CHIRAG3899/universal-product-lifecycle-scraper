@@ -1189,14 +1189,35 @@ class UniversalAICrawler:
             sanitized = sanitize_crawl_url(url)
             if not sanitized or is_junk_url(sanitized):
                 return
+            # Collapse language query parameters (?lang=zh, ?lang=no, etc.)
+            sanitized = re.sub(r'[\?\&]lang=[a-zA-Z\-]+', '', sanitized)
             clean_url = self.run_cache.normalize_url(sanitized)
             if not clean_url:
+                return
+
+            # Skip domains that already tripped the circuit breaker
+            host = urllib.parse.urlsplit(clean_url).netloc
+            if host in self._circuit_broken_domains:
+                self.dlq.record_failure(
+                    url=clean_url,
+                    vendor_id=site_vendor,
+                    error_type="CIRCUIT_BREAKER_TRIPPED",
+                    message=f"Domain {host} circuit is OPEN (threshold reached).",
+                    status_code=503,
+                    tier="circuit_breaker"
+                )
                 return
 
             if clean_url in visited_urls or clean_url in queued_urls or self.run_cache.is_visited(clean_url):
                 return
             if not is_safe_url(clean_url, allowed_domains):
                 return
+
+            # Hard upper bound on crawl queue capacity to prevent unbounded link explosion
+            max_q_cap = max(50, (max_pages * 3) if (max_pages and max_pages > 0) else 250)
+            if len(queue) >= max_q_cap:
+                return
+
             queued_urls.add(clean_url)
             queue.append((clean_url, depth, priority))
 
@@ -1216,7 +1237,14 @@ class UniversalAICrawler:
             crawl_data = await self.crawl_with_crawl4ai(base_url)
             visited_urls.add(base_url)
             html = crawl_data.get("html", "")
-            if html:
+            base_status = crawl_data.get("status_code", 200)
+            is_base_blocked = (
+                (base_status and base_status >= 400)
+                or "access denied" in html.lower()
+                or "anti-bot" in html.lower()
+                or "edgesuite.net" in html.lower()
+            )
+            if html and not is_base_blocked:
                 soup = BeautifulSoup(html, "html.parser")
                 for a in soup.find_all("a", href=True):
                     href = str(a.get("href") or "").strip()
@@ -1287,7 +1315,14 @@ class UniversalAICrawler:
                     if not w_crawl_data:
                         w_crawl_data = self.run_cache.get_crawled_page(norm_u) or await self.crawl_page(u)
                     sub_html = w_crawl_data.get("html", "")
-                    if sub_html:
+                    sub_status = w_crawl_data.get("status_code", 200)
+                    is_blocked = (
+                        (sub_status and sub_status >= 400)
+                        or "access denied" in sub_html.lower()
+                        or "anti-bot" in sub_html.lower()
+                        or "edgesuite.net" in sub_html.lower()
+                    )
+                    if sub_html and not is_blocked:
                         sub_soup = BeautifulSoup(sub_html, "html.parser")
                         for a in sub_soup.find_all("a", href=True):
                             href = str(a.get("href") or "").strip()
@@ -1325,15 +1360,22 @@ class UniversalAICrawler:
                 # Circuit breaker check: skip domains with consecutive failure trips
                 parsed_host = urllib.parse.urlsplit(norm_u).netloc
                 if parsed_host in self._circuit_broken_domains:
-                    logger.warning(f"[CIRCUIT BREAKER] Domain {parsed_host} is OPEN. Skipping URL: {norm_u}")
+                    orig_len = len(queue)
+                    queue = [q_item for q_item in queue if urllib.parse.urlsplit(q_item[0]).netloc != parsed_host]
+                    purged = orig_len - len(queue) + 1
+                    logger.warning(
+                        f"[CIRCUIT BREAKER] Domain {parsed_host} is OPEN. Purged {purged} pending URLs from queue. Skipping {norm_u}"
+                    )
                     self.dlq.record_failure(
                         url=norm_u,
                         vendor_id=site_vendor,
                         error_type="CIRCUIT_BREAKER_TRIPPED",
-                        message=f"Domain {parsed_host} exceeded consecutive failure threshold ({self._circuit_breaker_threshold})",
+                        message=f"Domain {parsed_host} exceeded consecutive failure threshold ({self._circuit_breaker_threshold}). Purged {purged} queue items.",
                         status_code=503,
                         tier="circuit_breaker"
                     )
+                    if not queue and not active_tasks:
+                        break
                     continue
 
                 if norm_u in visited_urls or self.run_cache.is_visited(norm_u):
@@ -1362,7 +1404,8 @@ class UniversalAICrawler:
                     accumulated_pre_extracted.extend(res["pre_recs"])
                     accumulated_chunks.extend(res["chunks"])
 
-                    queue_budget_allowed = (not max_pages or max_pages <= 0 or len(queue) < max_pages * 2)
+                    max_queue_size = (max_pages * 2) if (max_pages and max_pages > 0) else 250
+                    queue_budget_allowed = len(queue) < max_queue_size
                     if queue_budget_allowed:
                         for cand_u, c_depth, c_pri in res["discovered"]:
                             add_to_queue(cand_u, depth=c_depth, priority=c_pri)
