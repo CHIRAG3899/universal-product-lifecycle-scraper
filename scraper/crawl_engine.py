@@ -21,6 +21,7 @@ from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 
 from scraper.ai_extractor import UniversalAIExtractor
 from scraper.config import HEADLESS_BROWSER, REQUEST_TIMEOUT_SEC, USER_AGENT
+from scraper.dlq import DeadLetterQueue, categorize_http_status, get_global_dlq
 from scraper.models import ProductRecord, is_valid_product_model
 from scraper.security import is_safe_url
 from scraper.vendors import detect_vendor_from_url_or_text
@@ -94,6 +95,7 @@ class UniversalAICrawler:
         extractor: Optional[UniversalAIExtractor] = None,
         gemini_extractor: Optional[UniversalAIExtractor] = None,
         run_cache: Optional[Any] = None,
+        dlq: Optional[Any] = None,
     ):
         self.extractor = extractor or gemini_extractor or UniversalAIExtractor()
         self.gemini = self.extractor  # Backward compatibility alias
@@ -101,9 +103,14 @@ class UniversalAICrawler:
         self.run_cache: RunCache = run_cache or get_global_run_cache()
         if hasattr(self.extractor, "run_cache") and getattr(self.extractor, "run_cache", None) is None:
             self.extractor.run_cache = self.run_cache
+        self.dlq: DeadLetterQueue = dlq or get_global_dlq()
         self._pdf_replacement_cache: Dict[str, Dict[str, str]] = {}
         self._crawl_cache: Dict[str, Dict[str, Any]] = {}
         self._http_session: Optional[Any] = None
+        self._domain_failures: Dict[str, int] = {}
+        self._circuit_broken_domains: Set[str] = set()
+        self._circuit_breaker_threshold: int = int(os.getenv("CIRCUIT_BREAKER_THRESHOLD", "5"))
+        self._current_vendor: str = "unknown"
 
     def _get_http_session(self):
         """Returns a persistent, connection-pooled HTTP session for high-throughput fast-path crawling."""
@@ -272,15 +279,37 @@ class UniversalAICrawler:
             async with AsyncWebCrawler(config=browser_config) as crawler:
                 result = await crawler.arun(url=target_url, config=run_config)
                 
+                parsed_host = urllib.parse.urlsplit(target_url).netloc
                 if not result.success:
+                    if parsed_host:
+                        self._domain_failures[parsed_host] = self._domain_failures.get(parsed_host, 0) + 1
+                        if self._domain_failures[parsed_host] >= self._circuit_breaker_threshold:
+                            self._circuit_broken_domains.add(parsed_host)
+                            logger.warning(f"[CIRCUIT BREAKER TRIPPED] Domain {parsed_host} reached {self._domain_failures[parsed_host]} consecutive failures. Circuit opened.")
                     logger.warning(f"Crawl4AI failed to fetch {target_url}: {result.error_message}. Attempting resilient HTTP fallback...")
                     fallback_data = self.fetch_http_fallback(target_url)
                     if fallback_data.get("status_code", 500) < 400 and fallback_data.get("markdown"):
                         return _remember(fallback_data)
+                    self.dlq.record_failure(
+                        url=target_url,
+                        vendor_id=self._current_vendor,
+                        error_type=categorize_http_status(result.status_code, default="BROWSER_FETCH_ERROR"),
+                        message=result.error_message or "Headless browser failed to load page",
+                        status_code=result.status_code or 500,
+                        tier="crawl4ai"
+                    )
                     raise RuntimeError(f"Crawl4AI failed to fetch {target_url}: {result.error_message}")
 
                 if result.status_code and result.status_code >= 400:
                     logger.warning(f"URL {target_url} returned HTTP {result.status_code}. Skipping non-200 page.")
+                    self.dlq.record_failure(
+                        url=target_url,
+                        vendor_id=self._current_vendor,
+                        error_type=categorize_http_status(result.status_code),
+                        message=f"HTTP {result.status_code} returned by browser",
+                        status_code=result.status_code,
+                        tier="crawl4ai"
+                    )
                     return _remember({
                         "url": target_url,
                         "markdown": "",
@@ -290,6 +319,8 @@ class UniversalAICrawler:
                     })
 
                 logger.info(f"Crawl4AI succeeded! Extracted {len(result.markdown)} characters of clean markdown.")
+                if parsed_host in self._domain_failures:
+                    self._domain_failures[parsed_host] = 0
                 return _remember({
                     "url": target_url,
                     "markdown": result.markdown,
@@ -383,8 +414,23 @@ class UniversalAICrawler:
                 except Exception:
                     pass
 
+            parsed_host = urlparse(clean_url).netloc
             if status >= 400:
                 logger.warning(f"Resilient HTTP fallback got HTTP {status} for {clean_url}")
+                self.dlq.record_failure(
+                    url=clean_url,
+                    vendor_id=self._current_vendor,
+                    error_type=categorize_http_status(status),
+                    message=f"HTTP {status} returned by server",
+                    status_code=status,
+                    tier="fast_http"
+                )
+                if status in (401, 403, 429, 500, 502, 503, 504):
+                    self._domain_failures[parsed_host] = self._domain_failures.get(parsed_host, 0) + 1
+                    if self._domain_failures[parsed_host] >= self._circuit_breaker_threshold:
+                        if parsed_host not in self._circuit_broken_domains:
+                            self._circuit_broken_domains.add(parsed_host)
+                            logger.warning(f"[CIRCUIT BREAKER TRIPPED] Domain {parsed_host} reached {self._domain_failures[parsed_host]} consecutive failures. Circuit opened.")
                 return {
                     "url": clean_url,
                     "markdown": "",
@@ -392,6 +438,10 @@ class UniversalAICrawler:
                     "status_code": status,
                     "extracted_content": None
                 }
+
+            # Reset failure count on success
+            if parsed_host in self._domain_failures:
+                self._domain_failures[parsed_host] = 0
 
             html_text = resp.text
             soup = BeautifulSoup(html_text, "html.parser")
@@ -409,6 +459,14 @@ class UniversalAICrawler:
             }
         except Exception as fallback_err:
             logger.debug(f"Resilient HTTP fallback unavailable for {clean_url}: {fallback_err}")
+            self.dlq.record_failure(
+                url=clean_url,
+                vendor_id=self._current_vendor,
+                error_type=type(fallback_err).__name__,
+                message=str(fallback_err),
+                status_code=500,
+                tier="fast_http"
+            )
             return {
                 "url": clean_url,
                 "markdown": "",
@@ -900,6 +958,7 @@ class UniversalAICrawler:
                 return cached_products
 
         vendor = detect_vendor_from_url_or_text(target_url)
+        self._current_vendor = vendor
         logger.info(f"Detected target vendor: {vendor} from URL: {target_url}")
 
         # 1. Crawl via intelligent dual-tier engine (Fast HTTP -> Crawl4AI fallback)
@@ -1104,6 +1163,7 @@ class UniversalAICrawler:
         logger.info(f"[CRAWLER] Initiating site-level crawl on domain: {base_url} (Max pages: {pages_limit_str}, Max depth: {depth_limit_str}, Accumulate: {accumulate_batches})")
 
         site_vendor = detect_vendor_from_url_or_text(base_url)
+        self._current_vendor = site_vendor
 
         # Broad discovery keyword patterns:
         # Priority 1: Direct lifecycle, EOL, obsolescence, bulletins
@@ -1210,6 +1270,14 @@ class UniversalAICrawler:
                     w_crawl_data = self.run_cache.get_crawled_page(norm_u) or {}
             except Exception as pe:
                 logger.warning(f"Error crawling portal {u}: {pe}")
+                self.dlq.record_failure(
+                    url=u,
+                    vendor_id=site_vendor,
+                    error_type=type(pe).__name__,
+                    message=str(pe),
+                    status_code=500,
+                    tier="crawler"
+                )
 
             # Sub-portal link discovery
             discovered_links: List[Tuple[str, int, int]] = []
@@ -1253,6 +1321,21 @@ class UniversalAICrawler:
                     break
                 u, current_depth, pri = queue.pop(0)
                 norm_u = self.run_cache.normalize_url(u)
+
+                # Circuit breaker check: skip domains with consecutive failure trips
+                parsed_host = urllib.parse.urlsplit(norm_u).netloc
+                if parsed_host in self._circuit_broken_domains:
+                    logger.warning(f"[CIRCUIT BREAKER] Domain {parsed_host} is OPEN. Skipping URL: {norm_u}")
+                    self.dlq.record_failure(
+                        url=norm_u,
+                        vendor_id=site_vendor,
+                        error_type="CIRCUIT_BREAKER_TRIPPED",
+                        message=f"Domain {parsed_host} exceeded consecutive failure threshold ({self._circuit_breaker_threshold})",
+                        status_code=503,
+                        tier="circuit_breaker"
+                    )
+                    continue
+
                 if norm_u in visited_urls or self.run_cache.is_visited(norm_u):
                     if self.run_cache.has_extracted_products(norm_u):
                         cached_records = self.run_cache.get_extracted_products(norm_u)

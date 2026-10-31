@@ -19,6 +19,7 @@ sys.path.insert(0, str(BASE_DIR))
 
 from scraper.ai_extractor import GeminiExtractor
 from scraper.crawl_engine import MitsubishiAICrawler, UniversalAICrawler, is_junk_url, sanitize_crawl_url
+from scraper.dlq import DeadLetterQueue
 from scraper.models import ProductRecord
 
 
@@ -571,6 +572,46 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(len(records), 4)
         self.assertEqual(self.crawler.run.call_count, 4)
+
+    async def test_22_domain_circuit_breaker_and_dlq(self):
+        """Verifies that circuit breaker trips after consecutive failures and records to DLQ."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            test_dlq = DeadLetterQueue(dlq_path=Path(td) / "test_dlq.jsonl")
+            self.crawler.dlq = test_dlq
+            self.crawler._circuit_breaker_threshold = 2
+
+            # Manually trip circuit breaker on domain
+            broken_domain = "unstable-vendor.com"
+            self.crawler._circuit_broken_domains.add(broken_domain)
+
+            base_html = f"""
+            <html><body>
+              <a href="https://{broken_domain}/support/eol">EOL Bulletin 1</a>
+              <a href="https://{broken_domain}/products/catalog">Product Catalog 2</a>
+            </body></html>
+            """
+            self.crawler.crawl_with_crawl4ai = AsyncMock(return_value={
+                "url": f"https://{broken_domain}",
+                "markdown": "Base",
+                "html": base_html,
+                "status_code": 200
+            })
+            self.crawler.run = AsyncMock(return_value=[])
+
+            records = await self.crawler.crawl_website(
+                base_url=f"https://{broken_domain}",
+                allowed_domains=[broken_domain],
+                max_pages=3,
+                enable_sitemap=False
+            )
+
+            # Worker tasks should skip URLs from the tripped domain
+            self.assertEqual(len(records), 0)
+            self.assertEqual(self.crawler.run.call_count, 0)
+            summary = test_dlq.get_summary()
+            self.assertGreaterEqual(summary["total_failures"], 1)
+            self.assertIn("503", summary["by_status_code"])
 
 
 if __name__ == "__main__":

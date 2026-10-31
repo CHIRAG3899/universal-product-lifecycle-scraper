@@ -65,6 +65,44 @@ class TestDeadLetterQueue(unittest.TestCase):
         self.assertTrue(cleared)
         self.assertEqual(len(self.dlq.get_failures()), 0)
 
+    def test_categorize_http_status(self):
+        from scraper.dlq import categorize_http_status
+        self.assertEqual(categorize_http_status(301), "HTTP_301_REDIRECT")
+        self.assertEqual(categorize_http_status(400), "HTTP_400_BAD_REQUEST")
+        self.assertEqual(categorize_http_status(403), "HTTP_403_BOT_BLOCK")
+        self.assertEqual(categorize_http_status(404), "HTTP_404_NOT_FOUND")
+        self.assertEqual(categorize_http_status(429), "HTTP_429_RATE_LIMITED")
+        self.assertEqual(categorize_http_status(500), "HTTP_500_SERVER_ERROR")
+        self.assertEqual(categorize_http_status(502), "HTTP_502_BAD_GATEWAY")
+        self.assertEqual(categorize_http_status(503), "HTTP_503_SERVICE_UNAVAILABLE")
+        self.assertEqual(categorize_http_status(504), "HTTP_504_GATEWAY_TIMEOUT")
+        self.assertEqual(categorize_http_status(None), "FETCH_ERROR")
+
+    def test_summary_and_export_and_retryable(self):
+        self.dlq.record_failure("https://a.com/404", "siemens", "HTTP_404_NOT_FOUND", "Not found", status_code=404)
+        self.dlq.record_failure("https://b.com/500", "siemens", "HTTP_500_SERVER_ERROR", "Internal error", status_code=500)
+        self.dlq.record_failure("https://c.com/403", "omron", "HTTP_403_BOT_BLOCK", "Cloudflare block", status_code=403)
+        # Deduplication check: re-recording exact same URL and status code shouldn't duplicate
+        self.dlq.record_failure("https://c.com/403", "omron", "HTTP_403_BOT_BLOCK", "Cloudflare block", status_code=403)
+
+        summary = self.dlq.get_summary()
+        self.assertEqual(summary["total_failures"], 3)
+        self.assertEqual(summary["by_status_code"]["404"], 1)
+        self.assertEqual(summary["by_status_code"]["500"], 1)
+        self.assertEqual(summary["by_status_code"]["403"], 1)
+        self.assertEqual(summary["by_vendor"]["siemens"], 2)
+        self.assertEqual(summary["by_vendor"]["omron"], 1)
+
+        retryable = self.dlq.get_retryable_failures()
+        self.assertEqual(len(retryable), 2)
+        retryable_codes = {it.status_code for it in retryable}
+        self.assertIn(500, retryable_codes)
+        self.assertIn(403, retryable_codes)
+
+        export_target = Path(self.temp_dir.name) / "exported_failures.json"
+        self.dlq.export_failures_json(export_target)
+        self.assertTrue(export_target.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

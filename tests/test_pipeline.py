@@ -212,6 +212,64 @@ vendors:
         # Verify alert dispatcher was called
         mock_dispatch.assert_called_once()
 
+    @patch("scraper.observability.AlertDispatcher.dispatch_alert")
+    async def test_08_non_failable_execution_continues_on_vendor_error(self, mock_dispatch):
+        """Verifies that an error in one vendor does not abort remaining vendors (fault isolation & HA)."""
+        test_product = ProductRecord(
+            vendor_name="Cisco IoT",
+            model_name="IR1101-K9",
+            status="End of Life",
+            stage_date_utc="2027-06-30T00:00:00Z"
+        )
+
+        async def mock_exec_vendor(v_key, *args, **kwargs):
+            if v_key == "mitsubishi":
+                raise ConnectionResetError("Simulated socket reset on mitsubishi portal")
+            return [test_product]
+
+        self.pipeline.execute_vendor = AsyncMock(side_effect=mock_exec_vendor)
+        self.pipeline.storage.upsert_and_persist = MagicMock(return_value=(1, 1, 0))
+
+        # Execute across all vendors in sequential mode (concurrency=1)
+        dataset = await self.pipeline.execute(vendor_filter="all", concurrency=1)
+
+        # Must not crash!
+        self.assertIsInstance(dataset, ScrapedDataset)
+        # Verify that remaining vendors (cisco_iot, dell_it) succeeded and were persisted
+        self.pipeline.storage.upsert_and_persist.assert_called_once()
+        harvested = self.pipeline.storage.upsert_and_persist.call_args[0][0]
+        self.assertEqual(len(harvested), 2)  # cisco_iot and dell_it
+
+        # Verify failure tracking telemetry was exported
+        exported_failures = Path(self.temp_dir) / "output" / "crawl_failures.json"
+        self.assertTrue(exported_failures.exists())
+
+        summary = self.pipeline.dlq.get_summary()
+        self.assertGreaterEqual(summary["total_failures"], 1)
+        self.assertIn("mitsubishi", summary["by_vendor"])
+
+    @patch("scraper.observability.AlertDispatcher.dispatch_alert")
+    async def test_09_concurrent_non_failable_execution(self, mock_dispatch):
+        """Verifies concurrent multi-worker execution gracefully isolates worker failures."""
+        test_product = ProductRecord(
+            vendor_name="Dell Technologies",
+            model_name="PowerEdge R740",
+            status="End of Life",
+            stage_date_utc="2026-05-15T00:00:00Z"
+        )
+
+        async def mock_exec_vendor(v_key, *args, **kwargs):
+            if v_key == "mitsubishi":
+                raise TimeoutError("Simulated timeout on worker task")
+            return [test_product]
+
+        self.pipeline.execute_vendor = AsyncMock(side_effect=mock_exec_vendor)
+        self.pipeline.storage.upsert_and_persist = MagicMock(return_value=(2, 2, 0))
+
+        dataset = await self.pipeline.execute(vendor_filter="all", concurrency=3)
+        self.assertIsInstance(dataset, ScrapedDataset)
+        self.pipeline.storage.upsert_and_persist.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

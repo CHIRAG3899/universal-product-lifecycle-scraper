@@ -114,6 +114,27 @@ class TestObservability(unittest.TestCase):
         self.assertIn("run_obs_003", alert_text)
         self.assertIn("1 EOL", alert_text)
 
+    def test_alert_dispatcher_format_with_crawl_failures(self):
+        collector = PipelineMetricsCollector(run_id="run_obs_004")
+        collector.record_vendor_result("Omron", 1, 0.5)
+        products = [
+            ProductRecord(
+                vendor_name="Omron",
+                model_name="CJ1W",
+                status="Discontinued",
+                stage_date_utc="2025-01-01T00:00:00Z"
+            )
+        ]
+        metrics = collector.compute_metrics(products, 1, 0)
+        metrics["crawl_failures"] = {
+            "total_failures": 3,
+            "by_status_code": {"403": 2, "500": 1}
+        }
+        alert_text = AlertDispatcher.format_alert_text(metrics)
+        self.assertIn("Failures Mapped: 3 URLs", alert_text)
+        self.assertIn("403: 2", alert_text)
+        self.assertIn("500: 1", alert_text)
+
 
 if __name__ == "__main__":
     unittest.main()

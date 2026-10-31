@@ -46,6 +46,10 @@ class PipelineMetricsCollector:
         if error:
             self.errors.append(f"[{vendor_name}] {error}")
 
+    def record_vendor_failure(self, vendor_name: str, error: str):
+        """Records an isolated vendor failure for high availability observability."""
+        self.record_vendor_result(vendor_name, 0, 0.0, error=error)
+
     def compute_metrics(
         self,
         all_products: List[ProductRecord],
@@ -177,6 +181,12 @@ class AlertDispatcher:
             f"  Stages: {stages['last_time_buy_count']} LTB | {stages['end_of_life_count']} EOL | {stages['end_of_service_count']} EOS",
             f"  Quality: {quality['utc_date_coverage_pct']}% UTC Dates | {quality['metadata_coverage_pct']}% Rich Metadata",
         ]
+
+        crawl_failures = metrics.get("crawl_failures", {})
+        if crawl_failures.get("total_failures", 0) > 0:
+            sc_map = crawl_failures.get("by_status_code", {})
+            sc_str = ", ".join(f"{k}: {v}" for k, v in sorted(sc_map.items()))
+            lines.append(f"  Failures Mapped: {crawl_failures['total_failures']} URLs ({sc_str}) -> check output/crawl_failures.json")
 
         if alerts["urgent_ltb_count"] > 0:
             lines.append(f"\n[!] URGENT PROCUREMENT ALERTS ({alerts['urgent_ltb_count']} products closing orders in <{alerts['urgent_ltb_window_days']} days):")

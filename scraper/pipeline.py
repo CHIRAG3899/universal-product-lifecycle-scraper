@@ -22,7 +22,7 @@ from scraper.checkpoint import CheckpointManager
 from scraper.config import BASE_DIR
 from scraper.crawl_engine import UniversalAICrawler
 from scraper.delta_cache import DeltaCache
-from scraper.dlq import DeadLetterQueue
+from scraper.dlq import get_global_dlq
 from scraper.models import (
     ProductRecord,
     ScrapedDataset,
@@ -34,6 +34,19 @@ from scraper.security import clean_and_sanitize_identifier, inspect_security_thr
 from scraper.storage import MasterStorageManager
 
 logger = logging.getLogger("ai_scraper.pipeline")
+
+
+def _resolve_ep_url(cfg: Any) -> str:
+    """Safely extracts a string seed or portal URL from vendor config dictionary."""
+    if not isinstance(cfg, dict):
+        return "unknown"
+    eps = cfg.get("entry_points") or []
+    if eps and isinstance(eps, list):
+        first = eps[0]
+        if isinstance(first, dict):
+            return str(first.get("url") or cfg.get("website") or "unknown")
+        return str(first)
+    return str(cfg.get("website") or "unknown")
 
 
 class LifecyclePipeline:
@@ -80,11 +93,11 @@ class LifecyclePipeline:
             run_cache=self.run_cache,
         )
         self.gemini = self.extractor  # Backward compatibility alias
-        self.crawler = UniversalAICrawler(gemini_extractor=self.extractor, run_cache=self.run_cache)
+        self.dlq = get_global_dlq()
+        self.crawler = UniversalAICrawler(gemini_extractor=self.extractor, run_cache=self.run_cache, dlq=self.dlq)
         self.storage = MasterStorageManager(self.master_csv, self.output_dir)
         self.artifact_mgr = RunArtifactManager(self.artifacts_dir, run_id=run_id)
         self.checkpoint_mgr = CheckpointManager()
-        self.dlq = DeadLetterQueue()
         self.delta_cache = DeltaCache()
         
         obs_cfg = self.config.get("observability", {})
@@ -477,20 +490,30 @@ class LifecyclePipeline:
 
                 results = await asyncio.gather(*[_worker(vk, vc) for vk, vc in target_vendors], return_exceptions=True)
                 failed_exceptions = []
-                for r in results:
+                for (vk, vc), r in zip(target_vendors, results):
                     if isinstance(r, list):
                         all_harvested_products.extend(r)
                     elif isinstance(r, Exception):
-                        logger.error(f"Worker task error: {r}")
-                        failed_exceptions.append(r)
+                        logger.error(f"[HIGH AVAILABILITY] Concurrent worker task error for vendor '{vk}': {r}")
+                        failed_exceptions.append((vk, r))
+                        ep_url = _resolve_ep_url(vc)
+                        self.dlq.record_failure(
+                            url=ep_url,
+                            vendor_id=vk,
+                            error_type=type(r).__name__,
+                            message=str(r),
+                            status_code=500,
+                            tier="concurrent_pipeline_worker"
+                        )
+                        self.metrics_collector.record_vendor_failure(vk, str(r))
 
                 if failed_exceptions:
                     pending_keys = [tv[0] for tv in target_vendors if tv[0] not in completed_vendor_keys]
                     self.checkpoint_mgr.save_checkpoint(
-                        vendor_id=pending_keys[0] if pending_keys else "concurrent_worker",
+                        vendor_id=failed_exceptions[0][0],
                         run_id=self.artifact_mgr.run_id,
-                        status="failed",
-                        error_message=str(failed_exceptions[0]),
+                        status="degraded",
+                        error_message=str(failed_exceptions[0][1]),
                         completed_vendors=completed_vendor_keys,
                         pending_vendors=pending_keys,
                         harvested_records_count=len(all_harvested_products)
@@ -509,17 +532,28 @@ class LifecyclePipeline:
                         all_harvested_products.extend(v_prods)
                         completed_vendor_keys.append(v_key)
                     except Exception as v_err:
-                        pending_keys = [tv[0] for tv in target_vendors if tv[0] not in completed_vendor_keys]
+                        logger.error(f"[HIGH AVAILABILITY] Vendor '{v_key}' crawl encountered an isolated error: {v_err}. Preserving run state and continuing...")
+                        ep_url = _resolve_ep_url(v_cfg)
+                        self.dlq.record_failure(
+                            url=ep_url,
+                            vendor_id=v_key,
+                            error_type=type(v_err).__name__,
+                            message=str(v_err),
+                            status_code=500,
+                            tier="pipeline_vendor"
+                        )
+                        self.metrics_collector.record_vendor_failure(v_key, str(v_err))
+                        pending_keys = [tv[0] for tv in target_vendors if tv[0] not in completed_vendor_keys and tv[0] != v_key]
                         self.checkpoint_mgr.save_checkpoint(
                             vendor_id=v_key,
                             run_id=self.artifact_mgr.run_id,
-                            status="failed",
+                            status="degraded",
                             error_message=str(v_err),
                             completed_vendors=completed_vendor_keys,
                             pending_vendors=pending_keys,
                             harvested_records_count=len(all_harvested_products)
                         )
-                        raise v_err
+                        continue
 
         # -------------------------------------------------------------------------
         # STEP 5/6: DEDUPLICATION & MERGE
@@ -543,12 +577,25 @@ class LifecyclePipeline:
         print(f"  -> Run Cache Telemetry:     {cache_stats['total_redundant_operations_saved']} redundant operations saved "
               f"({cache_stats['page_crawl_hits']} crawl hits, {cache_stats['extraction_cache_hits']} AI extraction hits, {cache_stats['file_hits']} file hits)")
 
+        # Export crawl failure forensic map
+        self.dlq.export_failures_json(self.artifact_mgr.run_dir / "crawl_failures.json")
+        self.dlq.export_failures_json(self.output_dir / "crawl_failures.json")
+        failure_summary = self.dlq.get_summary()
+
         metrics = self.metrics_collector.compute_metrics(
             all_products=all_harvested_products,
             new_appended=new_appended,
             refreshed_existing=refreshed
         )
         metrics["run_cache"] = cache_stats
+        metrics["crawl_failures"] = failure_summary
+
+        if failure_summary["total_failures"] > 0:
+            sc_map = failure_summary["by_status_code"]
+            sc_str = ", ".join(f"{k}: {v}" for k, v in sorted(sc_map.items()))
+            print(f"  -> Failure Forensic Telemetry: {failure_summary['total_failures']} failed URLs mapped to {self.output_dir / 'crawl_failures.json'}")
+            print(f"     * Breakdown: {sc_str}")
+
         self.artifact_mgr.finalize_manifest(metrics)
         AlertDispatcher.dispatch_alert(metrics, webhook_url=self.webhook_url)
 

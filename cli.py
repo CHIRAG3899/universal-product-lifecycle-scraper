@@ -70,7 +70,8 @@ async def main():
     parser.add_argument("--vendor-terminology", "--standalone-terminology", dest="vendor_terminology", action="store_true", help="Display manufacturer-exact lifecycle terminology catalog standalone (runs without crawler framework)")
     parser.add_argument("--status-registry", action="store_true", help="Display or query standalone vendor lifecycle status registry")
     parser.add_argument("--resume", action="store_true", help="Resume interrupted or failed crawl from the last saved checkpoint")
-    parser.add_argument("--dlq", action="store_true", help="Inspect Dead Letter Queue (DLQ) forensic log of failed crawls")
+    parser.add_argument("--dlq", "--show-failures", "--failures", dest="show_failures", action="store_true", help="Inspect Dead Letter Queue (DLQ) forensic log and failure map of failed crawls")
+    parser.add_argument("--retry-failures", action="store_true", help="Retry transient failed crawl requests from DLQ with resilient evasion headers and merge recovered data")
     parser.add_argument("--clear-checkpoint", action="store_true", help="Discard saved checkpoint and start fresh")
     args = parser.parse_args()
 
@@ -159,18 +160,55 @@ async def main():
             print("\n[*] No active checkpoint found to clear.")
         return
 
-    if args.dlq:
-        failures = pipeline.dlq.get_failures()
-        print(f"\n[*] Dead Letter Queue: {len(failures)} logged failure events")
-        print("-" * 88)
-        if not failures:
-            print("  (DLQ is empty - no recorded failure events)")
+    if getattr(args, "show_failures", False):
+        summary = pipeline.dlq.get_summary()
+        failures = summary.get("failures", [])
+        total = summary.get("total_failures", 0)
+        print(f"\n[*] Crawl Failure Forensic Telemetry ({total} Total Tracked Failures):")
+        print("-" * 96)
+        if total == 0:
+            print("  (Zero failures recorded. All crawls succeeded with 100% availability!)")
         else:
-            print(f"{'Vendor':<18} | {'Type':<18} | {'Status':<6} | URL")
-            print("-" * 88)
-            for it in failures[-20:]:
-                print(f"{it.vendor_id:<18} | {it.error_type:<18} | {str(it.status_code or 'N/A'):<6} | {it.url}")
-        print("-" * 88)
+            by_sc = summary.get("by_status_code", {})
+            by_vendor = summary.get("by_vendor", {})
+            sc_line = " | ".join(f"{k}: {v}" for k, v in sorted(by_sc.items()))
+            print(f"  Status Code Breakdown: {sc_line}")
+            top_v = ", ".join(f"{k}: {v}" for k, v in list(by_vendor.items())[:6])
+            print(f"  Top Failing Vendors:   {top_v}")
+            print("-" * 96)
+            print(f"{'Vendor':<16} | {'Status':<6} | {'Category':<22} | URL")
+            print("-" * 96)
+            for it in failures[-30:]:
+                sc_str = str(it.get("status_code") or "N/A")
+                print(f"{it.get('vendor_id', 'unknown')[:16]:<16} | {sc_str:<6} | {it.get('error_type', 'UNKNOWN')[:22]:<22} | {it.get('url', '')}")
+            print("-" * 96)
+            print("  Full JSON map exported to: output/crawl_failures.json")
+        return
+
+    if getattr(args, "retry_failures", False):
+        retryable = pipeline.dlq.get_retryable_failures()
+        print(f"\n[*] Recovering Transient Failed Crawls ({len(retryable)} retryable failures in DLQ)...")
+        if not retryable:
+            print("  No retryable failures found in DLQ (all failures either empty or permanent 404s).")
+            return
+        recovered_records = []
+        for it in retryable:
+            print(f"  -> Retrying {it.url} (Prior status: {it.status_code}, Vendor: {it.vendor_id})...")
+            try:
+                prods = await pipeline.crawler.run(it.url)
+                if prods:
+                    print(f"     [SUCCESS] Recovered {len(prods)} product records from {it.url}!")
+                    recovered_records.extend(prods)
+                else:
+                    print("     [NO DATA] URL reachable but yielded no lifecycle product tables.")
+            except Exception as re_err:
+                print(f"     [STILL FAILING] {re_err}")
+        if recovered_records:
+            total_in_storage, new_appended, refreshed = pipeline.storage.upsert_and_persist(recovered_records)
+            print(f"\n[+] Retry Recovery Complete: {len(recovered_records)} records extracted ({new_appended} new, {refreshed} refreshed).")
+            print(f"    Master Consolidated CSV Updated: {pipeline.master_csv}")
+        else:
+            print("\n[*] Retry cycle completed. Zero new records recovered.")
         return
 
     if args.list_vendors:
