@@ -1373,10 +1373,7 @@ class UniversalAIExtractor:
                                     u_date = parse_to_utc_iso(raw_dt)
                                     if not u_date and bulletin_code:
                                         u_date = extract_date_from_bulletin_code(bulletin_code)
-                                    # MANDATORY DATE GUARD: NO NULL ALLOWED
-                                    if not u_date:
-                                        continue
-                                    m_dict = {
+                                    m_dict: Dict[str, Any] = {
                                         "replacement": repl_val,
                                         "family": row_cat,
                                         "series": row_series,
@@ -1389,6 +1386,9 @@ class UniversalAIExtractor:
                                         "all_milestones": [{"stage": n_stage, "date_utc": u_date, "raw_date": raw_dt}],
                                         "notes": f"Catalog series: {row_series}"
                                     }
+                                    if not u_date:
+                                        u_date = None
+                                        m_dict["missing_date"] = True
                                     try:
                                         products.append(ProductRecord(
                                             vendor_name=default_vendor,
@@ -1420,9 +1420,6 @@ class UniversalAIExtractor:
                                 u_date = parse_to_utc_iso(dt_val)
                                 if not u_date and bulletin_code:
                                     u_date = extract_date_from_bulletin_code(bulletin_code)
-                                # MANDATORY DATE GUARD: NO NULL ALLOWED
-                                if not u_date:
-                                    continue
                                 m_dict = {
                                     "replacement": repl_val,
                                     "family": row_cat,
@@ -1436,6 +1433,9 @@ class UniversalAIExtractor:
                                     "all_milestones": [{"stage": n_stage, "date_utc": u_date, "raw_date": dt_val}],
                                     "notes": f"Catalog series: {row_series}"
                                 }
+                                if not u_date:
+                                    u_date = None
+                                    m_dict["missing_date"] = True
                                 try:
                                     products.append(ProductRecord(
                                         vendor_name=default_vendor,

@@ -166,7 +166,7 @@ class LifecyclePipeline:
                 print(f"  -> Crawling verified lifecycle portal '{name}' ({region}): {url}")
                 try:
                     if accumulate:
-                        crawl_data = await self.crawler.crawl_with_crawl4ai(url)
+                        crawl_data = await self.crawler.crawl_page(url)
                         dir_recs, chunks = self.crawler.prepare_page_chunks(url, crawl_data, vendor_name)
                         for dr in dir_recs:
                             dr.vendor_name = vendor_name
@@ -456,7 +456,8 @@ class LifecyclePipeline:
                     continue
                 target_vendors.append((v_key, v_cfg))
 
-            max_workers = concurrency or int(os.getenv("MAX_CONCURRENT_VENDORS", "1"))
+            default_max = "1" if os.getenv("SCRAPER_TEST_MODE") == "1" else "4"
+            max_workers = concurrency or int(os.getenv("MAX_CONCURRENT_VENDORS", default_max))
             if max_workers > 1 and len(target_vendors) > 1:
                 print(f"\n[*] Executing multi-vendor crawl with bounded concurrency: {max_workers} parallel workers")
                 sem = asyncio.Semaphore(max_workers)

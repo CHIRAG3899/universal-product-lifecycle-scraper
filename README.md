@@ -1164,17 +1164,17 @@ Open **`http://localhost:8000`** in any web browser to:
 
 ## 🧪 Automated Verification & Testing
 
-The repository contains **220 automated unit, regression, edge-case, and end-to-end integration tests** across **25 test modules**, all passing with 100% green status in sub-second execution:
+The repository contains **222 automated unit, regression, edge-case, and end-to-end integration tests** across **25 test modules**, all passing with 100% green status in sub-second execution:
 
 ```bash
-# Run all 213 tests with verbose output
+# Run all 222 tests with verbose output
 python -m unittest discover tests -v
 
 # Run the comprehensive 8-stage pre-commit quality gate (AST, Ruff, Mypy, Secrets, 143-Vendor Config, SQL Schema, Tests, E2E)
 python scripts/pre_commit_check.py
 ```
 
-### Complete Test Suite Structure (24 Test Modules)
+### Complete Test Suite Structure (25 Test Modules)
 | Test Module | Tests | Key Invariants Tested |
 |---|:---:|---|
 | [`tests/test_adapters.py`](tests/test_adapters.py) | 13 | Multi-provider AI adapters (OpenAI, Claude, Azure, AWS Bedrock, Ollama, Gemini), prompt formatting, payload normalization. |
@@ -1182,25 +1182,26 @@ python scripts/pre_commit_check.py
 | [`tests/test_artifacts.py`](tests/test_artifacts.py) | 5 | Run artifact directory isolation, Markdown run summaries, vendor trace logs, atomic persistence. |
 | [`tests/test_checkpoint.py`](tests/test_checkpoint.py) | 3 | Atomic checkpoint save/load, failure recovery state, pending URL queue preservation, clean clear. |
 | [`tests/test_cli.py`](tests/test_cli.py) | 13 | All CLI argument flags, multi-vendor comma-separated parsing, alias resolution, `--no-site-crawl`, `--clean-artifacts`, setup key. |
-| [`tests/test_config.py`](tests/test_config.py) | 4 | Config file validation, sector checks, 143 unique vendor integrity (OT 54, IoT 45, IT 44), default fallbacks. |
-| [`tests/test_crawl_engine.py`](tests/test_crawl_engine.py) | 18 | `UniversalAICrawler`, Crawl4AI browser integration, Apollo state extraction, table parsing, pagination discovery. |
+| [`tests/test_config.py`](tests/test_config.py) | 7 | Config file validation, sector checks, 143 unique vendor integrity (OT 54, IoT 45, IT 44), default fallbacks. |
+| [`tests/test_crawl_engine.py`](tests/test_crawl_engine.py) | 15 | `UniversalAICrawler`, Crawl4AI browser integration, Apollo state extraction, table parsing, pagination discovery, Fast-Path HTTP routing, JSON-LD microdata zero-token extraction. |
 | [`tests/test_crawler_comparison.py`](tests/test_crawler_comparison.py) | 3 | Technical matrix benchmarking Generic IDE crawler vs. Enterprise AI crawler across 7 dimensions. |
-| [`tests/test_delta_cache.py`](tests/test_delta_cache.py) | 4 | Content SHA-256 hashing, unchanged page detection, ETag validation, token-saving skips. |
-| [`tests/test_dlq.py`](tests/test_dlq.py) | 4 | Dead Letter Queue failure recording, HTTP status code attribution, per-vendor forensic failure filtering. |
-| [`tests/test_e2e_pipeline.py`](tests/test_e2e_pipeline.py) | 9 | Complete synthetic 6-stage pipeline execution, schema compliance, formula sanitization, non-duplicating append. |
-| [`tests/test_framework_capability.py`](tests/test_framework_capability.py) | 6 | Loading of all 143 enterprise vendors (54 OT, 45 IoT, 44 IT), zero hardcoded config defaults, SSRF domain coverage. |
-| [`tests/test_models.py`](tests/test_models.py) | 26 | 10-column database schema sync, OS/Software lifecycles, date clamping, mandatory non-null guards, Zero-Dropped-EOL rule. |
-| [`tests/test_multi_provider.py`](tests/test_multi_provider.py) | 14 | Cross-provider switching, API key resolution, HTTP REST fallback, rate-limit retry handling. |
-| [`tests/test_observability.py`](tests/test_observability.py) | 6 | Pipeline metrics collector, LTB 90-day alert detection, webhook alert dispatching, health badges. |
-| [`tests/test_package_init.py`](tests/test_package_init.py) | 2 | Package namespace exports, environment base directory initialization, path configurations. |
-| [`tests/test_pipeline.py`](tests/test_pipeline.py) | 7 | 6-stage lifecycle pipeline, multi-vendor filtering, noise purging, in-vendor deduplication, error resilience. |
+| [`tests/test_delta_cache.py`](tests/test_delta_cache.py) | 3 | Content SHA-256 hashing, unchanged page detection, ETag validation, token-saving skips. |
+| [`tests/test_dlq.py`](tests/test_dlq.py) | 2 | Dead Letter Queue failure recording, HTTP status code attribution, per-vendor forensic failure filtering. |
+| [`tests/test_e2e_pipeline.py`](tests/test_e2e_pipeline.py) | 2 | Complete synthetic 6-stage pipeline execution, schema compliance, formula sanitization, non-duplicating append. |
+| [`tests/test_framework_capability.py`](tests/test_framework_capability.py) | 7 | Loading of all 143 enterprise vendors (54 OT, 45 IoT, 44 IT), zero hardcoded config defaults, SSRF domain coverage. |
+| [`tests/test_models.py`](tests/test_models.py) | 23 | 10-column database schema sync, OS/Software lifecycles, date clamping, mandatory non-null guards, Zero-Dropped-EOL rule, lifecycle status & date model guardrails. |
+| [`tests/test_multi_provider.py`](tests/test_multi_provider.py) | 16 | Cross-provider switching, API key resolution, HTTP REST fallback, rate-limit retry handling. |
+| [`tests/test_observability.py`](tests/test_observability.py) | 3 | Pipeline metrics collector, LTB 90-day alert detection, webhook alert dispatching, health badges. |
+| [`tests/test_package_init.py`](tests/test_package_init.py) | 1 | Package namespace exports, environment base directory initialization, path configurations. |
+| [`tests/test_pipeline.py`](tests/test_pipeline.py) | 7 | 6-stage lifecycle pipeline, multi-vendor filtering, noise purging, in-vendor deduplication, error resilience, bounded concurrency. |
 | [`tests/test_run_cache.py`](tests/test_run_cache.py) | 15 | `RunCache` lifecycle, canonical URL normalization (query sorting, fragment stripping), page crawl cache, 0-token AI extraction cache, PDF byte/text/replacement caching, FIFO eviction, thread safety. |
-| [`tests/test_security.py`](tests/test_security.py) | 16 | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense, threat detection. |
-| [`tests/test_server.py`](tests/test_server.py) | 8 | Built-in HTTP dashboard server, REST endpoints (`/api/vendors`, `/api/products`), search/filter handlers. |
-| [`tests/test_setup_key.py`](tests/test_setup_key.py) | 7 | Universal AI provider key setup tool, environment persistence, model validation routines. |
-| [`tests/test_stealth_and_batch_crawl.py`](tests/test_stealth_and_batch_crawl.py) | 6 | Anti-bot stealth browser configuration, SPA hydration delay (2.5s), prepare_page_chunks extraction, and batch extraction dispatch. |
+| [`tests/test_scraper_comparison.py`](tests/test_scraper_comparison.py) | 3 | Scraper Comparison Engine, CSV metric comparisons, head-to-head live benchmarking, CLI driver verification. |
+| [`tests/test_security.py`](tests/test_security.py) | 20 | SSRF boundary protection, private IP / CIDR blocking, integer IP (`2130706433`), CSV formula injection defense, threat detection. |
+| [`tests/test_server.py`](tests/test_server.py) | 11 | Built-in HTTP dashboard server, REST endpoints (`/api/vendors`, `/api/products`), search/filter handlers. |
+| [`tests/test_setup_key.py`](tests/test_setup_key.py) | 9 | Universal AI provider key setup tool, environment persistence, model validation routines. |
+| [`tests/test_stealth_and_batch_crawl.py`](tests/test_stealth_and_batch_crawl.py) | 6 | Anti-bot stealth browser configuration, SPA hydration delay, prepare_page_chunks extraction, and batch extraction dispatch. |
 | [`tests/test_storage.py`](tests/test_storage.py) | 8 | `MasterStorageManager`, non-destructive multi-run incremental append, deterministic SHA-256 deduplication, atomic `.tmp` swap, genuine lifecycle filter. |
-| [`tests/test_vendors.py`](tests/test_vendors.py) | 16 | Dynamic 143-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction, multi-stage keyword normalization. |
+| [`tests/test_vendors.py`](tests/test_vendors.py) | 11 | Dynamic 143-vendor resolution, multilingual translation (JA/DE/SV/FR/ES), official vendor terminology extraction, multi-stage keyword normalization. |
 
 ---
 

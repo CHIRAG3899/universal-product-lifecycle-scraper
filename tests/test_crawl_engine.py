@@ -455,6 +455,82 @@ class TestCrawlEngine(unittest.IsolatedAsyncioTestCase):
         # Chunks for LLM should be empty because direct zero-token extraction resolved the table!
         self.assertEqual(len(chunks), 0)
 
+    async def test_14_crawl_page_fast_path_and_browser_routing(self):
+        """Verifies crawl_page routes to fast HTTP when content is rich, or browser when challenged."""
+        # 1. Fast HTTP success case
+        fast_payload = {
+            "url": "https://example.com/fast-portal",
+            "html": "<html><body><table><tr><td>6ES7516-3AN02-0AB0</td><td>End of Life</td></tr></table></body></html>",
+            "markdown": "## Table\n6ES7516-3AN02-0AB0 End of Life",
+            "status_code": 200,
+            "extracted_content": None
+        }
+        self.crawler.fetch_http_fallback = MagicMock(return_value=fast_payload)
+        self.crawler.crawl_with_crawl4ai = AsyncMock()
+
+        res_fast = await self.crawler.crawl_page("https://example.com/fast-portal")
+        self.assertEqual(res_fast["status_code"], 200)
+        # Crawl4AI browser should NOT have been invoked for fast HTTP success
+        self.crawler.crawl_with_crawl4ai.assert_not_called()
+
+        # 2. Anti-bot Cloudflare challenge case (should route to browser)
+        challenge_payload = {
+            "url": "https://example.com/protected",
+            "html": "<html><body>Just a moment... Please wait while your browser is verified.</body></html>",
+            "markdown": "Just a moment...",
+            "status_code": 403,
+            "extracted_content": None
+        }
+        browser_payload = {
+            "url": "https://example.com/protected",
+            "html": "<html><body>Rendered after challenge</body></html>",
+            "markdown": "Rendered content",
+            "status_code": 200,
+            "extracted_content": None
+        }
+        self.crawler.fetch_http_fallback = MagicMock(return_value=challenge_payload)
+        self.crawler.crawl_with_crawl4ai = AsyncMock(return_value=browser_payload)
+
+        res_chal = await self.crawler.crawl_page("https://example.com/protected")
+        self.assertEqual(res_chal["status_code"], 200)
+        self.crawler.crawl_with_crawl4ai.assert_called_once_with("https://example.com/protected")
+
+    def test_15_extract_json_ld_products(self):
+        """Verifies schema.org JSON-LD microdata extraction parses Product and ItemList metadata directly."""
+        json_ld_html = """
+        <html>
+        <head>
+          <script type="application/ld+json">
+          {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "SIMATIC S7-1500 CPU 1516-3 PN/DP",
+            "model": "6ES7516-3AN02-0AB0",
+            "category": "PLC",
+            "brand": {
+              "@type": "Brand",
+              "name": "Siemens"
+            },
+            "offers": {
+              "@type": "Offer",
+              "availability": "https://schema.org/Discontinued"
+            }
+          }
+          </script>
+        </head>
+        <body>Catalog Page</body>
+        </html>
+        """
+        products = self.crawler.extract_json_ld_products(
+            json_ld_html,
+            target_url="https://siemens.com/products",
+            default_vendor="Siemens"
+        )
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].model_name, "6ES7516-3AN02-0AB0")
+        self.assertEqual(products[0].vendor_name, "Siemens")
+        self.assertEqual(products[0].status, "Discontinued")
+
 
 if __name__ == "__main__":
     unittest.main()
