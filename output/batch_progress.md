@@ -1,6 +1,6 @@
 # Multi-Vendor Lifecycle Scraping - Batch Execution & Knowledge Base Progress
 
-> **Last Synchronized:** `2026-11-03T08:34:22.640454+00:00`
+> **Last Synchronized:** `2026-11-03T08:36:33.386278+00:00`
 
 | Vendor ID | Cycle | Discovered | Done | Pending | Batches Left | Harvested | Duplicates | Step4 Purged | LLM Rejected | EOL CSV | Active CSV | Progress % | Status | Data Status |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -13,7 +13,7 @@
 | `emerson` | 1 | 1 | 1 | 0 | **0** | 0 | 0 | 0 | 0 | 158 | 0 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `fanuc` | 1 | 6 | 6 | 0 | **0** | 208 | 0 | 0 | 0 | 21 | 187 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `keyence` | 1 | 3 | 3 | 0 | **0** | 1501 | 0 | 0 | 0 | 1 | 1499 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
-| `mitsubishi` | 2 | 3 | 1 | 2 | **2** | 2515 | 0 | 0 | 0 | 1470 | 0 | 33.33% | `IN_PROGRESS` | `ACTIVE_DATA` |
+| `mitsubishi` | 2 | 3 | 1 | 2 | **2** | 2525 | 0 | 0 | 0 | 1470 | 0 | 33.33% | `IN_PROGRESS` | `ACTIVE_DATA` |
 | `moxa` | 1 | 2 | 2 | 0 | **0** | 1503 | 0 | 2 | 11 | 131 | 1359 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `omron` | 1 | 1 | 1 | 0 | **0** | 0 | 1 | 0 | 6 | 130 | 0 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `phoenix_contact` | 1 | 2 | 2 | 0 | **0** | 1500 | 0 | 0 | 0 | 4 | 1496 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
