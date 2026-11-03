@@ -148,7 +148,7 @@ class TestGeminiExtractor(unittest.TestCase):
 
     def test_clean_token_efficient_markdown(self):
         """Verifies that markdown table noise, HTML comments, and extra newlines are trimmed."""
-        from scraper.gemini_extractor import clean_token_efficient_markdown
+        from scraper.ai_extractor import clean_token_efficient_markdown
 
         raw = """
         <!-- navigation comment -->

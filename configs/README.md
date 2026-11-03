@@ -1,3 +1,57 @@
+# 🌐 Strategy-Pattern Config-Driven Architecture & Vendor Lifecycle Registry
+
+## 🏗️ 1. Strategy-Pattern Config-Driven Architecture
+
+The Multi-Vendor AI Scraper decouples crawler execution logic from vendor-specific configuration via a **pluggable Strategy Pattern**. Rather than maintaining fragile, one-off standalone scripts per manufacturer, all scraping behavior is modularized into four reusable strategy classes registered in `scraper/strategies/`:
+
+```mermaid
+flowchart TD
+    Config["configs/vendors.yaml<br/>(159 Enterprise Vendors)"] --> Dispatcher["LifecyclePipeline Dispatcher<br/>(scraper/pipeline.py)"]
+    Dispatcher --> SP["SearchPortalStrategy<br/>(search_portal)"]
+    Dispatcher --> DT["DomTableStrategy<br/>(dom_table)"]
+    Dispatcher --> SM["SitemapStrategy<br/>(sitemap)"]
+    Dispatcher --> RA["RestApiStrategy<br/>(rest_api)"]
+
+    SP --> Memory["VendorRunState Memory<br/>(artifacts/run_state/{vendor_id}_state.json)"]
+    DT --> Memory
+    SM --> Memory
+    RA --> Memory
+
+    Memory --> CleanCSV["Master CSV Storage<br/>(output/all_vendors_lifecycle.csv)"]
+```
+
+### Pluggable Strategy Classes
+| Strategy | Config Identifier | Operational Archetype | Representative Vendors | Dynamic Capabilities |
+|:---|:---|:---|:---|:---|
+| **`SearchPortalStrategy`** | `search_portal` / `lifecycle_search` | Parameterized search forms (`?keyword={keyword}`), CSS row extraction, live DOM hydration. | Rockwell Automation, Siemens Industry Mall, HP PartSurfer, Dell Support | **Dynamic Runtime Prefix Discovery**: Zero hardcoded keywords. Extracts family prefixes from XML sitemaps, historical seen models, and recurses on newly discovered replacement models in real-time. |
+| **`DomTableStrategy`** | `dom_table` / `table` | Structured HTML and DOM table rendering with column mapping, header detection, and sanitization. | Cisco Meraki, Aruba Networks, Juniper, Veeam, Teltonika, SonicWall, Fortinet | **Header Discrimination & Quote Sanitization**: Automatically skips non-data `<th>` rows, validates real model SKUs, cleans quotation marks, and standardizes date formats. |
+| **`SitemapStrategy`** | `sitemap` / `sitemap_index` | Recursive XML sitemap index traversal, product detail page (PDP) filtering, and metadata extraction. | Rockwell Automation, Schneider Electric, Phoenix Contact, Omron | **Regex Milestone Ingestion**: Recursively navigates sitemap trees, filtering catalog URLs and extracting models without LLM costs. |
+| **`RestApiStrategy`** | `rest_api` / `json_api` | Direct JSON/REST lifecycle catalog ingestion and JSON-LD schema parsing. | Microsoft Learn API, Red Hat Security Data API, Cisco Support APIs | **Zero-Scraping Overhead**: Direct deserialization, deterministic field mapping, and zero token consumption. |
+
+---
+
+## ⚡ 2. Dynamic Runtime Prefix Discovery (Zero Hardcoding)
+
+In previous versions, search portal queries relied on static, hardcoded prefix lists (e.g., `'1756'`, `'1769'`, `'5069'`). The Strategy Architecture completely eliminates hardcoded keywords in favor of **autonomous runtime discovery**:
+
+1. **State Memory Harvesting**: Reads all previously verified models from `artifacts/run_state/{vendor_id}_state.json` and extracts family series prefixes using `extract_model_family_prefix()`.
+2. **XML Sitemap Traversal**: Explores sitemap indexes (e.g. `sitemapindex.xml` -> `sitemap.PDP_*.xml`) on runtime and extracts discrete product family identifiers matching catalog patterns.
+3. **Adaptive Recursive Expansion**: Whenever a search returns product records, newly discovered `model_name` and `replacement` SKUs (e.g., `5069-L340ER` discovered as replacement for `1756-L61`) are parsed for new prefixes and dynamically appended to the active search queue.
+4. **Self-Improving Configuration**: Discovered prefixes are journaled into `metadata["discovered_prefixes"]` inside the vendor's persistent state JSON, enabling the system to retain and expand its knowledge base across runs.
+
+---
+
+## 🧠 3. Persistent State Memory & Error-Bound Circuit Breaking
+
+Each vendor maintains isolated, resume-safe execution state in `artifacts/run_state/{vendor_id}_state.json`:
+- **`completed_units`**: Records completed URLs, sitemaps, and search family prefixes to prevent redundant HTTP queries.
+- **`seen_models`**: Tracks all harvested model names across all historical runs to guarantee cross-session deduplication.
+- **`discovered_prefixes`**: Dynamically learned model prefixes discovered during crawl sessions.
+- **Circuit Breaker (`max_consecutive_errors=5`)**: Automatically halts a strategy run if 5 consecutive queries fail or timeout, safely protecting network resources and routing failures to `output/crawl_failures.json`.
+- **Unlimited Ingestion**: Runs continuously across all uncompleted units with `max_pages=0` and `max_depth=0`, stopping only when all queues are naturally exhausted or the circuit breaker trips.
+
+---
+
 ## 🏷️ Complete Manufacturer-Exact Lifecycle Status Terminology Registry
 
 Industrial automation, embedded IoT silicon, and enterprise IT hardware manufacturers **do not adhere to a single unified status vocabulary**. Each vendor defines rigorous proprietary lifecycle phases governing purchasing windows, warranty maintenance, component repair, and obsolescence.
@@ -5,9 +59,9 @@ Industrial automation, embedded IoT silicon, and enterprise IT hardware manufact
 > [!IMPORTANT]
 > **Zero Dropped EOL Records Rule**: Products that have reached End of Life (EOL), Discontinued, Phase-Out, or Obsolete status **always produce an entry even if the vendor does not publish an explicit milestone date**. Missing dates will NEVER drop a record. The extractor and storage preserve all end-of-life models, tagging missing dates cleanly in metadata.
 
-Below is the comprehensive cross-vendor status terminology catalog across **all 143 supported enterprise vendors**:
+Below is the comprehensive cross-vendor status terminology catalog across **all 159 supported enterprise vendors**:
 
-### 1. Operational Technology (OT) - Industrial Automation & Control (54 Supported Vendors)
+### 1. Operational Technology (OT) - Industrial Automation & Control (61 Supported Vendors)
 
 | Vendor / Manufacturer | Official Lifecycle Phasing Model | Exact Vendor Status Terminology | Operational Definition & Impact | Trusted Lifecycle Source URL |
 |:---|:---|:---|:---|:---|

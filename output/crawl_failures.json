@@ -1,0 +1,31 @@
+{
+  "generated_utc": "2026-11-03T08:18:39Z",
+  "summary": {
+    "total_failures": 1,
+    "by_status_code": {
+      "no_status": 1
+    },
+    "by_category": {
+      "ImportError": 1
+    },
+    "by_vendor": {
+      "eaton": 1
+    }
+  },
+  "failures": [
+    {
+      "url": "https://www.eaton.com/content/dam/eaton/products/backup-power-ups-surge-it-power-distribution/backup-power-ups/services-resources/eaton-end-of-service-life-master-table-us-pl161010en.pdf",
+      "vendor_id": "eaton",
+      "error_type": "ImportError",
+      "message": "cannot import name 'sanitize_crawl_url' from 'scraper.security' (C:\\Code\\universal-lifecycle-scraper\\scraper\\security.py)",
+      "status_code": null,
+      "timestamp_utc": "2026-11-03T08:15:13Z",
+      "retry_count": 0,
+      "tier": "fast_http",
+      "details": {
+        "region": "Global",
+        "entry_point": "Eaton_EOSL_Master_Table_PDF"
+      }
+    }
+  ]
+}

@@ -46,7 +46,7 @@ class FrameworkAdapter:
     ) -> None:
         self.output_dir = Path(output_dir) if output_dir else BASE_DIR / "output"
         self.master_csv_path = (
-            Path(master_csv_path) if master_csv_path else self.output_dir / "all_vendors_lifecycle.csv"
+            Path(master_csv_path) if master_csv_path else self.output_dir / "eol_products_lifecycle.csv"
         )
         self.config_path = (
             Path(config_path) if config_path else BASE_DIR / "configs" / "vendors.yaml"

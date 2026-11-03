@@ -50,7 +50,7 @@ class TestFrameworkAdapters(unittest.TestCase):
     def test_adapter_initialization(self):
         adapter = get_framework_adapter()
         self.assertIsInstance(adapter, FrameworkAdapter)
-        self.assertTrue(str(adapter.master_csv_path).endswith("all_vendors_lifecycle.csv"))
+        self.assertTrue(str(adapter.master_csv_path).endswith("eol_products_lifecycle.csv"))
         self.assertTrue(str(adapter.config_path).endswith("vendors.yaml"))
 
     # -------------------------------------------------------------------------

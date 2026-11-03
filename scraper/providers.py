@@ -30,7 +30,7 @@ SUPPORTED_PROVIDERS = (
 )
 
 DEFAULT_MODELS: Dict[str, str] = {
-    "gemini": "gemini-3.5-flash-lite",
+    "gemini": "gemini-3.8-flash",
     "openai": "gpt-4o-mini",
     "anthropic": "claude-3-5-haiku-20241022",
     "claude": "claude-3-5-haiku-20241022",
@@ -159,7 +159,7 @@ def resolve_provider_and_model(
         if req_provider == "gemini":
             final_model = os.getenv("GEMINI_MODEL", "") or DEFAULT_MODELS["gemini"]
         else:
-            final_model = DEFAULT_MODELS.get(req_provider, "gemini-3.5-flash-lite")
+            final_model = DEFAULT_MODELS.get(req_provider, "gemini-3.8-flash")
 
     # Step 5: Resolve API key for the chosen provider
     final_key = api_key

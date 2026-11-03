@@ -18,13 +18,14 @@ os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(Path(__file__).resolve().p
 
 from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
+from dateutil import parser as date_parser
 
 from scraper.ai_extractor import UniversalAIExtractor
 from scraper.config import HEADLESS_BROWSER, REQUEST_TIMEOUT_SEC, USER_AGENT
 from scraper.dlq import DeadLetterQueue, categorize_http_status, get_global_dlq
 from scraper.models import ProductRecord, is_valid_product_model
-from scraper.security import is_safe_url
-from scraper.vendors import detect_vendor_from_url_or_text
+from scraper.security import clean_csv_field, is_safe_url
+from scraper.vendors import detect_vendor_from_url_or_text, normalize_stage_name
 
 logger = logging.getLogger("ai_scraper.crawler")
 
@@ -617,14 +618,64 @@ class UniversalAICrawler:
 
         return products
 
+    def _fetch_pdf_page_data(self, target_url: str) -> Dict[str, Any]:
+        """Directly downloads and parses technical PDF notices into clean markdown text using pypdf."""
+        import io
+
+        import pypdf
+
+        from scraper.config import USER_AGENT
+
+        clean_url = sanitize_crawl_url(target_url) or target_url
+        session = self._get_http_session()
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "application/pdf,*/*",
+        }
+        try:
+            resp = session.get(clean_url, headers=headers, timeout=30, allow_redirects=True)
+            if resp.status_code == 200 and resp.content:
+                reader = pypdf.PdfReader(io.BytesIO(resp.content))
+                pages_text = []
+                for idx, page in enumerate(reader.pages):
+                    t = page.extract_text()
+                    if t and t.strip():
+                        pages_text.append(f"--- PAGE {idx+1} ---\n{t.strip()}")
+                full_text = "\n\n".join(pages_text)
+                logger.info(f"Successfully extracted {len(reader.pages)} pages ({len(full_text)} chars) from PDF {clean_url}")
+                return {
+                    "url": clean_url,
+                    "markdown": full_text,
+                    "html": f"<pre>{full_text}</pre>",
+                    "status_code": 200,
+                    "extracted_content": None,
+                }
+            return {
+                "url": clean_url,
+                "markdown": "",
+                "html": "",
+                "status_code": resp.status_code,
+                "extracted_content": None,
+            }
+        except Exception as e:
+            logger.warning(f"Error downloading PDF {clean_url}: {e}")
+            return {
+                "url": clean_url,
+                "markdown": "",
+                "html": "",
+                "status_code": 500,
+                "extracted_content": None,
+            }
+
     async def crawl_page(self, target_url: str, force_browser: bool = False) -> Dict[str, Any]:
         """
         Intelligent dual-tier crawl strategy:
-        1. Fast-Path Stealth HTTP: Fetches the page via connection-pooled HTTP in ~50-150ms.
+        1. Direct PDF Ingestion: Streams PDF notices and parses pages via pypdf (eliminates browser download aborts).
+        2. Fast-Path Stealth HTTP: Fetches the page via connection-pooled HTTP in ~50-150ms.
            If the page returns HTTP 200 and contains structured HTML tables, Apollo state,
            or rich catalog content without an anti-bot challenge or empty SPA shell:
            -> Returns immediately (up to 40x faster than headless browser).
-        2. Dynamic Browser (Crawl4AI): If the page is a dynamic SPA (<div id="root"></div> shell),
+        3. Dynamic Browser (Crawl4AI): If the page is a dynamic SPA (<div id="root"></div> shell),
            challenges the HTTP client (Cloudflare/Akamai 403/503), or force_browser=True:
            -> Launches headless Chromium to render the JavaScript DOM.
         """
@@ -637,6 +688,13 @@ class UniversalAICrawler:
             if cached is not None:
                 return cached
 
+        # Direct PDF Document Ingestion
+        if target_url.lower().endswith(".pdf") or ".pdf?" in target_url.lower():
+            logger.info(f"Target URL is a technical PDF notice: {target_url}. Ingesting via streaming HTTP...")
+            fast_pdf = await asyncio.to_thread(self._fetch_pdf_page_data, target_url)
+            self.run_cache.set_crawled_page(norm_url, fast_pdf)
+            return fast_pdf
+
         # Fast HTTP Tier 1: run in worker thread to prevent event-loop socket blocking
         fast_data = await asyncio.to_thread(self.fetch_http_fallback, target_url)
         status = fast_data.get("status_code", 500)
@@ -644,7 +702,17 @@ class UniversalAICrawler:
         markdown = fast_data.get("markdown", "")
 
         is_challenge = any(kw in html.lower() for kw in ("cf-browser-verification", "turnstile", "just a moment...", "challenge-platform"))
-        is_empty_spa = (len(markdown.strip()) < 100 and ("<div id=\"root\">" in html or "<div id=\"app\">" in html or "<app-root>" in html))
+        is_empty_spa = (
+            len(markdown.strip()) < 200
+            and (
+                "<div id=\"root\">" in html
+                or "<div id=\"app\">" in html
+                or "<app-root>" in html
+                or "enable javascript" in html.lower()
+                or "javascript is required" in html.lower()
+                or "loading..." in markdown.lower()
+            )
+        )
 
         if status == 200 and not is_challenge and not is_empty_spa and len(markdown.strip()) >= 30:
             self.run_cache.set_crawled_page(norm_url, fast_data)
@@ -786,12 +854,17 @@ class UniversalAICrawler:
 
             # Direct Zero-Token Table Extraction: Deterministic rule extraction skips LLM billing
             table_md = "\n\n---\n\n".join(table_blocks)
+            table_products = []
             try:
-                table_products = self.extractor.fallback_rule_based_extraction(
+                extracted = self.extractor.fallback_rule_based_extraction(
                     table_md,
                     source_url=target_url,
                     default_vendor=vendor
                 )
+                if isinstance(extracted, list):
+                    table_products = extracted
+                elif hasattr(extracted, "__iter__"):
+                    table_products = list(extracted)
                 if table_products:
                     logger.info(f"[ZERO-TOKEN EXTRACTION] Directly extracted {len(table_products)} structured products from DOM tables without LLM billing.")
                     pre_extracted.extend(table_products)
@@ -799,7 +872,7 @@ class UniversalAICrawler:
                 logger.debug(f"Direct rule extraction notice: {rule_err}")
 
             # If rule-based extraction didn't yield records (complex unstructured layout), pass to LLM
-            if not pre_extracted:
+            if not table_products:
                 for i in range(0, len(table_blocks), chunk_size):
                     chunk_text = "\n\n---\n\n".join(table_blocks[i:i + chunk_size])
                     chunks_to_extract.append({
@@ -809,7 +882,7 @@ class UniversalAICrawler:
                     })
 
         # 3. Process crawled body markdown (if no tables present or to capture unlisted items)
-        if markdown and (not dom_tables or len(pre_extracted) == 0):
+        if markdown and not dom_tables:
             filtered_lines = []
             if len(markdown) < 2000:
                 filtered_lines = [line_str.strip() for line_str in markdown.split("\n") if line_str.strip()]
@@ -1139,6 +1212,334 @@ class UniversalAICrawler:
         if discovered:
             logger.info(f"[SITEMAP] Discovered {len(discovered)} relevant portal/product URLs via XML sitemap network map.")
         return discovered
+
+    async def crawl_sitemap_entry_point(
+        self,
+        entry_point: Dict[str, Any],
+        vendor_name: str,
+        allowed_domains: Optional[List[str]] = None,
+        max_pages: int = 0
+    ) -> List[ProductRecord]:
+        """
+        Generic, config-driven XML sitemap, search portal, and Product Detail Page (PDP) crawler.
+        Recursively ingests sitemaps and search portals, filtering candidate product URLs.
+        Crawls matching pages concurrently using Crawl4AI and extracts structured lifecycle
+        records with clean symbols and zero dropped data.
+        """
+        sitemap_url = entry_point.get("url")
+        if not sitemap_url:
+            return []
+
+        pattern_str = entry_point.get("product_pattern") or entry_point.get("url_pattern") or "/products/"
+        product_regex = re.compile(pattern_str, re.IGNORECASE)
+        concurrency = int(entry_point.get("concurrency", 5))
+        keywords: List[str] = list(entry_point.get("keywords") or [])
+
+        browser_cfg = BrowserConfig(headless=True, verbose=False)
+        run_cfg = CrawlerRunConfig(cache_mode=CacheMode.BYPASS, delay_before_return_html=5.0)
+
+        discovered_product_urls: Set[str] = set()
+        child_sitemaps: List[str] = []
+
+        # Helper to filter genuine PDP URLs vs marketing brochures
+        def _is_valid_pdp_url(url_str: str) -> bool:
+            u_low = url_str.lower()
+            if any(u_low.endswith(x) for x in ("/products.html", "/hardware.html", "/software.html", "/overview.html", "/index.html")):
+                return False
+            # Reject marketing categories that have no discrete part number
+            if "/products/hardware/" in u_low or "/products/software/" in u_low:
+                return False
+            return bool(product_regex.search(url_str))
+
+        async with AsyncWebCrawler(config=browser_cfg) as crawler:
+            # Mode A: Search Portal Query Iteration (e.g. Rockwell Lifecycle Search)
+            if keywords or "keyword=" in sitemap_url or str(entry_point.get("crawler_type")).lower() in ("lifecycle_search", "search_portal"):
+                if keywords:
+                    sep = "&" if "?" in sitemap_url else "?"
+                    target_urls = [f"{sitemap_url}{sep}keyword={kw}" for kw in keywords]
+                else:
+                    target_urls = [sitemap_url]
+                logger.info(f"[GENERIC SEARCH] Querying {len(target_urls)} lifecycle search queries on {sitemap_url}")
+            else:
+                # Mode B: XML Sitemap Index Harvesting
+                logger.info(f"[GENERIC SITEMAP] Ingesting root sitemap: {sitemap_url} (Pattern: {pattern_str})")
+                res = await crawler.arun(url=sitemap_url, config=run_cfg)
+                if not res.success or not res.html:
+                    logger.warning(f"[GENERIC SITEMAP] Failed to fetch sitemap {sitemap_url} (HTTP {res.status_code})")
+                    return []
+
+                soup = BeautifulSoup(res.html, "html.parser")
+                loc_tags = [t.get_text().strip() for t in soup.find_all("loc")]
+
+                for loc in loc_tags:
+                    clean_loc = loc.split("#")[0].strip()
+                    if not is_safe_url(clean_loc, allowed_domains):
+                        continue
+                    if clean_loc.endswith(".xml") or "sitemap" in clean_loc.lower():
+                        child_sitemaps.append(clean_loc)
+                    elif _is_valid_pdp_url(clean_loc) and not is_junk_url(clean_loc):
+                        discovered_product_urls.add(clean_loc)
+
+                # Ingest child sitemaps in parallel batches (prioritize discrete PDP sitemaps)
+                if child_sitemaps:
+                    pdp_sitemaps = [sm for sm in child_sitemaps if any(k in sm.lower() for k in ("pdp", "discon", "catalog", "part"))]
+                    other_sitemaps = [sm for sm in child_sitemaps if sm not in pdp_sitemaps and "content" not in sm.lower()]
+                    content_sitemaps = [sm for sm in child_sitemaps if "content" in sm.lower()]
+                    target_child_sitemaps = (pdp_sitemaps or other_sitemaps) + content_sitemaps
+
+                    logger.info(f"[GENERIC SITEMAP] Discovered {len(target_child_sitemaps)} child sitemaps from {sitemap_url}")
+                    sm_batch_size = 4
+                    for i in range(0, len(target_child_sitemaps), sm_batch_size):
+                        if max_pages and max_pages > 0 and len(discovered_product_urls) >= max_pages * 2:
+                            logger.info(f"[GENERIC SITEMAP] URL discovery threshold reached ({len(discovered_product_urls)} URLs for max_pages={max_pages}). Proceeding to scrape.")
+                            break
+
+                        sm_batch = target_child_sitemaps[i:i + sm_batch_size]
+                        results = await crawler.arun_many(urls=sm_batch, config=run_cfg)
+                        for r in results:
+                            if not r.success or not r.html:
+                                continue
+                            sub_soup = BeautifulSoup(r.html, "html.parser")
+                            for t in sub_soup.find_all("loc"):
+                                u = t.get_text().strip().split("#")[0].strip()
+                                if is_safe_url(u, allowed_domains) and _is_valid_pdp_url(u) and not is_junk_url(u):
+                                    discovered_product_urls.add(u)
+
+                sorted_urls = sorted(list(discovered_product_urls))
+                logger.info(f"[GENERIC SITEMAP] Total matching product URLs discovered: {len(sorted_urls)}")
+                if max_pages and max_pages > 0:
+                    target_urls = sorted_urls[:max_pages]
+                else:
+                    target_urls = sorted_urls
+
+            # Crawl targets in concurrent batches
+            records: List[ProductRecord] = []
+            seen_models: Set[str] = set()
+
+            for i in range(0, len(target_urls), concurrency):
+                p_batch = target_urls[i:i + concurrency]
+                page_results = await crawler.arun_many(urls=p_batch, config=run_cfg)
+
+                for pr in page_results:
+                    if not pr.success or not pr.html:
+                        continue
+
+                    p_soup = BeautifulSoup(pr.html, "html.parser")
+                    page_title = p_soup.title.string.strip() if p_soup.title and p_soup.title.string else ""
+                    if "Page Not Found" in page_title or "404" in page_title:
+                        continue
+
+                    # 1. Search Portal Grid / Lifecycle Rows (e.g. Rockwell Product Lifecycle Search)
+                    lifecycle_rows = p_soup.find_all(class_=re.compile(r'lifecycle-row', re.I))
+                    if lifecycle_rows:
+                        for lr in lifecycle_rows:
+                            c_num_el = lr.find(class_=re.compile(r'catalog-number', re.I))
+                            p_name_el = lr.find(class_=re.compile(r'product-name', re.I))
+                            st_el = lr.find(class_=re.compile(r'lifecycle-status$', re.I)) or lr.find(class_=re.compile(r'lifecycle-status', re.I))
+                            dt_el = lr.find(class_=re.compile(r'discontinued-date', re.I))
+                            rc_el = lr.find(class_=re.compile(r'replacement-category', re.I))
+                            rp_el = lr.find(class_=re.compile(r'replacement-product|replacement-model', re.I))
+
+                            c_num = c_num_el.get_text(strip=True) if c_num_el else ""
+                            p_name = p_name_el.get_text(strip=True) if p_name_el else ""
+                            st_val = st_el.get_text(strip=True) if st_el else ""
+                            dt_val = dt_el.get_text(strip=True) if dt_el else ""
+                            rc_val = rc_el.get_text(strip=True) if rc_el else ""
+                            rp_val = rp_el.get_text(strip=True) if rp_el else ""
+
+                            # Fallback if specific classes aren't present: extract text divisions
+                            if not c_num:
+                                c_divs = [cd.get_text(strip=True) for cd in lr.find_all("div") if cd.get_text(strip=True)]
+                                if len(c_divs) >= 4:
+                                    c_num = c_divs[0]
+                                    p_name = c_divs[1]
+                                    st_val = c_divs[2]
+                                    dt_val = c_divs[3]
+                                    if len(c_divs) >= 5:
+                                        rc_val = c_divs[4]
+                                    if len(c_divs) >= 6:
+                                        rp_val = c_divs[5]
+
+                            if not c_num or not is_valid_product_model(c_num):
+                                continue
+
+                            dt_clean = None
+                            if dt_val and dt_val.upper() not in ("N/A", "NONE", "-", ""):
+                                try:
+                                    dt_obj = date_parser.parse(dt_val, fuzzy=True)
+                                    dt_clean = dt_obj.strftime("%Y-%m-%d") + "T00:00:00Z"
+                                except Exception:
+                                    pass
+
+                            repl_clean = rp_val if (rp_val and rp_val.upper() not in ("N/A", "NONE", "-")) else None
+                            norm_st = normalize_stage_name(st_val or "Active")
+
+                            clean_m = clean_csv_field(c_num, "model_name")
+                            clean_a = clean_csv_field(p_name, "aliases") if p_name and p_name.lower() != c_num.lower() else None
+                            clean_s = clean_csv_field(norm_st, "status")
+                            clean_r = clean_csv_field(repl_clean, "replacement") if repl_clean else None
+
+                            m_dedup = clean_m.strip().upper()
+                            if m_dedup not in seen_models:
+                                seen_models.add(m_dedup)
+                                meta = {"replacement_category": rc_val} if rc_val and rc_val.upper() not in ("N/A", "NONE", "-") else {}
+                                try:
+                                    rec = ProductRecord(
+                                        vendor_name=vendor_name,
+                                        model_name=clean_m,
+                                        aliases=clean_a,
+                                        status=clean_s,
+                                        stage=clean_s,
+                                        vendor_status=clean_s,
+                                        stage_date_utc=dt_clean,
+                                        source_url=pr.url,
+                                        category="Industrial Automation",
+                                        replacement=clean_r,
+                                        metadata=meta
+                                    )
+                                    records.append(rec)
+                                    logger.info(f"  [LIFECYCLE ROW] {clean_m} | Status: {clean_s} | Date: {dt_clean}")
+                                except Exception as err:
+                                    logger.debug(f"Row validation notice for {clean_m}: {err}")
+                        continue
+
+                    # 2. Standalone PDP (Product Detail Page) Processing
+                    sku = None
+                    name = None
+                    description = None
+                    category = "Industrial Automation"
+                    image_url = None
+
+                    # Extract JSON-LD Product microdata
+                    for s in p_soup.find_all("script", type="application/ld+json"):
+                        if not s.string:
+                            continue
+                        try:
+                            s_data = json.loads(s.string)
+                            if isinstance(s_data, list):
+                                s_data = s_data[0]
+                            if isinstance(s_data, dict) and s_data.get("@type") == "Product":
+                                sku = s_data.get("sku") or sku
+                                name = s_data.get("name") or name
+                                description = s_data.get("description") or description
+                                if s_data.get("category"):
+                                    category = str(s_data.get("category") or "Industrial Automation")
+                                if s_data.get("image"):
+                                    img = s_data.get("image")
+                                    image_url = img[0] if isinstance(img, list) and img else (img if isinstance(img, str) else None)
+                                break
+                        except Exception:
+                            pass
+
+                    # Fallback SKU from URL pattern: e.g. details.<sku>.html
+                    m_url_sku = re.search(r'details\.([A-Za-z0-9\-_.]+)\.html', pr.url, re.IGNORECASE)
+                    if m_url_sku:
+                        sku = sku or m_url_sku.group(1)
+                    elif not sku and "/products/" in pr.url:
+                        slug = pr.url.rstrip("/").split("/")[-1].replace(".html", "")
+                        if slug and slug.lower() not in ("hardware", "products", "software", "overview", "index"):
+                            sku = slug.upper()
+
+                    if not name and page_title:
+                        name = page_title.split("|")[0].strip()
+
+                    model_name = sku or name
+                    if not model_name or not is_valid_product_model(model_name):
+                        continue
+
+                    # DOM text extraction for lifecycle status & dates
+                    raw_text = p_soup.get_text(separator="\n", strip=True)
+                    dom_lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
+
+                    status = "Active"
+                    stage_date = None
+                    discontinued_date = None
+                    replacement_model = ""
+                    announcement_text = ""
+                    upc_code = ""
+                    has_explicit_lifecycle = False
+
+                    for idx, line in enumerate(dom_lines):
+                        l_low = line.lower()
+                        if l_low == "lifecycle status:" or l_low.startswith("lifecycle status:"):
+                            has_explicit_lifecycle = True
+                            if ":" in line and len(line) > 17:
+                                cand_st = line.split(":", 1)[1].strip()
+                                if cand_st:
+                                    status = cand_st
+                            elif idx + 1 < len(dom_lines):
+                                status = dom_lines[idx + 1]
+
+                        if "discontinued date:" in l_low:
+                            has_explicit_lifecycle = True
+                            cand_dt = line.split(":", 1)[1].strip() if (":" in line and len(line) > 18) else (dom_lines[idx + 1] if idx + 1 < len(dom_lines) else "")
+                            if cand_dt:
+                                try:
+                                    dt_obj = date_parser.parse(cand_dt, fuzzy=True)
+                                    discontinued_date = dt_obj.strftime("%Y-%m-%d")
+                                    stage_date = f"{discontinued_date}T00:00:00Z"
+                                except Exception:
+                                    discontinued_date = cand_dt
+
+                        if "replacement category:" in l_low or "replacement model:" in l_low:
+                            if idx + 1 < len(dom_lines):
+                                replacement_model = dom_lines[idx + 1]
+
+                        if "announces that as of" in l_low or "will be discontinued" in l_low:
+                            has_explicit_lifecycle = True
+                            announcement_text = line[:250]
+
+                        if l_low == "upc" and idx + 1 < len(dom_lines):
+                            cand_upc = dom_lines[idx + 1]
+                            if cand_upc.isdigit() and len(cand_upc) >= 8:
+                                upc_code = cand_upc
+
+                    # Reject generic marketing pages that have no lifecycle status, no dates, and no announcement
+                    if not has_explicit_lifecycle and not (discontinued_date or replacement_model):
+                        logger.debug(f"[SKIP NON-LIFECYCLE PAGE] {pr.url} lacks lifecycle evidence.")
+                        continue
+
+                    norm_status = normalize_stage_name(status)
+
+                    # Clean all fields: remove unnecessary quotes ("), backslashes, HTML entities, keep -, ., :, /, ,
+                    clean_model = clean_csv_field(model_name, "model_name")
+                    clean_aliases = clean_csv_field(name if (name and sku and name.lower() != sku.lower()) else "", "aliases")
+                    clean_status = clean_csv_field(norm_status, "status")
+                    clean_cat = clean_csv_field(category, "category")
+                    clean_repl = clean_csv_field(replacement_model, "replacement")
+
+                    meta_info = {
+                        "full_description": clean_csv_field(description or name or "", "text"),
+                        "discontinued_date": discontinued_date or "",
+                        "upc": upc_code,
+                        "image_url": image_url or "",
+                        "announcement": clean_csv_field(announcement_text, "text")
+                    }
+                    meta_info = {k: v for k, v in meta_info.items() if v}
+
+                    m_dedup = clean_model.strip().upper()
+                    if m_dedup not in seen_models:
+                        seen_models.add(m_dedup)
+                        try:
+                            rec = ProductRecord(
+                                vendor_name=vendor_name,
+                                model_name=clean_model,
+                                aliases=clean_aliases or None,
+                                status=clean_status,
+                                stage=clean_status,
+                                vendor_status=clean_status,
+                                stage_date_utc=stage_date,
+                                source_url=pr.url,
+                                category=clean_cat,
+                                replacement=clean_repl or None,
+                                metadata=meta_info
+                            )
+                            records.append(rec)
+                            logger.info(f"  [SITEMAP EXTRACT] {clean_model} | Status: {clean_status} | Date: {stage_date[:10] if stage_date else 'N/A'}")
+                        except Exception as val_err:
+                            logger.debug(f"Record validation notice for {clean_model}: {val_err}")
+
+            return records
 
     async def crawl_website(
         self,

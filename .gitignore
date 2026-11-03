@@ -32,6 +32,7 @@ ENV/
 
 # Temporary execution run artifacts (audits & intermediate dumps)
 artifacts/runs/
+artifacts/run_state/
 artifacts/temp/
 artifacts/checkpoint.json
 artifacts/dlq.json

@@ -26,6 +26,7 @@ class TestStealthAndBatchCrawl(unittest.IsolatedAsyncioTestCase):
         self.mock_extractor.provider = "gemini"
         self.mock_extractor.extract_from_markdown.return_value = []
         self.mock_extractor.extract_batch.return_value = []
+        self.mock_extractor.fallback_rule_based_extraction.return_value = []
         self.run_cache = RunCache()
         self.crawler = UniversalAICrawler(extractor=self.mock_extractor, run_cache=self.run_cache)
 

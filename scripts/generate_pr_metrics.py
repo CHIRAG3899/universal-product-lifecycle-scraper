@@ -146,7 +146,7 @@ def generate_pr_metrics(
     md.append("# 🚀 Automated Product Lifecycle Dataset Update & Health Metrics")
     md.append("")
     md.append(f"**Execution Timestamp**: `{now_utc.strftime('%Y-%m-%d %H:%M:%S UTC')}`  ")
-    md.append("**Master Dataset Path**: [`output/all_vendors_lifecycle.csv`](output/all_vendors_lifecycle.csv)  ")
+    md.append("**Master Dataset Path**: [`output/eol_products_lifecycle.csv`](output/eol_products_lifecycle.csv)  ")
     md.append(f"**Total Verified Products in Master Dataset**: **{total_records:,}**  ")
     md.append("")
 
@@ -258,7 +258,7 @@ def generate_pr_metrics(
 
 if __name__ == "__main__":
     root = Path(__file__).parent.parent
-    master_csv = root / "output" / "all_vendors_lifecycle.csv"
+    master_csv = root / "output" / "eol_products_lifecycle.csv"
     artifacts = root / "artifacts" / "runs"
     dlq = root / "artifacts" / "dlq" / "dead_letters.jsonl"
     out_md = root / "output" / "pr_description.md"

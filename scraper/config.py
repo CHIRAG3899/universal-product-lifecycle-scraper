@@ -78,4 +78,6 @@ HEADLESS_BROWSER = os.getenv("HEADLESS", "true").lower() in ("true", "1", "yes")
 
 # Default export locations
 DEFAULT_JSON_OUTPUT = OUTPUT_DIR / "all_vendors_lifecycle.json"
-DEFAULT_CSV_OUTPUT = OUTPUT_DIR / "all_vendors_lifecycle.csv"
+DEFAULT_EOL_CSV_OUTPUT = OUTPUT_DIR / "eol_products_lifecycle.csv"
+DEFAULT_ACTIVE_CSV_OUTPUT = OUTPUT_DIR / "active_products_lifecycle.csv"
+DEFAULT_CSV_OUTPUT = DEFAULT_EOL_CSV_OUTPUT

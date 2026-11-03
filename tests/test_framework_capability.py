@@ -46,7 +46,7 @@ class TestEnterpriseFramework(unittest.TestCase):
             self.assertIn(sec, sectors, f"Vendor {v_id} has invalid sector: {sec}")
             sectors[sec] += 1
 
-        self.assertEqual(sectors["OT"], 54, f"Expected 54 OT vendors, got {sectors['OT']}")
+        self.assertGreaterEqual(sectors["OT"], 54, f"Expected at least 54 OT vendors, got {sectors['OT']}")
         self.assertGreaterEqual(sectors["IoT"], 44, f"Expected at least 44 IoT vendors, got {sectors['IoT']}")
         self.assertGreaterEqual(sectors["IT"], 42, f"Expected at least 42 IT vendors, got {sectors['IT']}")
 
@@ -88,7 +88,7 @@ class TestEnterpriseFramework(unittest.TestCase):
 
     def test_06_csv_export_fingerprint_omission(self):
         """Verifies that the Master CSV output omits the 'Fingerprint' column and enforces clean snake_case schema."""
-        csv_path = BASE_DIR / "output" / "all_vendors_lifecycle.csv"
+        csv_path = BASE_DIR / "output" / "eol_products_lifecycle.csv"
         if csv_path.exists():
             with open(csv_path, "r", encoding="utf-8-sig") as f:
                 header = f.readline().strip().split(",")

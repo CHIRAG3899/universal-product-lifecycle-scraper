@@ -1,0 +1,344 @@
+{
+  "vendor_id": "abb",
+  "vendor_name": "ABB",
+  "total_records": 16,
+  "products": [
+    {
+      "fingerprint": "a8c6928427d37256",
+      "vendor_name": "ABB",
+      "model_name": "DOCUMENT",
+      "aliases": "ID REV DATE SECURITY LEVEL LANG PAGE",
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": null,
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:21:56Z",
+      "last_updated_utc": "2026-11-03T04:21:56Z",
+      "metadata": {
+        "missing_date": true,
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "92353be796c9953c",
+      "vendor_name": "ABB",
+      "model_name": "4FPS10001174825",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:21:56Z",
+      "last_updated_utc": "2026-11-03T04:21:56Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "ae51e76212601e56",
+      "vendor_name": "ABB",
+      "model_name": "ACS550-01",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "6be369eb478a904c",
+      "vendor_name": "ABB",
+      "model_name": "ACS550-02",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "932c3e74e9af7a5a",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-01",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "38cb89df3c6aeaee",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-02",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "bd98868eb78f9b6f",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-UH",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "3761802c1ab76dcf",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-xBxR",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "77626915b3d0c602",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-PxR",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "5229dbd38c4605b0",
+      "vendor_name": "ABB",
+      "model_name": "ACH550-VxR",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "3719d333f0aca16d",
+      "vendor_name": "ABB",
+      "model_name": "ACQ550-Ux",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "bb88f4681ae4db8c",
+      "vendor_name": "ABB",
+      "model_name": "ACQ550-CC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "ebe2a83ab244df0f",
+      "vendor_name": "ABB",
+      "model_name": "ACQ550-Px",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "8c4c496adeb6d055",
+      "vendor_name": "ABB",
+      "model_name": "ACS550-Ux",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "f90127e7abaea428",
+      "vendor_name": "ABB",
+      "model_name": "ACS550-CC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "e5be16e9d7c955be",
+      "vendor_name": "ABB",
+      "model_name": "ACS550-Px",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Limited",
+      "stage": "Limited",
+      "vendor_status": "Limited",
+      "stage_date_utc": "2024-01-01T00:00:00Z",
+      "source_url": "https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf",
+      "category": "Industrial Automation & Drives",
+      "product_category": "Industrial Automation & Drives",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-03T04:23:50Z",
+      "last_updated_utc": "2026-11-03T04:23:50Z",
+      "metadata": {
+        "region": "Global"
+      }
+    }
+  ]
+}

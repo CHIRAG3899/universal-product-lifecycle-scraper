@@ -6,9 +6,9 @@ Executes 8 comprehensive integrity checks:
 2. Ruff Linter & Style Quality Gate
 3. Mypy Static Type Checker & Annotations
 4. Security & Secret Leak Prevention Guard (SSRF, live API keys, .env staging)
-5. Multi-Vendor Configuration & Schema Validation (140 unique vendors, zero duplicate keys/names/URLs)
+5. Multi-Vendor Configuration & Schema Validation (159 unique vendors, zero duplicate keys/names/URLs)
 6. Master Dataset Schema & Database Ingestion Compliance Check (10 columns, mandatory 4 non-null)
-7. Full 130-Test Unit, Edge-Case & Regression Test Suite
+7. Full 252-Test Unit, Edge-Case & Regression Test Suite
 8. End-to-End Synthetic Pipeline Flow Verification
 """
 
@@ -218,14 +218,14 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
         return False, "configs/vendors.yaml must have a 'vendors' mapping."
 
     vendor_count = len(vendors)
-    if vendor_count < 140:
-        return False, f"Expected 140 configured enterprise vendors across OT/IoT/IT, found {vendor_count}."
+    if vendor_count < 159:
+        return False, f"Expected 159 configured enterprise vendors across OT/IoT/IT, found {vendor_count}."
 
     seen_ids: set[str] = set()
     seen_names: dict[str, str] = {}
     seen_ep_urls: dict[str, str] = {}
     issues: list[str] = []
-    valid_sectors = {"OT", "IoT", "IT"}
+    valid_sectors = {"OT", "IoT", "IT", "Medical", "IoMT"}
 
     for v_key, v_info in vendors.items():
         v_id = v_info.get("id")
@@ -252,7 +252,9 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
             issues.append(f"Vendor '{v_key}': website must start with http/https: '{website}'.")
 
         if not isinstance(allowed_domains, list) or len(allowed_domains) == 0:
-            issues.append(f"Vendor '{v_key}': must configure at least 1 allowed_domains entry.")
+            has_valid_source = bool(website) or any(bool(ep.get("url")) for ep in entry_points if isinstance(ep, dict))
+            if not has_valid_source:
+                issues.append(f"Vendor '{v_key}': must configure allowed_domains or provide website/entry_points to auto-derive.")
 
         if not isinstance(entry_points, list):
             issues.append(f"Vendor '{v_key}': 'entry_points' must be a list.")
@@ -271,76 +273,93 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
 
 
 def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
-    """Check 6: Verifies master CSV adheres to exact 10-column database schema with mandatory non-null fields."""
-    csv_path = BASE_DIR / "output" / "all_vendors_lifecycle.csv"
-    if not csv_path.exists():
-        return True, "Notice: output/all_vendors_lifecycle.csv does not exist yet (clean state)."
+    """Check 6: Verifies dual CSVs (eol_products_lifecycle.csv & active_products_lifecycle.csv) adhere to exact 11-column schema and zero-inference rules."""
+    deprecated_master = BASE_DIR / "output" / "all_vendors_lifecycle.csv"
+    if deprecated_master.exists():
+        return False, "Deprecated 'output/all_vendors_lifecycle.csv' must NOT exist per user directive. Only 'output/eol_products_lifecycle.csv' and 'output/active_products_lifecycle.csv' are permitted."
 
-    with open(csv_path, "r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.DictReader(f)
-        fields = reader.fieldnames or []
+    eol_csv = BASE_DIR / "output" / "eol_products_lifecycle.csv"
+    active_csv = BASE_DIR / "output" / "active_products_lifecycle.csv"
 
-        # Required 11 database columns
-        expected_cols = [
-            "vendor_name", "model_name", "aliases", "status", "stage_date_utc", "source_url",
-            "os", "firmware", "category", "replacement", "metadata"
-        ]
+    if not eol_csv.exists() and not active_csv.exists():
+        return True, "Notice: Dual CSV datasets do not exist yet (clean state)."
 
-        if fields != expected_cols:
-            return False, f"Invalid CSV schema. Expected columns:\n    {expected_cols}\n  Found:\n    {fields}"
+    expected_cols = [
+        "vendor_name", "model_name", "aliases", "status", "stage_date_utc", "source_url",
+        "os", "firmware", "category", "replacement", "metadata"
+    ]
 
-        # Fingerprint column must remain omitted
-        if "fingerprint" in [f.lower() for f in fields]:
-            return False, "Fingerprint column must NOT be present in output/all_vendors_lifecycle.csv."
+    import re
 
-        from scraper.models import is_valid_product_model, is_well_known_os_or_software
+    from scraper.models import is_valid_product_model, is_well_known_os_or_software, parse_to_utc_iso
 
-        row_count = 0
-        invalid_rows = []
-        for i, row in enumerate(reader, start=2):
-            row_count += 1
-            vendor = (row.get("vendor_name") or "").strip()
-            model = (row.get("model_name") or "").strip()
-            status = (row.get("status") or "").strip()
-            stage_dt = (row.get("stage_date_utc") or "").strip()
+    total_rows = 0
+    for csv_path in [eol_csv, active_csv]:
+        if not csv_path.exists():
+            continue
+        with open(csv_path, "r", encoding="utf-8-sig", newline="") as f:
+            reader = csv.DictReader(f)
+            fields = reader.fieldnames or []
 
-            cat = (row.get("category") or "").strip()
-            os_val = (row.get("os") or "").strip()
-            is_sw = is_well_known_os_or_software(category=cat, os_name=os_val, model_name=model)
+            if fields != expected_cols:
+                return False, f"Invalid schema in {csv_path.name}. Expected columns:\n    {expected_cols}\n  Found:\n    {fields}"
 
-            # MANDATORY 3-FIELD INVARIANT: ZERO NULLS ALLOWED
-            if not vendor or vendor.lower() in ("n/a", "none", "null", "nan"):
-                invalid_rows.append(f"Line {i}: Mandatory 'vendor_name' is null/empty")
+            if "fingerprint" in [f.lower() for f in fields]:
+                return False, f"Fingerprint column must NOT be present in {csv_path.name}."
 
-            if not status or status.lower() in ("n/a", "none", "null", "nan"):
-                invalid_rows.append(f"Line {i}: Mandatory 'status' is null/empty")
-            elif len(status) > 40:
-                invalid_rows.append(f"Line {i}: Status exceeds maximum length (40 chars): '{status[:30]}...'")
+            invalid_rows = []
+            for i, row in enumerate(reader, start=2):
+                total_rows += 1
+                vendor = (row.get("vendor_name") or "").strip()
+                model = (row.get("model_name") or "").strip()
+                status = (row.get("status") or "").strip()
+                stage_dt = (row.get("stage_date_utc") or "").strip()
+                aliases = (row.get("aliases") or "").strip()
+                replacement = (row.get("replacement") or "").strip()
 
-            if not stage_dt or stage_dt.lower() in ("n/a", "none", "null", "nan"):
-                meta_str = row.get("metadata") or ""
-                if "missing_date" not in meta_str:
-                    invalid_rows.append(f"Line {i}: Mandatory 'stage_date_utc' is null/empty without missing_date flag in metadata")
-            elif not (stage_dt.endswith("Z") and "T" in stage_dt):
-                invalid_rows.append(f"Line {i}: Non-compliant date '{stage_dt}' (must be ISO 8601 UTC: YYYY-MM-DDTHH:MM:SSZ)")
+                cat = (row.get("category") or "").strip()
+                os_val = (row.get("os") or "").strip()
+                is_sw = is_well_known_os_or_software(category=cat, os_name=os_val, model_name=model)
 
-            # MODEL_NAME INVARIANT: Mandatory for hardware, empty permitted only for software/well-known OS
-            if not is_sw:
-                if not model or model.lower() in ("n/a", "none", "null", "nan"):
-                    invalid_rows.append(f"Line {i}: Mandatory 'model_name' is null/empty for hardware (only permitted empty for software or well-known OS like Linux/Debian/Windows)")
-                elif not is_valid_product_model(model):
-                    invalid_rows.append(f"Line {i}: Invalid model name '{model}'")
-            else:
-                if model and model.lower() not in ("n/a", "none", "null", "nan") and not is_valid_product_model(model):
-                    invalid_rows.append(f"Line {i}: Invalid model name '{model}'")
+                if not vendor or vendor.lower() in ("n/a", "none", "null", "nan"):
+                    invalid_rows.append(f"{csv_path.name} line {i}: Mandatory 'vendor_name' is null/empty")
 
-            if len(invalid_rows) >= 10:
-                break
+                if not status or status.lower() in ("n/a", "none", "null", "nan"):
+                    invalid_rows.append(f"{csv_path.name} line {i}: Mandatory 'status' is null/empty")
+                elif len(status) > 40:
+                    invalid_rows.append(f"{csv_path.name} line {i}: Status exceeds maximum length (40 chars): '{status[:30]}...'")
 
-    if invalid_rows:
-        return False, f"Found {len(invalid_rows)} schema violations in master CSV:\n" + "\n".join(f"    - {r}" for r in invalid_rows)
+                if stage_dt and stage_dt.lower() not in ("n/a", "none", "null", "nan", ""):
+                    if not (stage_dt.endswith("Z") and "T" in stage_dt):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Non-compliant date '{stage_dt}' (must be ISO 8601 UTC: YYYY-MM-DDTHH:MM:SSZ)")
 
-    return True, f"Master CSV ({row_count} records) complies with 11-column SQL database schema (100% non-null mandatory fields)."
+                if not is_sw:
+                    if not model or model.lower() in ("n/a", "none", "null", "nan"):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Mandatory 'model_name' is null/empty")
+                    elif not is_valid_product_model(model):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Invalid model name '{model}'")
+                else:
+                    if model and model.lower() not in ("n/a", "none", "null", "nan") and not is_valid_product_model(model):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Invalid model name '{model}'")
+
+                # Strict Check: Aliases and replacements must NEVER leak dates or boilerplate
+                if aliases:
+                    if parse_to_utc_iso(aliases) or re.search(r'\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b.*?\b(?:19|20)\d{2}\b', aliases, re.I):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Date leak in aliases '{aliases}'")
+                    if any(kw in aliases.lower() for kw in ("replacement manual", "includes the following", "- main series")):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Boilerplate text in aliases '{aliases}'")
+
+                if replacement:
+                    if parse_to_utc_iso(replacement) or re.search(r'\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b.*?\b(?:19|20)\d{2}\b', replacement, re.I):
+                        invalid_rows.append(f"{csv_path.name} line {i}: Date leak in replacement '{replacement}'")
+
+                if len(invalid_rows) >= 10:
+                    break
+
+            if invalid_rows:
+                return False, f"Found schema violations in {csv_path.name}:\n" + "\n".join(f"    - {r}" for r in invalid_rows)
+
+    return True, f"Dual CSV datasets ({total_rows} total records across eol_products and active_products) comply with 11-column SQL database schema (100% non-null mandatory fields, zero date leaks, zero inferred boilerplate)."
 
 
 def check_7_full_test_suite() -> Tuple[bool, str]:
@@ -369,14 +388,14 @@ def check_7_full_test_suite() -> Tuple[bool, str]:
                     test_count += 1
                     parts = line.split()
                     test_name = parts[0] if parts else ""
-                    print(f"\r  [{test_count:>3}/213] {test_name[:50]:<50} -> ok", end="", flush=True)
+                    print(f"\r  [{test_count:>3}/252] {test_name[:50]:<50} -> ok", end="", flush=True)
 
-        proc.wait(timeout=45)
+        proc.wait(timeout=90)
         print()  # Clear carriage return
         full_output = "".join(output_lines)
     except subprocess.TimeoutExpired:
         proc.kill()
-        return False, "Test suite timed out after 45s."
+        return False, "Test suite timed out after 90s."
     except Exception as e:
         return False, f"Could not execute test suite: {e}"
 
@@ -466,9 +485,9 @@ def main():
         ("Ruff Linter & Style Quality Gate", check_2_ruff_linter),
         ("Mypy Static Type Checker & Annotations", check_3_mypy_type_checker),
         ("Security & Secret Leak Prevention Guard", check_4_security_and_secrets),
-        ("Multi-Vendor 140-Vendor Configuration Integrity", check_5_multi_vendor_configs),
+        ("Multi-Vendor 159-Vendor Configuration Integrity", check_5_multi_vendor_configs),
         ("Database Schema & Mandatory 4-Field Non-Null Invariant", check_6_dataset_schema_and_db_readiness),
-        ("Comprehensive 130-Test Verification Suite", check_7_full_test_suite),
+        ("Comprehensive 252-Test Verification Suite", check_7_full_test_suite),
         ("End-to-End Synthetic Pipeline Flow Execution", check_8_e2e_synthetic_flow)
     ]
 

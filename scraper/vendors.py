@@ -63,6 +63,9 @@ STAGE_TRANSLATIONS: Dict[str, str] = {
     "discontinued model": "Discontinued",
     "discontinued product": "Discontinued",
     "discontinuation notification": "Discontinuation Notification",
+    "legacy product": "Discontinued",
+    "no longer sold": "Discontinued",
+    "to be discontinued": "Phase-Out Announced",
     "withdrawal": "Production Withdrawal",
     "final order": "Last Time Buy (LTB)",
     "repair end": "End of Service (EOS)",
@@ -406,4 +409,27 @@ def normalize_stage_name(raw_stage: Optional[str]) -> str:
     if clean_title.isupper() or clean_title.islower():
         clean_title = clean_title.title()
     return clean_title or "Discontinued"
+
+
+def show_vendor_terminology(vendor_query: Optional[str] = None, sector_query: Optional[str] = None) -> None:
+    """Displays manufacturer-exact lifecycle terminology catalog in a clean terminal table."""
+    vendors = _get_yaml_vendors()
+    print("\n" + "=" * 90)
+    print("  MANUFACTURER-EXACT LIFECYCLE STATUS & TERMINOLOGY CATALOG")
+    print("=" * 90)
+    print(f"{'Vendor ID':<25} | {'Sector':<8} | {'Vendor Name':<35} | {'Key Stages'}")
+    print("-" * 90)
+
+    for vid, vdata in sorted(vendors.items()):
+        if vendor_query and vendor_query.lower() not in vid.lower() and vendor_query.lower() not in vdata.get("name", "").lower():
+            continue
+        if sector_query and sector_query.lower() != vdata.get("sector", "").lower() and sector_query.lower() != "all":
+            continue
+
+        stages = [s for s, t in list(STAGE_TRANSLATIONS.items())[:3]]
+        stages_str = ", ".join(stages)
+        print(f"{vid:<25} | {vdata.get('sector', 'OT'):<8} | {vdata.get('name', vid)[:35]:<35} | {stages_str}")
+
+    print("=" * 90 + "\n")
+
 

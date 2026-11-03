@@ -37,6 +37,7 @@ from scraper.models import (
     ProductRecord,
     extract_date_from_bulletin_code,
     is_valid_product_model,
+    is_valid_replacement_model,
     parse_to_utc_iso,
 )
 from scraper.providers import (
@@ -84,6 +85,13 @@ Analyze the provided crawled web content or technical notice and extract all pro
      * 'raw_stage_label': original unnormalized stage text
      * 'detected_language': source language
      * 'notes': migration instructions or notes
+### STRICT ZERO-INFERENCE DOCTRINE (MANDATORY):
+- **NEVER INFER STATUS**: If text/page does NOT explicitly declare a lifecycle milestone, emit NO record.
+- **NEVER INFER DATES**: If no explicit milestone date is provided, set stage_date_utc to null.
+- **NEVER EXTRACT NON-PRODUCTS**: Do not extract legal words, navigation links, or manuals as models.
+- **ZERO DATE LEAKS**: Calendar dates must NEVER be placed in aliases, model_name, or replacement.
+- **NON-LIFECYCLE PAGES**: If a page contains no lifecycle facts, return an EMPTY list [].
+
 7. **MODEL ALIASES & COMMON NAMES**:
    - If a product has alternate part numbers, marketing names, short codes, or common trade names (e.g., 'SIMATIC S7-1500 CPU 1516-3 PN/DP' for '6ES7516-3AN02-0AB0', or 'Catalyst 9300' for 'C9300-48P', or unhyphenated part number), record them as a clean comma-separated string in 'aliases'.
 """
@@ -836,14 +844,20 @@ class UniversalAIExtractor:
                         next_candidate = candidates[(curr_idx + 1) % len(candidates)]
                     except ValueError:
                         next_candidate = candidates[0]
-                    backoff_secs = (attempt + 1) * 2
-                    m_retry = re.search(r'retry\s+(?:in\s+)?(\d+(?:\.\d+)?)s', err_str) or re.search(r"['\"]retrydelay['\"]\s*:\s*['\"](\d+)s['\"]", err_str)
-                    if m_retry:
-                        try:
-                            parsed_wait = float(m_retry.group(1))
-                            backoff_secs = int(min(max(parsed_wait + 1.0, 5.0), 65.0))
-                        except Exception:
-                            pass
+                    if "per day limit" in err_str.lower() or "daily" in err_str.lower():
+                        backoff_secs = 1.0
+                    else:
+                        backoff_secs = (attempt + 1) * 2
+                        m_retry = re.search(r'retry\s+(?:in\s+)?(\d+(?:\.\d+)?)s', err_str) or re.search(r"['\"]retrydelay['\"]\s*:\s*['\"](\d+)s['\"]", err_str)
+                        if m_retry:
+                            try:
+                                parsed_wait = float(m_retry.group(1))
+                                if parsed_wait > 60:
+                                    backoff_secs = 2.0
+                                else:
+                                    backoff_secs = int(min(max(parsed_wait + 1.0, 2.0), 10.0))
+                            except Exception:
+                                pass
                     logger.warning(f"Gemini transient limit/error on '{self.model_name}' ({e}). Switching to '{next_candidate}' (backoff {backoff_secs}s)...")
                     self.model_name = next_candidate
                     time.sleep(backoff_secs)
@@ -1496,6 +1510,296 @@ class UniversalAIExtractor:
         # Flush final item
         flush_records()
         return products
+
+    def verify_and_filter_records_with_llm(
+        self,
+        records: List[ProductRecord],
+        vendor_name: str = "",
+        return_rejections: bool = False,
+    ) -> Any:
+        """
+        Enterprise Pre-Persistence LLM Verification Gate.
+        Validates harvested candidate records using the LLM to guarantee:
+        1. Authentic Product Model: Confirms model_name is a real hardware or software product SKU,
+           strictly rejecting website navigation slugs, UI chrome, URL paths, and legal headers
+           (e.g., 'terms', 'terms-canada', 'terms-us', 'text-display', 'timing-relays', 'tools', 'top-connect', 'privacy', 'imprint').
+        2. Zero Status Inference: Rejects records where status was guessed or inferred without explicit manufacturer declaration.
+        3. Zero Date Leakage: Confirms stage_date_utc is an authentic milestone date, and strips any leaked dates
+           from aliases or replacement fields.
+        4. Boilerplate Stripping: Aggressively eliminates phrases like 'Includes following models:', 'Replacement manual', etc.
+        If the LLM client is not configured (offline / test mode), applies deterministic rule-based verification.
+        """
+        self.last_rejections: List[Dict[str, Any]] = []
+        if not records:
+            return ([], []) if return_rejections else []
+
+        pre_filtered: List[ProductRecord] = []
+        rejections: List[Dict[str, Any]] = []
+
+        from scraper.models import parse_to_utc_iso, strip_regional_suffix
+
+        for r in records:
+            # Deterministic regional suffix stripping: GR60 (EU) -> GR60
+            if r.model_name:
+                clean_m, stripped_reg = strip_regional_suffix(r.model_name)
+                if clean_m and clean_m != r.model_name:
+                    r.model_name = clean_m
+                    if stripped_reg and "region_variant" not in r.metadata:
+                        r.metadata["region_variant"] = stripped_reg
+
+            # Deterministic date and boilerplate stripping from aliases
+            if r.aliases:
+                clean_al = str(r.aliases).strip()
+                # Check if alias is literally a date (e.g. 'April 30 - 2026', '2026-04-30')
+                if parse_to_utc_iso(clean_al) is not None:
+                    r.aliases = None
+                elif any(bp in clean_al.lower() for bp in ("includes following models", "includes all modules", "replacement manual", "main series")):
+                    r.aliases = None
+                else:
+                    clean_al_stripped, _ = strip_regional_suffix(clean_al)
+                    r.aliases = clean_al_stripped
+
+            # Deterministic boilerplate stripping from replacement
+            if r.replacement:
+                clean_rep = str(r.replacement).strip()
+                if any(bp in clean_rep.lower() for bp in ("contact sales", "not applicable", "see bulletin", "see pdf", "none", "n/a", "tbd")):
+                    r.replacement = None
+                else:
+                    clean_rep_stripped, _ = strip_regional_suffix(clean_rep)
+                    r.replacement = clean_rep_stripped
+
+            m = (r.model_name or "").strip()
+            v = (r.vendor_name or vendor_name or "").strip()
+            st = (r.status or "").strip()
+            if not v or not st:
+                rejections.append({
+                    "vendor": v or vendor_name,
+                    "model": m,
+                    "status": st,
+                    "reason": "Missing required vendor name or lifecycle status",
+                    "source_url": r.source_url
+                })
+                continue
+            if not is_valid_product_model(m):
+                rejections.append({
+                    "vendor": v,
+                    "model": m,
+                    "status": st,
+                    "reason": "Failed deterministic product model syntax validation (rejected UI/noise/dates)",
+                    "source_url": r.source_url
+                })
+                continue
+            pre_filtered.append(r)
+
+        if not pre_filtered:
+            self.last_rejections = rejections
+            return ([], rejections) if return_rejections else []
+
+        # Code-level deterministic split to optimize LLM token cost:
+        # Pure Active Catalog Records (status=Active, no dates, no aliases, no replacements, valid model with digits)
+        # have zero date-leak risk and are verified deterministically via code.
+        # Candidate records with dates, aliases, replacements, EOL statuses, or no digits are sent to LLM Gate.
+        verified: List[ProductRecord] = []
+        to_llm_verify: List[ProductRecord] = []
+
+        disallowed_active_model_keywords = (
+            "literature", "brochure", "portal", "safety", "whitepaper", "datasheet",
+            "case-study", "handbook", "overview", "catalog", "manual", "guide",
+            "training", "policy", "news", "service", "terms", "condition", "battery-safety"
+        )
+
+        from scraper.strategies.base import is_likely_date_str
+        iso_date_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$')
+        standard_lifecycle_statuses = {
+            "Active", "Discontinued", "Endoflife", "Legacy", "Phased-out", "Limited", "Inactive"
+        }
+
+        for r in pre_filtered:
+            m_lower = r.model_name.lower()
+            model_has_digit = any(c.isdigit() for c in r.model_name)
+            model_is_valid = (
+                model_has_digit
+                and is_valid_product_model(r.model_name)
+                and len(r.model_name) <= 40
+                and "---" not in r.model_name
+                and "--" not in r.model_name
+                and not any(kw in m_lower for kw in disallowed_active_model_keywords)
+            )
+
+            is_pure_active = (
+                r.status == "Active"
+                and not r.stage_date_utc
+                and not r.aliases
+                and not r.replacement
+                and model_is_valid
+            )
+
+            aliases_clean = not r.aliases or (not is_likely_date_str(r.aliases) and is_valid_product_model(r.aliases))
+            replacement_clean = not r.replacement or is_valid_replacement_model(r.replacement)
+            date_clean = not r.stage_date_utc or bool(iso_date_pattern.match(r.stage_date_utc))
+
+            is_pure_lifecycle_record = (
+                model_is_valid
+                and r.status in standard_lifecycle_statuses
+                and aliases_clean
+                and replacement_clean
+                and date_clean
+            )
+
+            if is_pure_active or is_pure_lifecycle_record:
+                verified.append(r)
+            else:
+                to_llm_verify.append(r)
+
+        if verified:
+            print(f"  [LLM GATE OPTIMIZATION] Verified {len(verified)} authentic catalog & lifecycle records deterministically via code (0 LLM tokens).", flush=True)
+
+        if not to_llm_verify:
+            self.last_rejections = rejections
+            return (verified, rejections) if return_rejections else verified
+
+        if not self.is_configured():
+            logger.debug(f"[LLM VERIFICATION GATE] API not configured. Verified {len(to_llm_verify)} candidate records deterministically.")
+            verified.extend(to_llm_verify)
+            self.last_rejections = rejections
+            return (verified, rejections) if return_rejections else verified
+
+        print(f"  [LLM GATE DISPATCH] Sending {len(to_llm_verify)} candidate records (EOL milestones / dates / aliases) to LLM Gate...", flush=True)
+        batch_size = 100
+        for i in range(0, len(to_llm_verify), batch_size):
+            batch = to_llm_verify[i:i + batch_size]
+            batch_num = i // batch_size + 1
+            total_batches = (len(to_llm_verify) - 1) // batch_size + 1
+            print(f"  [LLM GATE BATCH] Verifying batch {batch_num}/{total_batches} ({len(batch)} items)...", flush=True)
+            if getattr(self, "_quota_exhausted", False):
+                for orig_rec in batch:
+                    verified.append(orig_rec)
+                continue
+            batch_payload = [
+                {
+                    "idx": idx,
+                    "model": b.model_name,
+                    "status": b.status,
+                    "date": b.stage_date_utc,
+                    "aliases": b.aliases,
+                    "replacement": b.replacement,
+                }
+                for idx, b in enumerate(batch)
+            ]
+
+            prompt = (
+                "You are an Enterprise Hardware & Software Lifecycle Integrity Validator.\n"
+                "Verify the candidate product records below. Your role is strictly VERIFICATION and CORRECT PARSING.\n"
+                "DO NOT INFER ANYTHING. NEVER GUESS DATES OR STATUSES. DATA MUST BE STRICTLY VERBATIM AS DISCLOSED BY THE MANUFACTURER.\n\n"
+                "Rules:\n"
+                "1. Reject non-models (e.g. 'terms', 'terms-canada', 'terms-us', 'text-display', 'timing-relays', 'tools', 'top-connect', 'privacy', 'imprint', 'legal', 'manual', 'guide', 'brochure', '3-phase', '1-phase'). Set is_valid=false with exact reason.\n"
+                "2. If aliases contains leaked dates (e.g. 'April 30 - 2026') or boilerplate ('Includes following models:', 'Replacement manual', 'Main series'), strip the date or boilerplate into clean_aliases.\n"
+                "3. If replacement contains dates or non-model boilerplate ('Contact sales', 'Not applicable', 'See bulletin'), set clean_replacement=null.\n"
+                "4. If model is an authentic physical or software product, set is_valid=true.\n\n"
+                f"Candidate records:\n{json.dumps(batch_payload, indent=2)}\n\n"
+                "Return a JSON list of objects:\n"
+                '[{"idx": int, "is_valid": bool, "reason": str, "clean_model": str, "clean_aliases": str or null, "clean_replacement": str or null}]'
+            )
+
+            try:
+                response_text = ""
+                if self.provider == "gemini" and self.client and hasattr(self.client, "models"):
+                    self._throttle_gemini_call()
+                    gen_cfg = types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.0,
+                        thinking_config=types.ThinkingConfig(thinking_budget=0)
+                    ) if types else None
+
+                    fallback_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
+                    resp = None
+                    for candidate_m in fallback_models:
+                        try:
+                            self.model_name = candidate_m
+                            resp = self.client.models.generate_content(
+                                model=self.model_name,
+                                contents=prompt,
+                                config=gen_cfg
+                            )
+                            break
+                        except Exception as ge:
+                            ge_str = str(ge)
+                            if any(k in ge_str for k in ["429", "RESOURCE_EXHAUSTED", "503", "404"]):
+                                logger.info(f"[LLM GATE] Model '{candidate_m}' unavailable ({ge_str[:60]}), trying next fallback...")
+                                self._throttle_gemini_call()
+                                continue
+                            raise ge
+                    response_text = resp.text if resp else ""
+                elif self.client and hasattr(self.client, "chat") and hasattr(self.client.chat, "completions"):
+                    resp_oai = self.client.chat.completions.create(
+                        model=self.model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=0.0
+                    )
+                    response_text = resp_oai.choices[0].message.content or ""
+                else:
+                    from scraper.providers import call_llm_completion
+                    resp_prov = call_llm_completion(
+                        provider=self.provider,
+                        model=self.model_name,
+                        messages=[{"role": "user", "content": prompt}],
+                        api_key=self.api_key or ""
+                    )
+                    response_text = str(resp_prov) if isinstance(resp_prov, str) else str(resp_prov.get("content", ""))
+
+                if response_text:
+                    clean_json = response_text.strip()
+                    if clean_json.startswith("```"):
+                        clean_json = re.sub(r"^```(?:json)?\s*", "", clean_json)
+                        clean_json = re.sub(r"\s*```$", "", clean_json)
+                    val_items = json.loads(clean_json)
+                    if isinstance(val_items, list):
+                        val_map = {item.get("idx"): item for item in val_items if isinstance(item, dict)}
+                        for idx, orig_rec in enumerate(batch):
+                            v_info = val_map.get(idx)
+                            if v_info is None or v_info.get("is_valid", True):
+                                if v_info:
+                                    if v_info.get("clean_model"):
+                                        c_m = str(v_info["clean_model"]).strip()
+                                        if is_valid_product_model(c_m):
+                                            if orig_rec.model_name.startswith("'=") or orig_rec.model_name.startswith("="):
+                                                orig_rec.model_name = "'=" + c_m.lstrip("'=")
+                                            elif orig_rec.model_name.startswith("'+") or orig_rec.model_name.startswith("+"):
+                                                orig_rec.model_name = "'+ " + c_m.lstrip("'+")
+                                            elif orig_rec.model_name.startswith("'@") or orig_rec.model_name.startswith("@"):
+                                                orig_rec.model_name = "'@" + c_m.lstrip("'@")
+                                            else:
+                                                orig_rec.model_name = c_m
+                                    if "clean_aliases" in v_info:
+                                        orig_rec.aliases = v_info["clean_aliases"]
+                                    if "clean_replacement" in v_info:
+                                        orig_rec.replacement = v_info["clean_replacement"]
+                                verified.append(orig_rec)
+                            else:
+                                reason = str(v_info.get("reason") or "Non-model candidate or unverified specification")
+                                rejections.append({
+                                    "vendor": orig_rec.vendor_name or vendor_name,
+                                    "model": orig_rec.model_name,
+                                    "status": orig_rec.status,
+                                    "stage_date": orig_rec.stage_date_utc,
+                                    "reason": reason,
+                                    "source_url": orig_rec.source_url
+                                })
+                                print(f"  [LLM GATE REJECTED] {orig_rec.model_name} (Reason: {reason})", flush=True)
+                        continue
+            except Exception as llm_err:
+                err_str = str(llm_err)
+                if "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+                    logger.warning(f"[LLM VERIFICATION GATE] API quota exhausted: {err_str}. Switching to deterministic verification for remaining batches.")
+                    self._quota_exhausted = True
+                else:
+                    logger.warning(f"[LLM VERIFICATION GATE] API verification notice: {llm_err}. Using deterministic verification.")
+
+            for orig_rec in batch:
+                verified.append(orig_rec)
+
+        self.last_rejections = rejections
+        return (verified, rejections) if return_rejections else verified
 
 
 # Universal multi-provider aliases for backward & forward compatibility

@@ -6,13 +6,13 @@
   <img src="https://img.shields.io/badge/Type_Checked-Mypy-blueviolet.svg?style=for-the-badge" alt="Mypy" />
   <img src="https://img.shields.io/badge/AI_Engine-Universal_Multi--Provider_LLM-4285F4.svg?style=for-the-badge" alt="Universal Multi-Provider AI" />
   <img src="https://img.shields.io/badge/Crawler-Crawl4AI-orange.svg?style=for-the-badge" alt="Crawl4AI" />
-  <img src="https://img.shields.io/badge/Vendors-143_Enterprise-success.svg?style=for-the-badge" alt="143 Vendors" />
-  <img src="https://img.shields.io/badge/Tests-233_Passing-brightgreen.svg?style=for-the-badge" alt="233 Tests" />
+  <img src="https://img.shields.io/badge/Vendors-159_Enterprise-success.svg?style=for-the-badge" alt="159 Vendors" />
+  <img src="https://img.shields.io/badge/Tests-252_Passing-brightgreen.svg?style=for-the-badge" alt="252 Tests" />
 </p>
 
 An enterprise-grade, multi-vendor AI crawler and structured lifecycle intelligence engine designed to autonomously discover, crawl, normalize, sanitize, deduplicate, and monitor enterprise hardware and software reaching their **End of Product Lifecycle (EOL)**, **Last Time Buy (LTB)**, **End of Sale (EOS)**, and **End of Service / End of Support (EOSL/LDoS)** milestones across all phases.
 
-The platform natively supports **143 global enterprise vendors** across **Operational Technology (OT)** (54 vendors), **Internet of Things (IoT)** (45 vendors), and **Enterprise IT & Networking** (44 vendors), backed by **386 authentic category lifecycle URLs** across switches, routers, firewalls, servers, storage, PLCs, inverters, servos, HMIs, robotics, CNC, barcode scanners, printers, and enterprise operating systems. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and pluggable **Universal Multi-Provider AI** (OpenAI GPT-4o, Anthropic Claude 3.5, Google Gemini, Microsoft Azure OpenAI, Amazon AWS Bedrock, and Local Ollama/vLLM).
+The platform natively supports **159 global enterprise vendors** across **Operational Technology (OT)** (61 vendors), **Internet of Things (IoT)** (49 vendors), and **Enterprise IT & Networking** (49 vendors), backed by **386+ authentic category lifecycle URLs** across switches, routers, firewalls, servers, storage, PLCs, inverters, servos, HMIs, robotics, CNC, barcode scanners, printers, and enterprise operating systems. Powered by **[Crawl4AI](https://crawl4ai.com)** (asynchronous headless Chromium) and pluggable **Universal Multi-Provider AI** (OpenAI GPT-4o, Anthropic Claude 3.5, Google Gemini, Microsoft Azure OpenAI, Amazon AWS Bedrock, and Local Ollama/vLLM).
 
 ---
 
@@ -30,27 +30,28 @@ The platform natively supports **143 global enterprise vendors** across **Operat
 ## 📋 Table of Contents
 1. [Key Architecture & Highlights](#-key-architecture--highlights)
 2. [Universal Multi-Provider AI Architecture & Setup](#-universal-multi-provider-ai-architecture--setup)
-3. [URL Management & Lifecycle Directory Synchronizer (`scripts/update_vendor_urls.py`)](#-url-management--category-expanded-lifecycle-directory-synchronizer)
-4. [Manufacturer-Exact Terminology & Status Registry Tool (`scripts/update_vendor_status_registry.py`)](#-manufacturer-exact-lifecycle-status-registry--readme-tool)
-5. [AI Source Discovery & Regional Website Intelligence (`scripts/discover_vendor_sources.py`)](#-ai-source-discovery--regional-website-intelligence-scriptsdiscover_vendor_sourcespy)
-6. [Anti-Bot Stealth Architecture & SPA Hydration](#-anti-bot-stealth-architecture--spa-hydration)
-7. [Full-Website Accumulation & Batch AI Extraction Mode](#-full-website-accumulation--batch-ai-extraction-mode)
-8. [All-Stage Lifecycle Recognition & Per-Milestone Explosion](#-all-stage-lifecycle-recognition--per-milestone-explosion)
-9. [Framework Pluggability & Adapter Integration](#-framework-pluggability--adapter-integration)
-10. [Enterprise Security Layer & Threat Incident Prevention Shield](#-enterprise-security-layer--threat-incident-prevention-shield)
-11. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
-12. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
-13. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
-14. [Top 143 Enterprise Vendors Registry](#-top-143-enterprise-vendors-registry)
-15. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
-16. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
-17. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
-18. [Scraper Comparison & Empirical Benchmarking Engine (`scripts/compare_scrapers.py`)](#-scraper-comparison--empirical-benchmarking-engine-scriptscompare_scraperspy)
-19. [Zero-Defaults Policy & Strict Garbage Elimination](#-zero-defaults-policy--dynamic-terminology)
-20. [Data Model & 11-Column SQL Schema](#-data-model--11-column-sql-schema)
-21. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
-22. [Automated Verification & Testing](#-automated-verification--testing)
-23. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
+3. [Strategy-Pattern Config-Driven Architecture & Dynamic Prefix Discovery](#-strategy-pattern-config-driven-architecture--dynamic-prefix-discovery)
+4. [URL Management & Lifecycle Directory Synchronizer (`scripts/update_vendor_urls.py`)](#-url-management--category-expanded-lifecycle-directory-synchronizer)
+5. [Manufacturer-Exact Terminology & Status Registry Tool (`scripts/update_vendor_status_registry.py`)](#-manufacturer-exact-lifecycle-status-registry--readme-tool)
+6. [AI Source Discovery & Regional Website Intelligence (`scripts/discover_vendor_sources.py`)](#-ai-source-discovery--regional-website-intelligence-scriptsdiscover_vendor_sourcespy)
+7. [Anti-Bot Stealth Architecture & SPA Hydration](#-anti-bot-stealth-architecture--spa-hydration)
+8. [Full-Website Accumulation & Batch AI Extraction Mode](#-full-website-accumulation--batch-ai-extraction-mode)
+9. [All-Stage Lifecycle Recognition & Per-Milestone Explosion](#-all-stage-lifecycle-recognition--per-milestone-explosion)
+10. [Framework Pluggability & Adapter Integration](#-framework-pluggability--adapter-integration)
+11. [Enterprise Security Layer & Threat Incident Prevention Shield](#-enterprise-security-layer--threat-incident-prevention-shield)
+12. [6-Stage Visible Workflow Pipeline](#-6-stage-visible-workflow-pipeline)
+13. [Enterprise Pre-Commit Gate (Ruff + Mypy)](#-enterprise-pre-commit-gate-ruff--mypy)
+14. [Complete Manufacturer-Exact Lifecycle Status Terminology Registry](#-complete-manufacturer-exact-lifecycle-status-terminology-registry)
+15. [Top 159 Enterprise Vendors Registry](#-top-159-enterprise-vendors-registry)
+16. [Automated GitHub Actions CI/CD Pipeline & PR Metrics Report](#-automated-github-actions-cicd-pipeline--pr-metrics-report)
+17. [Full Website Network Map Discovery & Zero Category Bias](#-full-website-network-map-discovery--zero-category-bias)
+18. [Generic IDE Scraper vs. Enterprise AI Crawler](#-generic-ide-scraper-vs-enterprise-ai-crawler)
+19. [Scraper Comparison & Empirical Benchmarking Engine (`scripts/compare_scrapers.py`)](#-scraper-comparison--empirical-benchmarking-engine-scriptscompare_scraperspy)
+20. [Zero-Defaults Policy & Strict Garbage Elimination](#-zero-defaults-policy--dynamic-terminology)
+21. [Data Model & 11-Column SQL Schema](#-data-model--11-column-sql-schema)
+22. [CLI Usage & Web Dashboard](#-cli-usage--web-dashboard)
+23. [Automated Verification & Testing](#-automated-verification--testing)
+24. [AI Agent Harness & Cognitive Runbooks](#-ai-agent-harness--cognitive-runbooks)
 
 ---
 
@@ -186,6 +187,108 @@ extractor_ollama = UniversalAIExtractor(
 | **Native Prompt Caching** | Gemini, Anthropic Claude, OpenAI | **Up to 90% Input Token Discount** | Automatically leverages system instructions and prompt prefix caching across repetitive vendor portal layouts and tables. | `--prompt-caching`<br/>`AI_ENABLE_PROMPT_CACHING=true` |
 | **Asynchronous Batch API** | Gemini, OpenAI Batch, Azure | **50% Overall Token Discount** | Executes non-interactive background extractions via native provider batch APIs, cutting input and output pricing by half. | `--batch-mode`<br/>`AI_BATCH_MODE=true` |
 | **Token-Efficient Trimming** | All Providers (Universal) | **15–30% Input Token Reduction** | Strips HTML comments, redundant table dividers, padding, and duplicate whitespaces before dispatching context to any AI provider. | Built-in by default |
+
+---
+
+## 🧩 Strategy-Pattern Config-Driven Architecture & Dynamic Prefix Discovery
+
+To eliminate one-off vendor scraping scripts, fragile CSS hardcoding, and arbitrary scraping limits, the engine implements a **Polymorphic Strategy-Pattern Architecture** ([`scraper/strategies/`](scraper/strategies/)). All vendor scraping logic is unified, generic, and configured declaratively in [`configs/vendors.yaml`](configs/vendors.yaml).
+
+```mermaid
+graph TD
+    Pipeline["LifecyclePipeline Dispatcher"] --> StrategyResolver["scraper.strategies.get_strategy()"]
+    StrategyResolver --> S1["SearchPortalStrategy<br/>• Dynamic Prefix Discovery<br/>• Adaptive Queue Expansion<br/>• Deduplicated Checkpointing"]
+    StrategyResolver --> S2["DomTableStrategy<br/>• Table/TR/TD Selectors<br/>• Header Row Auto-Skip<br/>• Quote-Free Normalization"]
+    StrategyResolver --> S3["SitemapStrategy<br/>• sitemapindex.xml Traversal<br/>• PDP Regex Filtering<br/>• Dynamic Model Harvesting"]
+    StrategyResolver --> S4["RestApiStrategy<br/>• Direct JSON Ingestion<br/>• Zero-Browser Overhead<br/>• Native Field Mapping"]
+
+    S1 --> State["VendorRunState<br/>(artifacts/run_state/{vendor_id}_state.json)"]
+    S2 --> State
+    S3 --> State
+    S4 --> State
+```
+
+### 1. Canonical Scraping Strategies
+
+| Strategy | Target Architecture | Key Capabilities | Configuration Example |
+|---|---|---|---|
+| **`search_portal`** | Query-based vendor portals (Rockwell, Siemens SiePortal, Schneider) | Parameterized query templates, dynamic runtime keyword/prefix discovery, CSS row selectors, and adaptive result queue expansion. | `strategy: search_portal`<br/>`url_template: "...?keyword={keyword}"` |
+| **`dom_table`** | Static & client-rendered HTML lifecycle tables (Cisco, Meraki, Juniper) | Dynamic table and column selector mapping, automatic `<th>` header row elimination, and pagination traversal. | `strategy: dom_table`<br/>`selectors: {table: "table", row: "tr"}` |
+| **`sitemap`** | XML Sitemaps & Sitemap Indexes (Rockwell PDP, Omron, Advantech) | Traverses `sitemapindex.xml`, filters child sitemaps via regex (`child_filter: sitemap.PDP_`), and extracts model SKUs. | `strategy: sitemap`<br/>`child_filter: "sitemap.PDP_"` |
+| **`rest_api`** | Structured JSON REST feeds (Microsoft Learn, Red Hat, Dell API) | Direct HTTP GET, nested JSON path navigation (`items`, `products`), and high-throughput zero-browser ingestion. | `strategy: rest_api`<br/>`field_map: {model: "modelName", ...}` |
+
+---
+
+### 2. Dynamic Runtime Model Prefix Discovery (Zero Hardcoded Keywords)
+
+> [!IMPORTANT]
+> **No Hardcoded Keyword Lists**:
+> The crawler does **NOT** hardcode model lists (e.g. `1756`, `5069`, `20-`, `PL-CCP`). Hardcoding arbitrary keywords artificially constrains data collection and misses newly released or obscure catalog series.
+>
+> Instead, the framework discovers model prefixes dynamically at runtime:
+> 1. **Sitemap Harvesting**: Inspects XML product sitemaps (`sitemapindex.xml` -> `sitemap.PDP_*.xml`), regex-extracts genuine catalog SKUs (`details.<model>.html`), and clusters them into alphanumeric family prefixes (`extract_model_family_prefix`).
+> 2. **Adaptive Queue Expansion**: Whenever a search portal query yields results, the models and recommended replacements in those results are inspected in real-time. Any newly seen family prefix is added to the dynamic search queue on the fly.
+> 3. **Persistent Memory State**: Harvested prefixes and completed query units are journaled to `artifacts/run_state/{vendor_id}_state.json`. Subsequent runs immediately resume from memory without re-querying discovered catalogs.
+
+---
+
+### 3. Self-Improving Persistent State Memory & Dynamic Knowledge Base (`scraper/state.py`)
+
+Each vendor execution maintains persistent resumable memory in `artifacts/run_state/{vendor_id}_state.json`:
+- **Dynamic Knowledge Base**: Stores all discovered URLs, child sitemaps, and search queries with their first-seen and last-checked timestamps. On every run, newly discovered endpoints are synchronized with the knowledge base.
+- **Capability-Based Batching**: Workloads are automatically divided into discrete batches based on endpoint capability (sitemaps: 10, dom_tables: 15, search_portals: 20, rest_apis: 50). Operators can run one batch now and subsequent batches in future runs via `--batch-size <N>`.
+- **Multi-Cycle Automatic Queue Refresh**: Once all pending units in a cycle are processed, the crawler automatically increments the cycle counter (`cycle += 1`), re-enqueues all known endpoints, and starts a fresh refresh cycle to capture new lifecycle updates.
+- **`completed_units` & `seen_models`**: Eliminates cross-session duplicate requests and duplicate product harvests.
+- **`discovered_prefixes`**: Stores dynamically learned catalog prefixes across runs.
+- **Atomic Persistence**: Flushes state atomically using temporary file renaming (`.tmp` -> target) to prevent state corruption during interruptions.
+
+---
+
+### 4. Progress Observability & Multi-Vendor Delta Coverage Tracking
+
+To ensure operators and downstream data pipelines always know exact catalog coverage and run deltas:
+
+1. **Persistent Batch Progress Dashboard**:
+   - Persisted to `output/batch_progress.json` and human-readable `artifacts/batch_progress.md`.
+   - Records per vendor: current cycle, total discovered units, completed units, pending units, batches completed, batches remaining, and progress percentage.
+2. **Persistent Coverage & Delta Tracker (`scraper/coverage.py`)**:
+   - Persisted to `output/coverage_tracker.json` and `output/coverage_tracker.md`.
+   - **Old Mapping vs. New Findings Comparison**: On every run, the tracker compares the prior mapping snapshot against current findings to calculate run-level deltas:
+     - `newly_added_urls`: URLs discovered on this run that were not in the prior mapping.
+     - `newly_added_models`: Models extracted on this run that were not in the prior mapping.
+     - `new_records_count`: Number of new records contributed by the run.
+   - Preserves an audit trail of run history and cumulative model/record totals per vendor.
+
+---
+
+### 5. Strict Case-Insensitive Deduplication & Data Quality Guards
+
+Data integrity is enforced at every pipeline boundary to ensure database readiness:
+- **Case-Insensitive Deduplication**: Deduplication across in-memory buffers, per-vendor JSON datasets, and master CSV persistence enforces case-insensitive normalization on `(vendor_name, model_name, status, stage_date_utc)`. No duplicate rows can exist due to casing variations (`Catalyst 2960X` vs. `catalyst 2960x`).
+- **Date Leakage Prevention**: Date tokens (e.g. `"April 30 - 2026"`, `"2024-12-01"`) detected in alias columns are automatically rerouted to `metadata["announcement_date_utc"]`, keeping the `aliases` column 100% clean.
+- **Sales Boilerplate Purge**: Marketing and sales boilerplate (`"consult representative"`, `"refer to bulletin"`, `"contact sales"`, `"-"`, `"n/a"`) is rejected from the `replacement` column, retaining only authentic successor SKUs.
+- **11 Database-Ready Snake_Case Columns**: Clean, quote-free CSV schema: `vendor_name`, `model_name`, `aliases`, `status`, `stage_date_utc`, `source_url`, `os`, `firmware`, `category`, `replacement`, `metadata`.
+
+---
+
+### 6. Unlimited Crawling with Circuit-Breaker Fault Tolerance
+
+- **Zero Arbitrary Ceilings**: Pass `--max-pages 0` or `--max-depth 0` (or configure `max_pages: 0` in config) to crawl unbounded through complete catalog hierarchies.
+- **Adaptive Circuit Breaker**: The crawler halts **only** when consecutive HTTP failures or anti-bot blocks exceed the configured fault threshold (`max_consecutive_errors: 5`), preventing endless loops on broken remote portals while ensuring full catalog harvesting when endpoints are healthy.
+
+---
+
+### 7. Active Production Benchmark Status (8,113 Verified Records Across 6 Core Vendors)
+
+| Vendor | Sector | Active Harvest Strategy | Master Records | Verified Unique SKUs | UTC Date % | Batch / Cycle Status |
+|:---|:---:|:---|:---:|:---:|:---:|:---:|
+| **Rockwell Automation (Allen-Bradley)** | OT | Full Sitemap Hierarchy (PDP Sitemaps 1-90) | 2,001 | 2,001 | 100.0% | Cycle 1 (Batches 1-2 done, 88 remaining) |
+| **Juniper Networks** | IT | Underscore Hardware Architecture Tables | 3,931 | 1,796 | 95.6% | Cycle 1 (Batches 1-2 done, 6 remaining) |
+| **Cisco Systems** | IT | Authoritative Collateral Notice Strategy | 784 | 196 | 100.0% | Cycle 1 (Batches 1-2 done, 8 remaining) |
+| **Mitsubishi Electric** | OT | European & Nordic EOL/LTB/EOS Matrices | 817 | 100 | 87.8% | **Cycle 1 COMPLETE** (2/2 batches done) |
+| **Honeywell** | OT | Discontinued Productivity Model Status Table | 554 | 273 | 93.5% | **Cycle 1 COMPLETE** (1/1 batch done) |
+| **Cisco Meraki** | IT | Cloud Managed Architecture Lifecycle Matrix | 418 | 209 | 98.6% | **Cycle 1 COMPLETE** (1/1 batch done) |
+| **Total Active Storage** | — | — | **8,113** | **4,575** | **96.8%** | **Zero Case-Insensitive Duplicates** |
 
 ---
 
@@ -697,18 +800,18 @@ python scripts/standalone_vendor_terminology.py --markdown
 
 ---
 
-## 🏭 Top 143 Enterprise Vendors Registry
+## 🏭 Top 159 Enterprise Vendors Registry
 
-[`configs/vendors.yaml`](configs/vendors.yaml) contains **140 verified global enterprise manufacturers** configured with strict SSRF domain boundaries:
+[`configs/vendors.yaml`](configs/vendors.yaml) contains **159 verified global enterprise manufacturers** configured with strict SSRF domain boundaries:
 
 | Sector | Count | Coverage Highlights | Interactive Directory |
 |---|:---:|---|:---:|
-| **Operational Technology (OT)** | **54 Vendors** | PLCs, PACs, Inverters, Servos, Machine Controllers, Safety Relays, Industrial PCs | [View 54 OT Vendors](#-operational-technology-ot--automation-54-vendors) |
-| **Internet of Things (IoT)** | **45 Vendors** | Smart Cameras, Edge Vision, Cellular Gateways, LPWAN, Wireless Sensor Nodes | [View 45 IoT Vendors](#-internet-of-things-iot--smart-vision-44-vendors) |
-| **Enterprise IT & Networking** | **44 Vendors** | Core/Edge Switches, Enterprise Firewalls, SAN/NAS Storage, Hyperconverged Servers | [View 44 IT Vendors](#-enterprise-it-cloud--networking-42-vendors) |
+| **Operational Technology (OT)** | **61 Vendors** | PLCs, PACs, Inverters, Servos, Machine Controllers, Safety Relays, Industrial PCs | [View 61 OT Vendors](#-operational-technology-ot--automation-61-vendors) |
+| **Internet of Things (IoT)** | **49 Vendors** | Smart Cameras, Edge Vision, Cellular Gateways, LPWAN, Wireless Sensor Nodes | [View 49 IoT Vendors](#-internet-of-things-iot--smart-vision-49-vendors) |
+| **Enterprise IT & Networking** | **49 Vendors** | Core/Edge Switches, Enterprise Firewalls, SAN/NAS Storage, Hyperconverged Servers | [View 49 IT Vendors](#-enterprise-it-cloud--networking-49-vendors) |
 
 <details>
-<summary>🏭 <b>Operational Technology (OT) & Automation</b> (54 Vendors) — <i>Click to expand</i></summary>
+<summary>🏭 <b>Operational Technology (OT) & Automation</b> (61 Vendors) — <i>Click to expand</i></summary>
 
 | Vendor ID | Manufacturer Name | Covered Sectors | Allowed Domain Whitelist |
 |---|---|---|---|
@@ -766,11 +869,18 @@ python scripts/standalone_vendor_terminology.py --markdown
 | panasonic | **Panasonic** | OT/IoT | [industry.panasonic.eu, panasonic.com, industrial.panasonic.com](https://industry.panasonic.eu) |
 | yamaha | **Yamaha Motor Robotics** | OT | [yamaha-motor-robotics.com, yamaha-motor.com](https://www.yamaha-motor-robotics.com) |
 | hitachi | **Hitachi** | OT/IT/IoT | [hitachi.com, hitachi-ies.co.jp, hitachivantara.com](https://www.hitachi.com) |
+| sew_eurodrive | **SEW-EURODRIVE** | OT | [sew-eurodrive.com](https://www.sew-eurodrive.com) |
+| belden | **Belden** | OT/IT | [belden.com](https://www.belden.com) |
+| aveva | **AVEVA** | OT | [aveva.com](https://www.aveva.com) |
+| inductive_automation | **Inductive Automation** | OT | [inductiveautomation.com](https://www.inductiveautomation.com) |
+| opto22 | **Opto 22** | OT | [opto22.com](https://www.opto22.com) |
+| johnson_controls | **Johnson Controls** | OT | [johnsoncontrols.com](https://www.johnsoncontrols.com) |
+| vertiv | **Vertiv** | OT/IT | [vertiv.com](https://www.vertiv.com) |
 
 </details>
 
 <details>
-<summary>📷 <b>Internet of Things (IoT) & Smart Vision</b> (44 Vendors) — <i>Click to expand</i></summary>
+<summary>📷 <b>Internet of Things (IoT) & Smart Vision</b> (49 Vendors) — <i>Click to expand</i></summary>
 
 | Vendor ID | Manufacturer Name | Covered Sectors | Allowed Domain Whitelist |
 |---|---|---|---|
@@ -819,11 +929,16 @@ python scripts/standalone_vendor_terminology.py --markdown
 | kyocera | **Kyocera AVX** | IoT/OT | [kyocera-avx.com, kyocera.com](https://www.kyocera-avx.com) |
 | milesight | **Milesight** | IoT | [milesight.com](https://www.milesight.com) |
 | philips | **Philips** | IoT | [philips.com, philips-hue.com, dictation.philips.com](https://www.philips.com) |
+| lantronix | **Lantronix** | IoT | [lantronix.com](https://www.lantronix.com) |
+| cradlepoint | **Cradlepoint** | IoT/IT | [cradlepoint.com](https://www.cradlepoint.com) |
+| samsara | **Samsara** | IoT | [samsara.com](https://www.samsara.com) |
+| genetec | **Genetec** | IoT | [genetec.com](https://www.genetec.com) |
+| milestone_systems | **Milestone Systems** | IoT | [milestonesys.com](https://www.milestonesys.com) |
 
 </details>
 
 <details>
-<summary>🌐 <b>Enterprise IT, Cloud & Networking</b> (44 Vendors) — <i>Click to expand</i></summary>
+<summary>🌐 <b>Enterprise IT, Cloud & Networking</b> (49 Vendors) — <i>Click to expand</i></summary>
 
 | Vendor ID | Manufacturer Name | Covered Sectors | Allowed Domain Whitelist |
 |---|---|---|---|
@@ -871,6 +986,10 @@ python scripts/standalone_vendor_terminology.py --markdown
 | citrix | **Citrix Systems** | IT | [citrix.com](https://www.citrix.com) |
 | trend_micro | **Trend Micro** | IT | [trendmicro.com](https://www.trendmicro.com) |
 | commvault | **Commvault** | IT | [commvault.com](https://www.commvault.com) |
+| cisco_meraki | **Cisco Meraki** | IT | [meraki.cisco.com, meraki.com](https://meraki.cisco.com) |
+| aruba_networks | **Aruba Networks** | IT | [arubanetworks.com](https://www.arubanetworks.com) |
+| hp_inc | **HP Inc.** | IT | [hp.com](https://www.hp.com) |
+| veeam | **Veeam Software** | IT | [veeam.com](https://www.veeam.com) |
 
 </details>
 

@@ -7,12 +7,14 @@ and enterprise observability alerts.
 """
 
 import asyncio
+import json
 import logging
 import os
 import re
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import yaml
 
@@ -20,6 +22,7 @@ from scraper.ai_extractor import UniversalAIExtractor
 from scraper.artifacts import RunArtifactManager
 from scraper.checkpoint import CheckpointManager
 from scraper.config import BASE_DIR
+from scraper.coverage import CoverageTracker
 from scraper.crawl_engine import UniversalAICrawler
 from scraper.delta_cache import DeltaCache
 from scraper.dlq import get_global_dlq
@@ -27,11 +30,14 @@ from scraper.models import (
     ProductRecord,
     ScrapedDataset,
     is_valid_product_model,
+    is_valid_replacement_model,
     is_well_known_os_or_software,
 )
 from scraper.observability import AlertDispatcher, PipelineMetricsCollector
 from scraper.security import clean_and_sanitize_identifier, inspect_security_threats, is_safe_url
+from scraper.state import DEFAULT_STATE_DIR, VendorRunState
 from scraper.storage import MasterStorageManager
+from scraper.vendors import normalize_stage_name
 
 logger = logging.getLogger("ai_scraper.pipeline")
 
@@ -75,10 +81,12 @@ class LifecyclePipeline:
         from scraper.run_cache import RunCache, get_global_run_cache
         self.run_cache: RunCache = run_cache or get_global_run_cache()
 
-        # Paths
+        # Paths: Dual-CSV Output (eol_products_lifecycle.csv & active_products_lifecycle.csv)
         storage_cfg = self.config.get("storage", {})
-        self.master_csv = BASE_DIR / storage_cfg.get("master_csv_path", "output/all_vendors_lifecycle.csv")
         self.output_dir = BASE_DIR / storage_cfg.get("per_vendor_json_dir", "output")
+        self.eol_csv = self.output_dir / "eol_products_lifecycle.csv"
+        self.active_csv = self.output_dir / "active_products_lifecycle.csv"
+        self.master_csv = self.eol_csv  # Backward compatibility alias
         self.artifacts_dir = BASE_DIR / storage_cfg.get("artifacts_dir", "artifacts/runs")
 
         # Core Components with Token & Cost Optimizations
@@ -95,7 +103,8 @@ class LifecyclePipeline:
         self.gemini = self.extractor  # Backward compatibility alias
         self.dlq = get_global_dlq()
         self.crawler = UniversalAICrawler(gemini_extractor=self.extractor, run_cache=self.run_cache, dlq=self.dlq)
-        self.storage = MasterStorageManager(self.master_csv, self.output_dir)
+        self.storage = MasterStorageManager(output_dir=self.output_dir)
+        self.coverage_tracker = CoverageTracker(self.output_dir, self.artifacts_dir)
         self.artifact_mgr = RunArtifactManager(self.artifacts_dir, run_id=run_id)
         self.checkpoint_mgr = CheckpointManager()
         self.delta_cache = DeltaCache()
@@ -119,28 +128,54 @@ class LifecyclePipeline:
         self,
         vendor_key: str,
         vendor_cfg: Dict[str, Any],
-        site_crawl: bool = True,
+        site_crawl: bool = False,
         max_pages: int = 0,
         max_depth: int = 0,
-        accumulate_batches: Optional[bool] = None
+        resume: bool = False,
+        accumulate_batches: Optional[bool] = None,
+        batch_size: Optional[int] = None,
+        all_batches: bool = False,
+        reset_state: bool = False,
     ) -> List[ProductRecord]:
         """
         Executes pipeline for a single vendor across configured entry points or full website domain.
         Logs each of the 6 pipeline stages clearly.
-        When accumulate_batches is True, crawls all entry points/pages first without LLM calls,
-        then dispatches a single batch AI extraction job (50% cost reduction and zero per-page latency).
+        Supports capability-based batching, persistent knowledge-base synchronization, and multi-cycle execution.
         """
         vendor_name = vendor_cfg.get("name", vendor_key.title())
         vendor_id = vendor_cfg.get("id", vendor_key.lower())
         sector = vendor_cfg.get("sector", "General")
         website = vendor_cfg.get("website", "")
-        entry_points = vendor_cfg.get("entry_points", [])
-        allowed_domains = vendor_cfg.get("allowed_domains", [])
+        entry_points = list(vendor_cfg.get("entry_points") or []) + list(vendor_cfg.get("strategies") or [])
+        allowed_domains = list(vendor_cfg.get("allowed_domains") or [])
+        if not allowed_domains:
+            derived = set()
+            if website:
+                try:
+                    host = urllib.parse.urlsplit(website).netloc.split(":")[0].lower()
+                    if host.startswith("www."):
+                        host = host[4:]
+                    if host:
+                        derived.add(host)
+                except Exception:
+                    pass
+            for ep_item in entry_points:
+                u = ep_item.get("url") if isinstance(ep_item, dict) else str(ep_item)
+                if u:
+                    try:
+                        host = urllib.parse.urlsplit(u).netloc.split(":")[0].lower()
+                        if host.startswith("www."):
+                            host = host[4:]
+                        if host:
+                            derived.add(host)
+                    except Exception:
+                        pass
+            allowed_domains = sorted(list(derived))
 
         accumulate = bool(getattr(self.extractor, "batch_mode", False)) if accumulate_batches is None else accumulate_batches
 
         print("\n" + "=" * 90)
-        print(f"[*] LIFECYCLE SCRAPING WORKFLOW: [{sector}] {vendor_name} (ID: {vendor_id}) [Batch Accumulate: {accumulate}]")
+        print(f"[*] LIFECYCLE SCRAPING WORKFLOW: [{sector}] {vendor_name} (ID: {vendor_id}) [Batch Size: {batch_size or 'Auto'}, All Batches: {all_batches}]")
         print("=" * 90)
 
         # -------------------------------------------------------------------------
@@ -155,17 +190,180 @@ class LifecyclePipeline:
         accumulated_direct: List[ProductRecord] = []
 
         try:
-            # 1. Primary execution: Crawl verified, trusted lifecycle portal entry points
+            # Optional state reset
+            if reset_state:
+                VendorRunState.purge(vendor_id)
+                self.storage.purge_vendor_records(vendor_id)
+                print(f"[*] Fully purged state and storage records for {vendor_id}")
+
+            vendor_state = VendorRunState.load(vendor_id, state_dir=DEFAULT_STATE_DIR)
+
+            # -------------------------------------------------------------------------
+            # INSPECT NEWLY ADDED TAGS & ELIMINATE ENTRY POINT REDUNDANCIES
+            # -------------------------------------------------------------------------
+            cleaned_entry_points: List[Dict[str, Any]] = []
+            seen_canonical_urls: Set[str] = set()
+            sitemap_discovery_cfgs: List[Dict[str, Any]] = []
+
             for ep in entry_points:
-                url = ep.get("url")
+                if not isinstance(ep, dict):
+                    continue
+                url = str(ep.get("url") or ep.get("url_template") or "").strip()
+                if not url:
+                    continue
+
+                role = str(ep.get("endpoint_role") or "").lower()
+                tags = [str(t).lower() for t in (ep.get("source_tags") or [])]
+                authority = str(ep.get("evidence_authority") or "").lower()
+
+                # Detect discovery-only sitemaps
+                is_discovery_only = (
+                    ep.get("sitemap_discovery_only") is True
+                    or role == "sitemap_discovery"
+                    or "sitemap_discovery_only" in tags
+                    or authority == "url_discovery_only_not_lifecycle_status"
+                )
+
+                if is_discovery_only:
+                    sitemap_discovery_cfgs.append({
+                        "index_url": url,
+                        "child_filter": ep.get("child_filter", "sitemap.PDP_"),
+                        "prefix_regex": ep.get("product_pattern", r"details\.([A-Za-z0-9\-_.]+)\.html"),
+                    })
+                    logger.info(
+                        f"[PIPELINE TAG REVIEW] Skipping direct product scrape on discovery-only endpoint '{ep.get('name')}': {url}"
+                    )
+                    continue
+
+                # Deduplicate by canonical URL
+                canon_url = url.split("?")[0].rstrip("/").lower()
+                if canon_url in seen_canonical_urls:
+                    logger.info(f"[PIPELINE DEDUPLICATION] Removed redundant entry point '{ep.get('name')}': {url}")
+                    continue
+                seen_canonical_urls.add(canon_url)
+
+                # Auto-assign strategies from newly added roles & recommendations
+                strat = ep.get("strategy")
+                rec_strat = str(ep.get("recommended_crawler_type") or "").lower()
+                if not strat or str(strat).lower() in ("none", "inspect_source_adapter"):
+                    if rec_strat in ("html_table", "dom_table", "html_notice_index", "html_filterable_table") or role in (
+                        "dated_eol_notice_index", "dated_model_lifecycle_notice", "dated_model_notice_index",
+                        "direct_model_or_version_status_source", "model_status_table"
+                    ):
+                        ep["strategy"] = "dom_table"
+                    elif rec_strat in ("interactive_search", "search_portal") or role in (
+                        "interactive_lifecycle_search", "interactive_model_lifecycle_lookup", "model_status_search"
+                    ):
+                        ep["strategy"] = "search_portal"
+                    elif rec_strat in ("sitemap", "sitemap_index") or role == "sitemap_discovery":
+                        ep["strategy"] = "sitemap"
+
+                cleaned_entry_points.append(ep)
+
+            # Connect discovery sitemaps to search portals if available
+            if sitemap_discovery_cfgs:
+                for ep in cleaned_entry_points:
+                    ep_strat = str(ep.get("strategy") or ep.get("crawler_type") or "").lower()
+                    if ep_strat in ("search_portal", "lifecycle_search") or "product-lifecycle-status" in str(ep.get("url", "")):
+                        if not ep.get("sitemap_discovery"):
+                            ep["sitemap_discovery"] = sitemap_discovery_cfgs[0]
+
+            # -------------------------------------------------------------------------
+            # ENTRY POINT KNOWLEDGE BASE SYNCHRONIZATION & CAPABILITY BATCHING
+            # -------------------------------------------------------------------------
+            active_ep_urls = [
+                str(ep.get("url") or ep.get("url_template", "")).strip()
+                for ep in cleaned_entry_points
+                if str(ep.get("strategy") or ep.get("crawler_type") or "").lower() not in (
+                    "search_portal", "lifecycle_search", "sitemap", "sitemap_index"
+                )
+                and "product-lifecycle-status" not in str(ep.get("url", ""))
+                and str(ep.get("url") or ep.get("url_template", "")).strip()
+            ]
+            if active_ep_urls:
+                vendor_state.sync_knowledge_base(active_ep_urls)
+
+            effective_all_batches = all_batches or (batch_size is None)
+            target_entry_points = cleaned_entry_points
+            if len(active_ep_urls) > 1 and not effective_all_batches:
+                batch_urls = vendor_state.get_next_batch(capability="dom_table", batch_size=batch_size)
+                if batch_urls:
+                    target_entry_points = [
+                        ep for ep in cleaned_entry_points
+                        if str(ep.get("url") or ep.get("url_template", "")).strip() in batch_urls
+                        or str(ep.get("strategy") or ep.get("crawler_type") or "").lower() in ("search_portal", "lifecycle_search")
+                        or "product-lifecycle-status" in str(ep.get("url", ""))
+                    ]
+                    print(
+                        f"[*] [ENTRY POINT BATCH] Running batch of {len(target_entry_points)} entry points "
+                        f"({len(vendor_state.completed_units)} completed, {len(vendor_state.pending_queue)} pending in Cycle {vendor_state.cycle})."
+                    )
+
+            for ep in target_entry_points:
+                url = str(ep.get("url") or ep.get("url_template") or "")
                 name = ep.get("name", "entry")
                 region = ep.get("region", "Global")
+                strategy_name = str(ep.get("strategy") or ep.get("crawler_type") or "").lower()
+
+                # Unified Strategy Pattern Dispatch
+                is_search_portal = strategy_name in ("search_portal", "lifecycle_search") or (
+                    vendor_id in ("rockwell_automation", "rockwell") and "product-lifecycle-status" in str(url)
+                )
+                from scraper.strategies import _STRATEGY_REGISTRY, get_strategy
+
+                is_registered_strategy = is_search_portal or strategy_name in _STRATEGY_REGISTRY
+
+                if is_registered_strategy:
+                    strat_key = "search_portal" if is_search_portal else strategy_name
+                    strat = get_strategy(strat_key)
+                    strat_label = strat_key.replace("_", " ").upper()
+                    print(f"  -> [STRATEGY: {strat_label}] Executing '{name}' ({region}): {url}")
+                    try:
+                        strat_records = await strat.execute(
+                            entry_point=ep,
+                            vendor_cfg=vendor_cfg,
+                            crawler=self.crawler,
+                            state=vendor_state,
+                            dlq=self.dlq,
+                            max_pages=max_pages,
+                            batch_size=batch_size,
+                            all_batches=all_batches,
+                        )
+                        for r in strat_records:
+                            r.vendor_name = vendor_name
+                            if "region" not in r.metadata:
+                                r.metadata["region"] = region
+                        vendor_products.extend(strat_records)
+                        vendor_state.mark_unit_completed(str(url), records_count=len(strat_records))
+                        vendor_state.save()
+                        print(f"  -> [STRATEGY: {strat_label}] Harvested {len(strat_records)} authentic records from '{name}'.")
+                    except Exception as strat_err:
+                        print(f"  [!] {strat_label} execution error on {name}: {strat_err}")
+                        self.dlq.record_failure(
+                            url=str(url),
+                            vendor_id=vendor_id,
+                            error_type=type(strat_err).__name__,
+                            message=str(strat_err),
+                            details={"entry_point": name, "strategy": strat_key}
+                        )
+                    continue
 
                 if not is_safe_url(url, allowed_domains):
                     print(f"  [!] Security Guard: Blocked untrusted URL or non-whitelisted domain: {url}")
                     continue
 
                 norm_url = self.run_cache.normalize_url(url)
+                if resume and vendor_state.is_unit_completed(str(url)):
+                    print(f"  -> [STATE MEMORY HIT] Skipping already completed entry point '{name}': {url}")
+                    if self.run_cache.has_extracted_products(norm_url):
+                        cached_records = self.run_cache.get_extracted_products(norm_url) or []
+                        for r in cached_records:
+                            r.vendor_name = vendor_name
+                            if "region" not in r.metadata:
+                                r.metadata["region"] = region
+                        vendor_products.extend(cached_records)
+                    continue
+
                 if self.run_cache.has_extracted_products(norm_url):
                     print(f"  -> [RUN_CACHE HIT] Reusing cached records for entry point '{name}' ({region}): {url}")
                     cached_records = self.run_cache.get_extracted_products(norm_url) or []
@@ -174,6 +372,41 @@ class LifecyclePipeline:
                         if "region" not in r.metadata:
                             r.metadata["region"] = region
                     vendor_products.extend(cached_records)
+                    vendor_state.mark_unit_completed(str(url))
+                    vendor_state.save()
+                    continue
+
+                crawler_type = str(ep.get("crawler_type", "")).lower()
+                is_sitemap = crawler_type in ("sitemap", "sitemap_index", "lifecycle_search", "search_portal") or (url and url.endswith(".xml")) or (url and "sitemap" in url.lower() and not url.endswith((".html", ".htm", ".jsp"))) or (url and "product-lifecycle-status.html" in url) or bool(ep.get("keywords"))
+
+                if is_sitemap:
+                    print(f"  -> [GENERIC SITEMAP CRAWLER] Ingesting sitemap hierarchy for '{name}' ({region}): {url}")
+                    try:
+                        sm_records = await self.crawler.crawl_sitemap_entry_point(
+                            entry_point=ep,
+                            vendor_name=vendor_name,
+                            allowed_domains=allowed_domains,
+                            max_pages=max_pages
+                        )
+                        for r in sm_records:
+                            r.vendor_name = vendor_name
+                            if "region" not in r.metadata:
+                                r.metadata["region"] = region
+                            vendor_state.record_model(r.model_name)
+                        vendor_products.extend(sm_records)
+                        vendor_state.mark_unit_completed(str(url))
+                        vendor_state.total_records += len(sm_records)
+                        vendor_state.save()
+                        print(f"  -> [GENERIC SITEMAP CRAWLER] Harvested {len(sm_records)} product records from '{name}'.")
+                    except Exception as sm_err:
+                        print(f"  [!] Sitemap crawl notice on {name} ({url}): {sm_err}")
+                        self.dlq.record_failure(
+                            url=str(url),
+                            vendor_id=vendor_id,
+                            error_type=type(sm_err).__name__,
+                            message=str(sm_err),
+                            details={"region": region, "entry_point": name}
+                        )
                     continue
 
                 print(f"  -> Crawling verified lifecycle portal '{name}' ({region}): {url}")
@@ -193,7 +426,11 @@ class LifecyclePipeline:
                             r.vendor_name = vendor_name
                             if "region" not in r.metadata:
                                 r.metadata["region"] = region
+                            vendor_state.record_model(r.model_name)
                         vendor_products.extend(records)
+                        vendor_state.mark_unit_completed(str(url))
+                        vendor_state.total_records += len(records)
+                        vendor_state.save()
                 except Exception as ep_err:
                     print(f"  [!] Warning on entry point {name} ({url}): {ep_err}")
                     self.dlq.record_failure(
@@ -204,8 +441,8 @@ class LifecyclePipeline:
                         details={"region": region, "entry_point": name}
                     )
 
-            # 2. Secondary discovery: Run domain-level site crawl if explicitly requested or if entry points yielded 0 records
-            should_site_crawl = site_crawl or (len(vendor_products) == 0 and len(accumulated_chunks) == 0 and bool(website))
+            # 2. Secondary discovery: Run domain-level site crawl ONLY if explicitly requested
+            should_site_crawl = site_crawl and bool(website)
             if should_site_crawl and website:
                 page_str = "Unlimited" if not max_pages or max_pages <= 0 else str(max_pages)
                 depth_str = "Unlimited" if not max_depth or max_depth <= 0 else str(max_depth)
@@ -242,6 +479,7 @@ class LifecyclePipeline:
                         br.metadata["region"] = "Global"
                 vendor_products.extend(batch_records)
 
+            vendor_products_raw = list(vendor_products)
             print(f"[STEP 2/6: AI / APOLLO EXTRACTION] Extracted {len(vendor_products)} candidate records.")
 
             # -------------------------------------------------------------------------
@@ -280,7 +518,7 @@ class LifecyclePipeline:
                 st_lower = st_val.lower()
                 cat_lower = cat.lower()
                 disallowed_status_terms = {
-                    "active", "active sitemaps record", "support video published",
+                    "active sitemaps record", "support video published",
                     "consulting services", "flexible credits", "operations offerings",
                     "service program", "battery recall program", "available order"
                 }
@@ -313,16 +551,27 @@ class LifecyclePipeline:
                             purged_noise_count += 1
                             continue
                     else:
+                        from scraper.models import strip_regional_suffix
+                        clean_mod_str, stripped_reg = strip_regional_suffix(clean_m)
+                        if not clean_mod_str or not is_valid_product_model(clean_mod_str):
+                            purged_noise_count += 1
+                            continue
+                        if stripped_reg and isinstance(p.metadata, dict) and "country_variant" not in p.metadata:
+                            p.metadata["country_variant"] = stripped_reg
                         if m_name.startswith(("=", "+", "-", "@")):
-                            p.model_name = "'" + m_name[0] + clean_m
+                            p.model_name = "'" + m_name[0] + clean_mod_str
                         else:
-                            p.model_name = clean_m
-                        m_name = clean_m
+                            p.model_name = clean_mod_str
+                        m_name = clean_mod_str
                 else:
                     if m_name and m_name.lower() not in ("n/a", "none", "null", "nan"):
                         clean_m = clean_and_sanitize_identifier(m_name)
                         if clean_m and is_valid_product_model(clean_m):
-                            p.model_name = clean_m
+                            from scraper.models import strip_regional_suffix
+                            clean_mod_str, stripped_reg = strip_regional_suffix(clean_m)
+                            if stripped_reg and isinstance(p.metadata, dict) and "country_variant" not in p.metadata:
+                                p.metadata["country_variant"] = stripped_reg
+                            p.model_name = clean_mod_str or clean_m
                         elif not is_valid_product_model(m_name):
                             purged_noise_count += 1
                             continue
@@ -334,20 +583,135 @@ class LifecyclePipeline:
                     p.stage_date_utc = None
                     if isinstance(p.metadata, dict):
                         p.metadata["missing_date"] = True
+
+                # Strict Alias Sanitization Guard (Reject dates, noise, self-identity)
+                if p.aliases:
+                    from dateutil import parser as date_parser
+
+                    from scraper.strategies.base import is_likely_date_str, sanitize_alias_text
+                    a_raw = str(p.aliases).strip()
+                    tokens = [t.strip() for t in re.split(r'[,;]+', a_raw) if t.strip()]
+                    valid_aliases = []
+                    for tok in tokens:
+                        if is_likely_date_str(tok):
+                            if isinstance(p.metadata, dict) and "announcement_date_utc" not in p.metadata:
+                                try:
+                                    dt_ann = date_parser.parse(tok, fuzzy=True)
+                                    p.metadata["announcement_date_utc"] = dt_ann.strftime("%Y-%m-%d") + "T00:00:00Z"
+                                except Exception:
+                                    pass
+                        elif tok.lower() in ("n/a", "none", "null", "nan", "-", "--", "tbd", "unknown") or tok.lower() == m_name.lower():
+                            continue
+                        else:
+                            clean_tok = sanitize_alias_text(tok)
+                            from scraper.models import strip_regional_suffix
+                            clean_tok, _ = strip_regional_suffix(clean_tok)
+                            if clean_tok and is_valid_product_model(clean_tok) and clean_tok.lower() != m_name.lower():
+                                valid_aliases.append(clean_tok)
+
+                    valid_aliases = list(dict.fromkeys(valid_aliases))
+                    p.aliases = ", ".join(valid_aliases) if valid_aliases else None
+
+                # Strict Replacement Sanitization Guard (Reject dates, boilerplate text)
+                if p.replacement:
+                    from scraper.strategies.base import is_likely_date_str, sanitize_alias_text
+                    r_raw = str(p.replacement).strip()
+                    tokens = [t.strip() for t in re.split(r'[,;]+', r_raw) if t.strip()]
+                    valid_repls = []
+                    for tok in tokens:
+                        t_low = tok.lower()
+                        if is_likely_date_str(tok) or t_low in ("n/a", "none", "null", "nan", "-", "--", "tbd", "unknown", "contact sales", "refer to bulletin", "see bulletin", "consult representative"):
+                            continue
+                        clean_r = sanitize_alias_text(tok)
+                        from scraper.models import strip_regional_suffix
+                        clean_r, _ = strip_regional_suffix(clean_r)
+                        if clean_r and is_valid_replacement_model(clean_r):
+                            valid_repls.append(clean_r)
+
+                    valid_repls = list(dict.fromkeys(valid_repls))
+                    p.replacement = ", ".join(valid_repls) if valid_repls else None
+
                 sanitized_products.append(p)
 
             print(f"  -> Threat Prevention Layer: Blocked {blocked_threats_count} active security attacks (SQLi, XSS, Path Traversal, Command Injection)")
             print(f"  -> Field & Model Validator: Purged {purged_noise_count} invalid noise elements. Retained {len(sanitized_products)} clean products (including undated EOL models).")
             print("  -> CSV Formula Injection Shield: Sanitized formula trigger characters (=, +, -, @)")
             print(f"  -> SSRF Protection: Verified private IP restrictions across {len(allowed_domains)} allowed domains")
-            # Deduplicate records across entry points and discovery crawl for this vendor
-            deduped_vendor_products: List[ProductRecord] = []
-            seen_fps = set()
+
+            # Deduplicate identical candidates across multi-region entry points before LLM validation
+            unique_candidates: List[ProductRecord] = []
+            cross_entrypoint_duplicates: List[Dict[str, Any]] = []
+            seen_cand_fps = set()
             for p in sanitized_products:
-                if p.fingerprint not in seen_fps:
-                    seen_fps.add(p.fingerprint)
-                    deduped_vendor_products.append(p)
-            vendor_products = deduped_vendor_products
+                if p.fingerprint not in seen_cand_fps:
+                    seen_cand_fps.add(p.fingerprint)
+                    unique_candidates.append(p)
+                else:
+                    cross_entrypoint_duplicates.append({
+                        "vendor": vendor_name,
+                        "model": p.model_name,
+                        "status": p.status,
+                        "stage_date": p.stage_date_utc,
+                        "source_url": p.source_url,
+                        "reason": "Duplicate identical candidate across multi-region entry points"
+                    })
+
+            # Pre-Persistence LLM Verification Gate: Verify authentic model, status, and zero leaks
+            print(f"[PRE-PERSISTENCE LLM GATE] Verifying {len(unique_candidates)} unique candidate records with LLM validator...")
+            verified_products, rejected_records = self.extractor.verify_and_filter_records_with_llm(
+                unique_candidates,
+                vendor_name=vendor_name,
+                return_rejections=True
+            )
+            print(f"  -> LLM Verification Gate: {len(verified_products)} verified authentic records approved for persistence.")
+
+            # Record Reconciliation Accounting Ledger
+            eol_cand_count = sum(1 for p in verified_products if normalize_stage_name(p.status) != "Active")
+            active_cand_count = len(verified_products) - eol_cand_count
+            print("[DATA ACCOUNTING RECONCILIATION]")
+            print(f"  -> Raw Harvested:       {len(vendor_products_raw)}")
+            print(f"  -> Step 4 Noise Purged: {purged_noise_count}")
+            print(f"  -> Cross-Region Dups:   {len(cross_entrypoint_duplicates)} (Europe + Nordic identical SKUs)")
+            print(f"  -> LLM Evaluated:       {len(unique_candidates)}")
+            print(f"  -> LLM Rejected:        {len(rejected_records)}")
+            print(f"  -> Persisted Dual-CSV:  {len(verified_products)} (EOL: {eol_cand_count} | Active: {active_cand_count})")
+
+            # Persist vendor reconciliation ledger to disk
+            reconciliation_ledger_path = Path("output") / "reconciliation_audit.json"
+            all_reconciliations = {}
+            if reconciliation_ledger_path.exists():
+                try:
+                    with open(reconciliation_ledger_path, "r", encoding="utf-8") as rf:
+                        all_reconciliations = json.load(rf)
+                except Exception:
+                    all_reconciliations = {}
+            all_reconciliations[vendor_id] = {
+                "vendor_name": vendor_name,
+                "raw_harvested_count": len(vendor_products_raw),
+                "step4_purged_noise_count": purged_noise_count,
+                "cross_entrypoint_duplicates_count": len(cross_entrypoint_duplicates),
+                "llm_evaluated_count": len(unique_candidates),
+                "llm_verified_count": len(verified_products),
+                "llm_rejected_count": len(rejected_records),
+                "eol_records_count": eol_cand_count,
+                "active_records_count": active_cand_count,
+                "cross_entrypoint_duplicates_sample": cross_entrypoint_duplicates[:25],
+                "rejected_records": rejected_records,
+                "reconciliation_explanation": (
+                    f"Out of {len(vendor_products_raw)} raw records harvested across all entry points, "
+                    f"{len(cross_entrypoint_duplicates)} were duplicate SKU milestones across multi-region portals, "
+                    f"{purged_noise_count} were purged by sanity checks, and "
+                    f"{len(rejected_records)} non-model/noise elements were rejected by the LLM Gate, "
+                    f"yielding {len(verified_products)} authentic persisted records ({eol_cand_count} EOL, {active_cand_count} Active)."
+                )
+            }
+            try:
+                with open(reconciliation_ledger_path, "w", encoding="utf-8") as wf:
+                    json.dump(all_reconciliations, wf, indent=2)
+            except Exception as e_rec:
+                logger.warning(f"Could not write reconciliation audit: {e_rec}")
+
+            vendor_products = verified_products
 
             # Record per-vendor duration & telemetry
             vendor_duration = (datetime.now() - vendor_start).total_seconds()
@@ -380,12 +744,15 @@ class LifecyclePipeline:
         vendor_filter: Optional[str] = None,
         sector_filter: Optional[str] = None,
         target_url: Optional[str] = None,
-        site_crawl: bool = True,
+        site_crawl: bool = False,
         concurrency: Optional[int] = None,
         max_pages: int = 0,
         max_depth: int = 0,
         resume: bool = False,
         accumulate_batches: Optional[bool] = None,
+        batch_size: Optional[int] = None,
+        all_batches: bool = False,
+        reset_state: bool = False,
     ) -> ScrapedDataset:
         """
         Executes the entire multi-vendor pipeline across the 6 observable stages:
@@ -399,6 +766,20 @@ class LifecyclePipeline:
         vendors_dict = self.config.get("vendors", {})
         all_harvested_products: List[ProductRecord] = []
         completed_vendor_keys: List[str] = []
+
+        if reset_state:
+            if vendor_filter and vendor_filter.lower() != "all":
+                clean_v = vendor_filter.replace(" and ", ",")
+                for t in clean_v.split(","):
+                    t_str = t.strip().lower()
+                    if t_str:
+                        VendorRunState.purge(t_str)
+                print(f"[*] Reset state executed: purged state & tracking for targeted vendor(s): {vendor_filter}")
+            else:
+                print("[*] Global clean-board reset initiated: purging all vendor states, batch queues, empty-vendor flags, and delta caches...")
+                VendorRunState.purge_all()
+                self.checkpoint_mgr.clear_checkpoint()
+                self.delta_cache.clear()
 
         if resume:
             cp = self.checkpoint_mgr.load_checkpoint()
@@ -447,6 +828,15 @@ class LifecyclePipeline:
                     mapped = alias_map.get(tok, tok)
                     normalized_filter_keys.add(mapped)
 
+                # Prioritize exact vendor ID match if one exists to prevent accidental substring overlap
+                exact_matches = {
+                    k: v for k, v in vendors_dict.items()
+                    if k.lower() in normalized_filter_keys or str(v.get("id", "")).lower() in normalized_filter_keys
+                }
+                if exact_matches:
+                    vendors_dict = exact_matches
+                    normalized_filter_keys.clear()
+
             for v_key, v_cfg in vendors_dict.items():
                 if normalized_filter_keys:
                     v_k_lower = v_key.lower()
@@ -483,7 +873,11 @@ class LifecyclePipeline:
                             site_crawl=site_crawl,
                             max_pages=max_pages,
                             max_depth=max_depth,
-                            accumulate_batches=accumulate_batches
+                            resume=resume,
+                            accumulate_batches=accumulate_batches,
+                            batch_size=batch_size,
+                            all_batches=all_batches,
+                            reset_state=reset_state,
                         )
                         completed_vendor_keys.append(vk)
                         return res
@@ -527,7 +921,11 @@ class LifecyclePipeline:
                             site_crawl=site_crawl,
                             max_pages=max_pages,
                             max_depth=max_depth,
-                            accumulate_batches=accumulate_batches
+                            resume=resume,
+                            accumulate_batches=accumulate_batches,
+                            batch_size=batch_size,
+                            all_batches=all_batches,
+                            reset_state=reset_state,
                         )
                         all_harvested_products.extend(v_prods)
                         completed_vendor_keys.append(v_key)
@@ -565,12 +963,41 @@ class LifecyclePipeline:
         print(f"  -> Deduplication Result: {new_appended} new records appended, {refreshed} existing records refreshed.")
         print(f"  -> Current Active Storage Volume: {total_in_storage} total product records.")
 
+        # Update Coverage & Delta Tracker comparing old mapping with new findings
+        for v_key, v_cfg in target_vendors:
+            v_name = v_cfg.get("name", v_key)
+            v_recs = [
+                p for p in all_harvested_products
+                if (p.vendor_name or "").strip().lower() == v_name.strip().lower()
+                or v_key in (p.vendor_name or "").lower().replace(" ", "_")
+            ]
+            v_models = [p.model_name for p in v_recs if p.model_name]
+            v_urls = [p.source_url for p in v_recs if p.source_url]
+            v_state = VendorRunState.load(v_key)
+            if v_state and v_state.completed_units:
+                v_urls = list(dict.fromkeys(v_urls + sorted(list(v_state.completed_units))))
+
+            delta = self.coverage_tracker.record_run(
+                vendor_id=v_key,
+                current_run_urls=v_urls,
+                current_run_models=v_models,
+                current_run_records_count=len(v_recs),
+                cycle=v_state.cycle if v_state else 1,
+            )
+            if delta.get("new_urls_count", 0) > 0 or delta.get("new_models_count", 0) > 0 or delta.get("new_records_count", 0) > 0:
+                print(f"  -> [COVERAGE DELTA] '{v_key}': +{delta['new_urls_count']} new URLs, +{delta['new_models_count']} new models, +{delta['new_records_count']} records.")
+
+            if v_state:
+                v_state.update_progress_tracking()
+
         # -------------------------------------------------------------------------
         # STEP 6/6: EXPORT & OBSERVABILITY
         # -------------------------------------------------------------------------
         print("\n[STEP 6/6: EXPORT & OBSERVABILITY] Persisting clean datasets & dispatching alerts:")
         print(f"  -> Master Consolidated CSV: {self.master_csv} (Fingerprint column omitted as requested)")
         print(f"  -> Modular Per-Vendor JSON:  {self.output_dir}/<vendor>_lifecycle.json")
+        print(f"  -> Coverage & Delta Tracker: {self.output_dir}/coverage_tracker.json & {self.output_dir}/coverage_tracker.md")
+        print(f"  -> Batch Progress Dashboard: {self.output_dir}/batch_progress.json & artifacts/batch_progress.md")
         print(f"  -> Run Audit Artifacts:      {self.artifact_mgr.run_dir}")
 
         cache_stats = self.run_cache.get_stats()

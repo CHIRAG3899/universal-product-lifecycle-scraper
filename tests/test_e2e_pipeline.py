@@ -37,7 +37,7 @@ class TestEndToEndArtifactDrivenPipeline(unittest.IsolatedAsyncioTestCase):
 
         self.output_dir = self.test_root / "output"
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.master_csv = self.output_dir / "all_vendors_lifecycle.csv"
+        self.master_csv = self.output_dir / "eol_products_lifecycle.csv"
 
         self.artifacts_dir = self.test_root / "artifacts" / "runs"
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)

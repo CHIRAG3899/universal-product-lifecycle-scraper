@@ -18,7 +18,13 @@ from socketserver import ThreadingMixIn
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.config import DEFAULT_CSV_OUTPUT, DEFAULT_JSON_OUTPUT, GEMINI_API_KEY, GEMINI_MODEL
+from scraper.config import (
+    DEFAULT_ACTIVE_CSV_OUTPUT,
+    DEFAULT_CSV_OUTPUT,
+    DEFAULT_JSON_OUTPUT,
+    GEMINI_API_KEY,
+    GEMINI_MODEL,
+)
 from scraper.pipeline import LifecyclePipeline
 from scraper.providers import resolve_provider_and_model
 from scraper.storage import MasterStorageManager
@@ -31,7 +37,9 @@ from scraper.crawler_comparison import CRAWLER_COMPARISON_MATRIX
 
 WEB_DIR = BASE_DIR / "web"
 OUTPUT_DIR = BASE_DIR / "output"
-MASTER_CSV = OUTPUT_DIR / "all_vendors_lifecycle.csv"
+EOL_CSV = OUTPUT_DIR / "eol_products_lifecycle.csv"
+ACTIVE_CSV = OUTPUT_DIR / "active_products_lifecycle.csv"
+MASTER_CSV = EOL_CSV  # default master endpoint points to EOL CSV
 ARTIFACTS_DIR = BASE_DIR / "artifacts" / "runs"
 
 
@@ -78,8 +86,11 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         elif path == "/api/comparison":
             self._send_json({"comparison": CRAWLER_COMPARISON_MATRIX})
         elif path == "/api/export/csv":
-            target = MASTER_CSV if MASTER_CSV.exists() else DEFAULT_CSV_OUTPUT
-            self.handle_export_file(target, "text/csv", "all_vendors_lifecycle.csv")
+            target = EOL_CSV if EOL_CSV.exists() else DEFAULT_CSV_OUTPUT
+            self.handle_export_file(target, "text/csv", "eol_products_lifecycle.csv")
+        elif path == "/api/export/csv/active":
+            target = ACTIVE_CSV if ACTIVE_CSV.exists() else DEFAULT_ACTIVE_CSV_OUTPUT
+            self.handle_export_file(target, "text/csv", "active_products_lifecycle.csv")
         elif path == "/api/export/json":
             self.handle_export_file(DEFAULT_JSON_OUTPUT, "application/json", "lifecycle_dataset.json")
         else:

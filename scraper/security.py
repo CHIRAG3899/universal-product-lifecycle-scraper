@@ -272,26 +272,82 @@ def sanitize_threat_string(value: Any) -> str:
     return s.strip()
 
 
-def sanitize_csv_cell(value: Any) -> str:
+def clean_csv_field(value: Any, field_name: str = "") -> str:
     """
-    Defends against CSV Formula Injection (CWE-1236).
-    If a cell starts with formula characters (=, +, -, @, tab, cr), prepend single quote.
+    Cleans raw scraped text before adding to CSV.
+    Removes unnecessary symbols like quotes (", ', `), backslashes, HTML entities,
+    and trailing noise, while strictly preserving meaningful domain symbols:
+      - '-' in models, firmware, OS, and dates (e.g. 1756-L85EXT, WS-C2960X-48FPS-L)
+      - '.' in firmware versions, OS releases, and decimal models (e.g. 1.0.0, RHEL 9.2)
+      - ':' in UTC ISO timestamps (e.g. 2026-01-01T00:00:00Z)
+      - ',' in alias lists
+      - '/' in interface/part codes and URLs
     """
     if value is None:
         return ""
-
     s = str(value).strip()
-    if not s:
+    if not s or s.lower() in ("n/a", "none", "null", "nan", "undefined", "unknown"):
         return ""
 
-    # Sanitize control characters
+    import html
+    s = html.unescape(s)
+
+    # Normalize unicode hyphens, en-dashes, em-dashes (\u2010-\u2015, \u2212) to standard ascii hyphen '-'
+    s = re.sub(r'[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]', '-', s)
+    # Normalize non-breaking spaces
+    s = s.replace("\xa0", " ").replace("\u00a0", " ")
+
+    # Strip control characters
     s = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F]', '', s)
 
+    # Strip unnecessary quotes and backslashes (preserve inside metadata JSON)
+    if field_name.lower() != "metadata":
+        s = re.sub(r'[\"\'\`\“\”\‘\’\‚\„\«\»]', '', s)
+        s = s.replace("\\", "")
+
+    fn = field_name.lower()
+    if fn in ("model_name", "model"):
+        s = s.strip("' .,:;#")
+        s = re.sub(r'\s+', ' ', s)
+    elif fn in ("firmware", "fw"):
+        s = s.strip("' ")
+    elif fn in ("os", "operating_system"):
+        s = s.strip("' ")
+        s = re.sub(r'\s+', ' ', s)
+    elif fn in ("stage_date_utc", "date"):
+        s = s.strip("' ")
+    elif fn in ("status", "vendor_status", "stage"):
+        s = s.strip("' ")
+        s = re.sub(r'\s+', ' ', s)
+    elif fn in ("aliases", "alias"):
+        # Split synonyms by semicolon, clean each of quotes, normalize internal commas to dashes to avoid CSV quote wrapping
+        parts = [re.sub(r'[\"\'\`\“\”\‘\’\‚\„\«\»]', '', p).strip() for p in re.split(r'[;]+', s) if p.strip()]
+        cleaned_parts = []
+        for p in parts:
+            p_clean = re.sub(r',\s*', ' - ', p).strip(" -")
+            p_clean = re.sub(r'\s+', ' ', p_clean)
+            if p_clean:
+                cleaned_parts.append(p_clean)
+        s = "; ".join(dict.fromkeys(cleaned_parts)) if cleaned_parts else ""
+    elif fn in ("replacement", "category", "vendor_name"):
+        s = s.strip("' ")
+        s = re.sub(r'\s+', ' ', s)
+
+    s = re.sub(r'[ \t]+', ' ', s).strip()
+
     # Prefix with quote if it could trigger spreadsheet formula execution
-    if s[0] in ('=', '+', '-', '@', '\t', '\r'):
-        return "'" + s
+    if s and s[0] in ('=', '+', '-', '@', '\t', '\r') and fn not in ("metadata",):
+        s = "'" + s
 
     return s
+
+
+def sanitize_csv_cell(value: Any, field_name: str = "") -> str:
+    """
+    Defends against CSV Formula Injection (CWE-1236) and removes unnecessary
+    quotes, backslashes, and noise while preserving domain symbols (-, ., :, ,, /).
+    """
+    return clean_csv_field(value, field_name)
 
 
 def mask_secret(secret: Optional[str]) -> str:
@@ -400,4 +456,15 @@ def safe_atomic_replace(temp_path: Path, dest_path: Path, max_retries: int = 4) 
                 temp_path.unlink()
             except Exception:
                 pass
+
+
+def sanitize_crawl_url(raw_url: str) -> str:
+    """Sanitize URL before crawling to ensure valid schema and prevent injection."""
+    if not raw_url or not isinstance(raw_url, str):
+        return ""
+    clean = raw_url.strip()
+    if clean.startswith("//"):
+        clean = "https:" + clean
+    return clean
+
 

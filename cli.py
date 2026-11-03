@@ -15,9 +15,9 @@ from pathlib import Path
 if sys.platform == "win32":
     try:
         if hasattr(sys.stdout, "reconfigure"):
-            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
         if hasattr(sys.stderr, "reconfigure"):
-            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
     except Exception:
         pass
 
@@ -55,7 +55,7 @@ async def main():
     parser.add_argument("--model", default=None, help="AI Model name (default: auto-resolved based on active provider)")
     parser.add_argument("--webhook-url", default=None, help="Webhook URL for enterprise alerting (Slack/Teams)")
     parser.add_argument("--compare-modes", action="store_true", help="Display deep technical comparison between Generic IDE Crawler and AI Crawler")
-    parser.add_argument("--compare-csv", nargs="+", default=None, metavar=("BASELINE", "CANDIDATE"), help="Compare legacy scraper CSV with candidate CSV (e.g. --compare-csv legacy.csv [output/all_vendors_lifecycle.csv])")
+    parser.add_argument("--compare-csv", nargs="+", default=None, metavar=("BASELINE", "CANDIDATE"), help="Compare legacy scraper CSV with candidate CSV (e.g. --compare-csv legacy.csv [output/eol_products_lifecycle.csv])")
     parser.add_argument("--benchmark", action="store_true", help="Run head-to-head live benchmark between legacy scraper and Crawl4AI")
     parser.add_argument("--list-vendors", action="store_true", help="List all 140 supported enterprise vendors across OT, IoT, and IT")
     parser.add_argument("--setup-key", action="store_true", help="Launch interactive Universal Multi-Provider AI Key setup, validation, and .env configuration")
@@ -73,14 +73,16 @@ async def main():
     parser.add_argument("--dlq", "--show-failures", "--failures", dest="show_failures", action="store_true", help="Inspect Dead Letter Queue (DLQ) forensic log and failure map of failed crawls")
     parser.add_argument("--retry-failures", action="store_true", help="Retry transient failed crawl requests from DLQ with resilient evasion headers and merge recovered data")
     parser.add_argument("--clear-checkpoint", action="store_true", help="Discard saved checkpoint and start fresh")
+    parser.add_argument("--batch-size", type=int, default=None, help="Batch size for capability-based batch processing (e.g. 10 or 20 items per run)")
+    parser.add_argument("--all-batches", action="store_true", default=False, help="Process all batches continuously until the queue is fully drained")
+    parser.add_argument("--reset-state", action="store_true", default=False, help="Purge vendor state and restart batch queue from fresh knowledge base")
     args = parser.parse_args()
 
     print_banner()
 
     if args.vendor_terminology or args.status_registry:
-        from scripts.standalone_vendor_terminology import filter_terminology, print_terminal_table
-        filtered = filter_terminology(vendor_query=args.vendor, sector_query=args.sector)
-        print_terminal_table(filtered)
+        from scraper.vendors import show_vendor_terminology
+        show_vendor_terminology(vendor_query=args.vendor, sector_query=args.sector)
         return
 
     if args.setup_key:
@@ -115,7 +117,7 @@ async def main():
     if args.compare_csv:
         from scraper.crawler_comparison import compare_csv_datasets, format_dataset_comparison_markdown
         baseline_file = args.compare_csv[0]
-        candidate_file = args.compare_csv[1] if len(args.compare_csv) > 1 else str(Path(__file__).resolve().parent / "output" / "all_vendors_lifecycle.csv")
+        candidate_file = args.compare_csv[1] if len(args.compare_csv) > 1 else str(Path(__file__).resolve().parent / "output" / "eol_products_lifecycle.csv")
         summary = compare_csv_datasets(baseline_file, candidate_file)
         print("\n" + format_dataset_comparison_markdown(summary) + "\n")
         return
@@ -254,6 +256,12 @@ async def main():
         exec_kwargs["concurrency"] = args.concurrency
     if args.accumulate_batches is not None:
         exec_kwargs["accumulate_batches"] = args.accumulate_batches
+    if args.batch_size is not None:
+        exec_kwargs["batch_size"] = args.batch_size
+    if args.all_batches:
+        exec_kwargs["all_batches"] = args.all_batches
+    if args.reset_state:
+        exec_kwargs["reset_state"] = args.reset_state
 
     dataset = await pipeline.execute(**exec_kwargs)
     

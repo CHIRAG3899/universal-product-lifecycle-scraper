@@ -1,0 +1,1644 @@
+{
+  "omron": {
+    "vendor_name": "Omron Corporation",
+    "raw_harvested_count": 131,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 1,
+    "llm_evaluated_count": 130,
+    "llm_verified_count": 124,
+    "llm_rejected_count": 6,
+    "eol_records_count": 124,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Omron Corporation",
+        "model": "05117-100",
+        "status": "End of Support",
+        "stage_date": "2021-07-03T00:00:00Z",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2025/07/Omron_Adept_Python_Linear_Module_UG_201603_R278IE01_ae3e7c.pdf",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [
+      {
+        "vendor": "Omron Corporation",
+        "model": "Controllers",
+        "status": "End of Support",
+        "stage_date": "2032-06-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      },
+      {
+        "vendor": "Omron Corporation",
+        "model": "Controllers",
+        "status": "End of Sale",
+        "stage_date": "2026-11-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      },
+      {
+        "vendor": "Omron Corporation",
+        "model": "Vision Components",
+        "status": "End of Support",
+        "stage_date": "2032-06-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      },
+      {
+        "vendor": "Omron Corporation",
+        "model": "Vision Components",
+        "status": "End of Sale",
+        "stage_date": "2026-11-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      },
+      {
+        "vendor": "Omron Corporation",
+        "model": "Cables",
+        "status": "End of Support",
+        "stage_date": "2032-06-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      },
+      {
+        "vendor": "Omron Corporation",
+        "model": "Cables",
+        "status": "End of Sale",
+        "stage_date": "2026-11-03T00:00:00Z",
+        "reason": "Non-model category name.",
+        "source_url": "https://robotics.omron.com/wp-content/uploads/2026/07/Product-Discontinuation-Notice_Accessories.pdf"
+      }
+    ],
+    "reconciliation_explanation": "Out of 131 raw records harvested across all entry points, 1 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 6 non-model/noise elements were rejected by the LLM Gate, yielding 124 authentic persisted records (124 EOL, 0 Active)."
+  },
+  "mitsubishi": {
+    "vendor_name": "Mitsubishi Electric",
+    "raw_harvested_count": 0,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 0,
+    "llm_verified_count": 0,
+    "llm_rejected_count": 0,
+    "eol_records_count": 0,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 0 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 0 authentic persisted records (0 EOL, 0 Active)."
+  },
+  "yokogawa": {
+    "vendor_name": "Yokogawa Electric",
+    "raw_harvested_count": 2176,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 35,
+    "llm_evaluated_count": 2141,
+    "llm_verified_count": 2122,
+    "llm_rejected_count": 19,
+    "eol_records_count": 2122,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "PC-Based MX100",
+        "status": "Discontinued",
+        "stage_date": "2019-03-31T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/pc-based-mx100/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Standalone MW100",
+        "status": "Discontinued",
+        "stage_date": "2019-03-31T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/standalone-mw100/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "PZ4000",
+        "status": "Discontinued",
+        "stage_date": "2012-12-31T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/power-viewer-for-pz4000/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Measurement System",
+        "status": "Discontinued",
+        "stage_date": "2006-08-01T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/aq8202-series-optical-test-and-measurement-system-and-optional-units/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "optional units",
+        "status": "Discontinued",
+        "stage_date": "2006-08-01T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/aq8202-series-optical-test-and-measurement-system-and-optional-units/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AH5503",
+        "status": "Discontinued",
+        "stage_date": "2003-09-01T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/614114203-ah5503-rfmeasuringunit/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AH5503",
+        "status": "Discontinued",
+        "stage_date": "2003-09-01T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/614114201-ah5503-secondary-cell-unit/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AH5503",
+        "status": "Discontinued",
+        "stage_date": "2003-09-01T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/614114202-ah5503-tacs-unit/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE5321",
+        "status": "Discontinued",
+        "stage_date": "2002-11-08T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417316409-ae5321-adsl-annex-c-module/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE5321",
+        "status": "Discontinued",
+        "stage_date": "2002-11-08T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417316408-ae5321-alcatel-adslatu-c/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE5321",
+        "status": "Discontinued",
+        "stage_date": "2002-11-08T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417316401-ae5321-alcatel-adslatu-r/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE5321",
+        "status": "Discontinued",
+        "stage_date": "2002-11-08T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417316403-ae5321-carrying-case/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE5321",
+        "status": "Discontinued",
+        "stage_date": "2002-11-08T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417316407-ae5321-dpu-414-printer/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AD-9430",
+        "status": "Discontinued",
+        "stage_date": "2002-09-24T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/213725004-ad-9430-800hz-bpf/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AD-9430",
+        "status": "Discontinued",
+        "stage_date": "2002-09-24T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/213725001-ad-9430-progp53/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AD-9430",
+        "status": "Discontinued",
+        "stage_date": "2002-09-24T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/213725002-ad-9430-progj16/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AD-9430",
+        "status": "Discontinued",
+        "stage_date": "2002-09-24T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/213725003-ad-9430-vf-bpf/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AP9943",
+        "status": "Discontinued",
+        "stage_date": "2002-03-31T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314115138-ap9943-option3-variable-bit-rate/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AP-9850",
+        "status": "Discontinued",
+        "stage_date": "2000-12-27T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314107701-ap-9850-transformer-op-1/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AP-9850",
+        "status": "Discontinued",
+        "stage_date": "2000-12-27T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314107702-ap-9850-transformer-op-2a/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AP-9850",
+        "status": "Discontinued",
+        "stage_date": "2000-12-27T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314107705-ap-9850-transformer-op-2b/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AP-9850",
+        "status": "Discontinued",
+        "stage_date": "2000-12-27T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314107706-ap-9850-transmitter/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE-5150",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/3317313902-ae-5150-frame-relay-dce/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE-5150",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/3317313903-ae-5150-ppp-tcpip-analyzer/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "AE-7310",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/417311905-ae-7310-lapb-unit/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "100 MHz (DISCONTINUED)",
+        "status": "Discontinued",
+        "stage_date": "2021-01-18T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/700924-differential-probe-100-mhz1400-v/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Rack",
+        "status": "Discontinued",
+        "stage_date": "2012-09-10T00:00:00Z",
+        "reason": "Generic term",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/701965-rack-mount-kit-for-eia-rack/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "optional units",
+        "status": "Discontinued",
+        "stage_date": "2006-09-01T00:00:00Z",
+        "reason": "Generic term",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/aq2140-optical-multimeter-and-optional-units/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Measurement System",
+        "status": "Discontinued",
+        "stage_date": "2006-08-01T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/aq8201-series-optical-test-and-measurement-system-and-optional-units/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "optional units",
+        "status": "Discontinued",
+        "stage_date": "2006-08-01T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/aq8201-series-optical-test-and-measurement-system-and-optional-units/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Mainframe 314115132",
+        "status": "Discontinued",
+        "stage_date": "2004-09-30T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314115132-ap9943-mainframe/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "GP-IB Control System",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/810517721-aq-2105b-gp-ib-control-system/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Carrying Case",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813915015-aq7210-carrying-case/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Hard Carrying Case",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "Non-model description",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813915102-aq8602-hard-carrying-case/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Extension able Set",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/814108028-aq8201a-extension-able-set/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Coaxial Cord",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/816300307-aq7700-coaxial-cord/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Trunk Case 314113203",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314113203-ap-9456-trunk-case/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Through Jitter Modulation 314108201",
+        "status": "Discontinued",
+        "stage_date": "2003-09-30T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/314108201-ap-9851-through-jitter-modulation/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Charger",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813916802-aq7220bc-charger/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Sub-BatteryPack",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813916805-aq7220bc-sub-batterypack/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Battery Adapter",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813916806-aq7220bc-battery-adapter/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Upgrade",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/813917201-aq7220c-upgrade/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "Booster Amplifier",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/822900501-aq8423-booster-amplifier/"
+      },
+      {
+        "vendor": "Yokogawa Electric",
+        "model": "PPP",
+        "status": "Discontinued",
+        "stage_date": "2000-11-20T00:00:00Z",
+        "reason": "non-model",
+        "source_url": "https://tmi.yokogawa.com/solutions/discontinued/3317313903-ae-5150-ppp-tcpip-analyzer/"
+      }
+    ],
+    "reconciliation_explanation": "Out of 2176 raw records harvested across all entry points, 35 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 19 non-model/noise elements were rejected by the LLM Gate, yielding 2122 authentic persisted records (2122 EOL, 0 Active)."
+  },
+  "cisco_meraki": {
+    "vendor_name": "Cisco Meraki",
+    "raw_harvested_count": 400,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 400,
+    "llm_verified_count": 400,
+    "llm_rejected_count": 0,
+    "eol_records_count": 400,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 400 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 400 authentic persisted records (400 EOL, 0 Active)."
+  },
+  "emerson": {
+    "vendor_name": "Emerson Electric",
+    "raw_harvested_count": 158,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 158,
+    "llm_verified_count": 158,
+    "llm_rejected_count": 0,
+    "eol_records_count": 158,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 158 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 158 authentic persisted records (158 EOL, 0 Active)."
+  },
+  "siemens": {
+    "vendor_name": "Siemens",
+    "raw_harvested_count": 67,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 67,
+    "llm_verified_count": 67,
+    "llm_rejected_count": 0,
+    "eol_records_count": 67,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 67 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 67 authentic persisted records (67 EOL, 0 Active)."
+  },
+  "abb": {
+    "vendor_name": "ABB",
+    "raw_harvested_count": 14,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 14,
+    "llm_verified_count": 14,
+    "llm_rejected_count": 0,
+    "eol_records_count": 14,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 14 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 14 authentic persisted records (14 EOL, 0 Active)."
+  },
+  "beckhoff": {
+    "vendor_name": "Beckhoff Automation",
+    "raw_harvested_count": 790,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 141,
+    "llm_evaluated_count": 649,
+    "llm_verified_count": 649,
+    "llm_rejected_count": 0,
+    "eol_records_count": 649,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C3620-0050",
+        "status": "Discontinued",
+        "stage_date": "2018-07-01T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/ipc-service-products/",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B400",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B730",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B800",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C318",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2301-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2301-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C900",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2301-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C318",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "C900",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/il2302-c310.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B400",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1001-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B730",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1001-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B800",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1001-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1001-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B400",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1002-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B730",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1002-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B800",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1002-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1002-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B400",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1011-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B730",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1011-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B800",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1011-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B810",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1011-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B400",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1012-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Beckhoff Automation",
+        "model": "B730",
+        "status": "Discontinued",
+        "stage_date": "2022-12-31T00:00:00Z",
+        "source_url": "https://www.beckhoff.com/en-en/support/service-products/i-o-service-products/ip1012-b200.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 790 raw records harvested across all entry points, 141 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 649 authentic persisted records (649 EOL, 0 Active)."
+  },
+  "phoenix_contact": {
+    "vendor_name": "Phoenix Contact",
+    "raw_harvested_count": 1500,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1500,
+    "llm_verified_count": 1500,
+    "llm_rejected_count": 0,
+    "eol_records_count": 4,
+    "active_records_count": 1496,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1500 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1500 authentic persisted records (4 EOL, 1496 Active)."
+  },
+  "fanuc": {
+    "vendor_name": "FANUC Corporation",
+    "raw_harvested_count": 208,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 208,
+    "llm_verified_count": 208,
+    "llm_rejected_count": 0,
+    "eol_records_count": 21,
+    "active_records_count": 187,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 208 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 208 authentic persisted records (21 EOL, 187 Active)."
+  },
+  "yaskawa": {
+    "vendor_name": "Yaskawa Electric",
+    "raw_harvested_count": 603,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 20,
+    "llm_evaluated_count": 583,
+    "llm_verified_count": 583,
+    "llm_rejected_count": 0,
+    "eol_records_count": 457,
+    "active_records_count": 126,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CVSR",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "JGSM",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "JZSP",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "JVOP",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-L5A",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-L5P",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-L5R",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-L5S",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-L5H",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-V7",
+        "status": "Discontinued",
+        "stage_date": "2010-09-30T00:00:00Z",
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-V7",
+        "status": "End of Support",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-V7",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-V7",
+        "status": "End of Support",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-V7",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-DCA",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-XC",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-G5",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-PC",
+        "status": "End of Support",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-PC",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Yaskawa Electric",
+        "model": "CIMR-SVJ",
+        "status": "End of Support",
+        "stage_date": "2012-09-20T00:00:00Z",
+        "source_url": "https://www.e-mechatronics.com/support/afterservice/servo/disc_pdct.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 603 raw records harvested across all entry points, 20 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 583 authentic persisted records (457 EOL, 126 Active)."
+  },
+  "advantech": {
+    "vendor_name": "Advantech",
+    "raw_harvested_count": 1500,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1500,
+    "llm_verified_count": 1500,
+    "llm_rejected_count": 0,
+    "eol_records_count": 0,
+    "active_records_count": 1500,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1500 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1500 authentic persisted records (0 EOL, 1500 Active)."
+  },
+  "moxa": {
+    "vendor_name": "Moxa Technologies",
+    "raw_harvested_count": 1503,
+    "step4_purged_noise_count": 2,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1501,
+    "llm_verified_count": 1490,
+    "llm_rejected_count": 11,
+    "eol_records_count": 131,
+    "active_records_count": 1359,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [
+      {
+        "vendor": "Moxa Technologies",
+        "model": "2-5-gigabit-ethernet-sfp-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/accessories/sfp-modules/2-5-gigabit-ethernet-sfp-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "10-gigabit-ethernet-sfp-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/accessories/sfp-modules/10-gigabit-ethernet-sfp-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-682a-ethernet-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-682a-ethernet-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-682a-uart-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-682a-uart-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-682c-ethernet-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-682c-ethernet-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-682c-uart-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-682c-uart-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-720-ethernet-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-720-ethernet-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-720-uart-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-720-uart-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-820c-ethernet-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-820c-ethernet-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "da-820-ethernet-series-expansion-modules",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "non-model category description",
+        "source_url": "https://www.moxa.com/en/products/industrial-computing/x86-computers/da-820-ethernet-series-expansion-modules"
+      },
+      {
+        "vendor": "Moxa Technologies",
+        "model": "Service",
+        "status": "Moxa repair service",
+        "stage_date": null,
+        "reason": "non-model service description",
+        "source_url": "https://www.moxa.com/en/support/product-support/product-life-cycle-management-policy"
+      }
+    ],
+    "reconciliation_explanation": "Out of 1503 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 2 were purged by sanity checks, and 11 non-model/noise elements were rejected by the LLM Gate, yielding 1490 authentic persisted records (131 EOL, 1359 Active)."
+  },
+  "wago": {
+    "vendor_name": "WAGO Kontakttechnik",
+    "raw_harvested_count": 1501,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1501,
+    "llm_verified_count": 1501,
+    "llm_rejected_count": 0,
+    "eol_records_count": 1,
+    "active_records_count": 1500,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1501 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1501 authentic persisted records (1 EOL, 1500 Active)."
+  },
+  "keyence": {
+    "vendor_name": "Keyence Corporation",
+    "raw_harvested_count": 1501,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1501,
+    "llm_verified_count": 1501,
+    "llm_rejected_count": 0,
+    "eol_records_count": 1,
+    "active_records_count": 1500,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1501 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1501 authentic persisted records (1 EOL, 1500 Active)."
+  },
+  "rockwell_automation": {
+    "vendor_name": "Rockwell Automation (Allen-Bradley)",
+    "raw_harvested_count": 2155,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 178,
+    "llm_evaluated_count": 1977,
+    "llm_verified_count": 1977,
+    "llm_rejected_count": 0,
+    "eol_records_count": 1114,
+    "active_records_count": 863,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37C00",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37C00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37F01",
+        "status": "Discontinued",
+        "stage_date": "2022-02-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37F01.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37F10",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37F10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37H00",
+        "status": "Discontinued",
+        "stage_date": "2021-08-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37H00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37H10",
+        "status": "Discontinued",
+        "stage_date": "2021-08-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37H10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37J00",
+        "status": "Discontinued",
+        "stage_date": "2021-06-01T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37J00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37J10",
+        "status": "Discontinued",
+        "stage_date": "2022-01-13T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37J10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37K00",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37K00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37K10",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37K10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37N00",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37N00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37E00",
+        "status": "Discontinued",
+        "stage_date": "2021-07-09T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37E00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C37E10",
+        "status": "Discontinued",
+        "stage_date": "2021-07-09T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C37E10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97P00",
+        "status": "Discontinued",
+        "stage_date": "2024-03-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97P00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97P10",
+        "status": "Discontinued",
+        "stage_date": "2021-08-25T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97P10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97S00",
+        "status": "Discontinued",
+        "stage_date": "2022-01-07T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97S00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97S10",
+        "status": "Discontinued",
+        "stage_date": "2022-01-07T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97S10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97F01",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97F01.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97F10",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97F10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97K10",
+        "status": "Discontinued",
+        "stage_date": "2020-08-12T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97K10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C97V10",
+        "status": "Discontinued",
+        "stage_date": "2024-03-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C97V10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C30X00",
+        "status": "Discontinued",
+        "stage_date": "2021-12-31T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C30X00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C30X10",
+        "status": "Discontinued",
+        "stage_date": "2022-03-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C30X10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C30Y00",
+        "status": "Discontinued",
+        "stage_date": "2022-01-05T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C30Y00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C30V00",
+        "status": "Discontinued",
+        "stage_date": "2022-02-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C30V00.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Rockwell Automation (Allen-Bradley)",
+        "model": "100-C30V10",
+        "status": "Discontinued",
+        "stage_date": "2022-03-08T00:00:00Z",
+        "source_url": "https://www.rockwellautomation.com/en-us/products/details.100-C30V10.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 2155 raw records harvested across all entry points, 178 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1977 authentic persisted records (1114 EOL, 863 Active)."
+  },
+  "eaton": {
+    "vendor_name": "Eaton Electrical",
+    "raw_harvested_count": 194,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 2,
+    "llm_evaluated_count": 192,
+    "llm_verified_count": 157,
+    "llm_rejected_count": 35,
+    "eol_records_count": 151,
+    "active_records_count": 6,
+    "cross_entrypoint_duplicates_sample": [
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various CTX parts",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "SD3812",
+        "status": "Discontinued",
+        "stage_date": null,
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html",
+        "reason": "Duplicate identical candidate across multi-region entry points"
+      }
+    ],
+    "rejected_records": [
+      {
+        "vendor": "Eaton Electrical",
+        "model": "ESD Suppressors",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "MOVS EOL notice",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "EOL notice or announcement entry rather than a specific product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "MLVA EOL notice",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "EOL notice or announcement entry rather than a specific product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Fuses",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "MDA- select values",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific part selection",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "PC Tron solder dipped fuses",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific part selection",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Non-RoHS fuses",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Non-RoHS Ferrule Fuses",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Select Non-RoHS Small Dimension Fuses",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific part selection",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Fuseclips",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Fuse Holders",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Fuse Blocks",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Non-RoHS SMD Fuse Series",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific product series description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Fuse Holder/Clips",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "HTC fuse holder-EOL select values",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "EOL notice or generic part selection description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "HTB fuse holder--Add manufacturing site",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Manufacturing notice rather than a product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "EOL select part numbers",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic EOL notice text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "HB PCB fuse holder- Add manufacturing site",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Manufacturing notice rather than a product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "EOL select values",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic EOL notice text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "VDE removal select values",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Compliance/regulatory notice rather than a product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "HJM- EOL variuous part numbers",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "EOL notice or generic part selection description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "packaging options",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic packaging descriptor rather than a product model",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "HRK fuse holder--EOL non-RoHS part numbers",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "EOL notice or generic part selection description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Select HTB part numbers",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic part selection description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various fuse",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic non-specific text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Non-RoHS Fuse Clips",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "PTC Devices",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various CTX parts",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic non-specific text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various CTX part numbers",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic non-specific text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various Terminal Blocks",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic non-specific text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Various Custom Single Row Barrier Strips",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic non-specific text",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Single Row Barrier Strip",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "Barrier Strip Connectors",
+        "status": "Discontinued",
+        "stage_date": null,
+        "reason": "Generic category or non-specific model description",
+        "source_url": "https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "5p-lithium-ion-ups-battery-safety",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "Documentation, safety guide, or web slug, not a product model",
+        "source_url": "https://www.eaton.com/us/en-us/products/backup-power-ups-surge-it-power-distribution/backup-power-ups/lithium-ion-batteries-/eaton-5p-lithium-ion-ups-battery-safety.html"
+      },
+      {
+        "vendor": "Eaton Electrical",
+        "model": "g4-user-portal",
+        "status": "Active",
+        "stage_date": null,
+        "reason": "Web portal or software feature slug, not a hardware or standalone software product model",
+        "source_url": "https://www.eaton.com/us/en-us/products/backup-power-ups-surge-it-power-distribution/power-distribution-for-it-equipment/eaton-g4-user-portal.html"
+      }
+    ],
+    "reconciliation_explanation": "Out of 194 raw records harvested across all entry points, 2 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 35 non-model/noise elements were rejected by the LLM Gate, yielding 157 authentic persisted records (151 EOL, 6 Active)."
+  },
+  "cisco_iot": {
+    "vendor_name": "Cisco IoT",
+    "raw_harvested_count": 1,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1,
+    "llm_verified_count": 1,
+    "llm_rejected_count": 0,
+    "eol_records_count": 1,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1 authentic persisted records (1 EOL, 0 Active)."
+  },
+  "dell_it": {
+    "vendor_name": "Dell Technologies",
+    "raw_harvested_count": 1,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 1,
+    "llm_verified_count": 1,
+    "llm_rejected_count": 0,
+    "eol_records_count": 1,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 1 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1 authentic persisted records (1 EOL, 0 Active)."
+  },
+  "malicious": {
+    "vendor_name": "Malicious Vendor",
+    "raw_harvested_count": 0,
+    "step4_purged_noise_count": 0,
+    "cross_entrypoint_duplicates_count": 0,
+    "llm_evaluated_count": 0,
+    "llm_verified_count": 0,
+    "llm_rejected_count": 0,
+    "eol_records_count": 0,
+    "active_records_count": 0,
+    "cross_entrypoint_duplicates_sample": [],
+    "rejected_records": [],
+    "reconciliation_explanation": "Out of 0 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 0 authentic persisted records (0 EOL, 0 Active)."
+  }
+}

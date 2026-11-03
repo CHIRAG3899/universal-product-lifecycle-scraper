@@ -13,10 +13,10 @@ The platform is an enterprise-grade intelligence engine designed to autonomously
 - **End of Life / End of Sale (EOL)**
 - **End of Service / End of Support (EOS)**
 
-It provides native out-of-the-box support for **140 top enterprise vendors** across:
-1. **Operational Technology (OT) & Factory Automation**: 54 vendors (JTEKT Toyoda [Toyopuc PLCs], Rockwell Automation / Allen-Bradley, Siemens, Mitsubishi Electric, Schneider Electric, ABB, Omron, Hitachi Industrial Equipment, Shibaura Machine, Dragos, Phoenix Contact, Yokogawa, Fanuc, Lenze, Parker Hannifin, Fuji Electric, IDEC, National Instruments, etc.)
-2. **Internet of Things (IoT), Smart Cameras & Edge Vision**: 44 vendors (Cisco Meraki [MV cameras & switches], Nozomi Networks, Axis Communications, Hikvision, Dahua, Hanwha Vision, Teledyne FLIR, Basler, Mobotix, Bosch Security, Avigilon, Uniview, Advantech, Digi International, Intel IoT, etc.)
-3. **Enterprise IT, Switches & Networking**: 42 vendors (Barracuda Networks, Fluke Networks, Cisco Systems, HPE / Aruba Networks, Allied Telesis, D-Link Enterprise, NETGEAR Business, TP-Link Enterprise, Zyxel, Westermo, Alcatel-Lucent Enterprise, Juniper, Arista, Fortinet, Dell Technologies, etc.)
+It provides native out-of-the-box support for **159 top enterprise vendors** across:
+1. **Operational Technology (OT) & Factory Automation**: 61 vendors (Rockwell Automation / Allen-Bradley, Siemens, Mitsubishi Electric, Schneider Electric, ABB, Omron, JTEKT Toyoda, Hitachi, SEW-EURODRIVE, Belden, AVEVA, Inductive Automation, Opto 22, Johnson Controls, Vertiv, Phoenix Contact, Yokogawa, Fanuc, Lenze, Parker Hannifin, Fuji Electric, IDEC, National Instruments, etc.)
+2. **Internet of Things (IoT), Smart Cameras & Edge Vision**: 49 vendors (Axis Communications, Hikvision, Dahua, Hanwha Vision, Teledyne FLIR, Basler, Mobotix, Bosch Security, Avigilon, Uniview, Lantronix, Cradlepoint, Samsara, Genetec, Milestone Systems, Advantech, Digi International, Intel IoT, etc.)
+3. **Enterprise IT, Switches & Networking**: 49 vendors (Cisco Systems, Cisco Meraki, Aruba Networks, HPE, HP Inc., Dell Technologies, IBM Systems, Veeam, Juniper, Arista, Fortinet, Palo Alto Networks, Check Point, F5 Networks, NetApp, Pure Storage, Lenovo, Supermicro, etc.)
 
 ---
 
@@ -149,16 +149,17 @@ universal-lifecycle-scraper/
 │   │   └── gemini-llm-tuning/
 │   └── rules/                  # Workspace directory rules
 ├── configs/
-│   └── vendors.yaml            # Config-driven registry of all 140 enterprise vendors
+│   └── vendors.yaml            # Config-driven registry of all 159 enterprise vendors
 ├── docs/
 │   ├── ai/
 │   │   └── AI_HARNESS.md       # Comprehensive AI Harness & architectural guide
 │   └── ...
 ├── output/                     # Persistence artifacts
-│   ├── all_vendors_lifecycle.csv # Consolidated master database CSV (10 columns, no Fingerprint)
+│   ├── all_vendors_lifecycle.csv # Consolidated master database CSV (11 columns, no Fingerprint)
 │   └── <vendor>_lifecycle.json   # Modular per-vendor JSON datasets
 ├── artifacts/
 │   ├── runs/                   # Per-run execution traces and audit manifests
+│   ├── run_state/              # Persistent memory state files ({vendor_id}_state.json)
 │   ├── checkpoint.json         # Atomic checkpoint file for failure resumption
 │   ├── dlq.json                # Dead letter queue forensic failure logs
 │   └── cache/delta_cache.json  # Incremental content hash & ETag cache
@@ -176,8 +177,16 @@ universal-lifecycle-scraper/
 │   ├── pipeline.py             # 6-stage visible LifecyclePipeline orchestrator
 │   ├── providers.py            # Multi-provider LLM abstraction (Gemini, OpenAI, Claude, Azure, AWS, Ollama)
 │   ├── security.py             # SSRF prevention & CSV formula injection defense
+│   ├── state.py                # VendorRunState persistent memory & discovered prefix tracking
 │   ├── storage.py              # MasterStorageManager with atomic file swapping
-│   └── vendors.py              # 140-vendor resolution & multilingual stage translation
+│   ├── strategies/             # Pluggable Scraping Strategy Framework
+│   │   ├── __init__.py         # Strategy registry & get_strategy() factory
+│   │   ├── base.py             # BaseScrapingStrategy & sanitize_alias_text
+│   │   ├── dom_table.py        # DomTableStrategy HTML table parser
+│   │   ├── rest_api.py         # RestApiStrategy direct JSON endpoint consumer
+│   │   ├── search_portal.py    # SearchPortalStrategy with dynamic prefix discovery
+│   │   └── sitemap.py          # SitemapStrategy XML index traversal
+│   └── vendors.py              # 159-vendor resolution & multilingual stage translation
 ├── scripts/
 │   ├── pre_commit_check.py     # Automated 8-stage pre-commit quality gate (Ruff, Mypy, AST, Tests)
 │   ├── standalone_vendor_terminology.py # Standalone vendor lifecycle status query tool
@@ -211,7 +220,7 @@ Execute the full test suite locally:
 ```bash
 python -m unittest discover tests -v
 ```
-*Requirement: All 126 tests must pass with 100% green status before any code is approved.*
+*Requirement: All 252 tests must pass with 100% green status before any code is approved.*
 
 ### 2. Running Linters & Type Checkers
 ```bash
@@ -224,7 +233,7 @@ python -m mypy .
 ```
 
 ### 3. Running Pre-Commit Quality Checks
-Validate AST syntax, Ruff linter, Mypy types, secret leakage prevention, 140-vendor schema, SQL compliance, test suite, and synthetic end-to-end flow:
+Validate AST syntax, Ruff linter, Mypy types, secret leakage prevention, 159-vendor schema, SQL compliance, 252-test suite, and synthetic end-to-end flow:
 ```bash
 python scripts/pre_commit_check.py
 ```

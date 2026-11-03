@@ -8,7 +8,7 @@ import calendar
 import hashlib
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -50,6 +50,39 @@ def normalize_firmware_version(raw_firmware: Optional[str]) -> Optional[str]:
     return None
 
 
+REGIONAL_TOKEN_STR = (
+    r'(?:[A-Za-z]{2,3}|Global|Worldwide|ROW|North America|NA|EMEA|APAC|'
+    r'Europe|Canada|Japan|US|UK|EU|AU|JP|CN|WW|DE|FR|IT|ES|IN|BR|MX)'
+)
+REGIONAL_SUFFIX_PATTERN = re.compile(
+    r'\s*[\(\[]\s*' + REGIONAL_TOKEN_STR + r'(?:\s*[-/,\s]+\s*' + REGIONAL_TOKEN_STR + r')*\s*[\)\]]\s*$',
+    re.IGNORECASE
+)
+
+
+def strip_regional_suffix(model_or_alias: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Strips regional/country suffix from model identifiers, aliases, and replacements.
+    Examples:
+      'GR60 (EU)' -> ('GR60', 'EU')
+      'GR60 (UK)' -> ('GR60', 'UK')
+      'MS220-8P (US)' -> ('MS220-8P', 'US')
+      'GR12-HW (US - EU)' -> ('GR12-HW', 'US - EU')
+      'GR62-HW (US - UK - EU)' -> ('GR62-HW', 'US - UK - EU')
+      'Product (Canada)' -> ('Product', 'Canada')
+    """
+    if not model_or_alias or not isinstance(model_or_alias, str):
+        return model_or_alias, None
+    clean = model_or_alias.strip()
+    m = REGIONAL_SUFFIX_PATTERN.search(clean)
+    if m:
+        extracted_reg = clean[m.start():].strip(" ()[]")
+        clean_model = clean[:m.start()].strip()
+        if clean_model:
+            return clean_model, extracted_reg
+    return clean, None
+
+
 COOKIE_AND_POLICY_SUBSTRINGS = {
     "performance cookies", "cookie notice", "manage consent preferences", "consent preferences",
     "strictly necessary cookies", "functional cookies", "targeting cookies", "cookies settings",
@@ -62,13 +95,30 @@ EXACT_DISALLOWED_MODEL_TOKENS = {
     # Geographic / Regional
     "global", "americas", "asia-pacific", "europe", "europe, cis, middle east & africa",
     "north america", "latin america", "japan", "china", "germany", "france", "united states",
-    # Website Navigation / Web Chrome
-    "follow us", "about", "about us", "sustainability", "news", "newsroom", "contact us",
-    "site map", "sitemap", "disclaimer", "copyright", "search", "home", "products", "all products",
+    # Website Navigation / Legal / Web Chrome / URL Slugs
+    "terms", "terms-canada", "terms-us", "terms-conditions", "terms-of-use", "terms-of-service",
+    "terms and conditions", "terms of use", "terms of service", "tools", "top-connect",
+    "text-display", "timing-relays", "privacy", "privacy policy", "imprint", "legal",
+    "legal notice", "disclaimer", "cookie-policy", "site map", "site-map", "sitemap", "contact",
+    "contact us", "about", "about us", "sustainability", "news", "newsroom",
+    "follow us", "search", "home", "products", "all products",
     "solutions", "support", "downloads", "training", "documentation", "resources", "overview",
     "specifications", "features", "details", "comments", "notes", "action", "status", "stage",
-    "category", "family", "series", "main series", "complete series", "expansion units",
-    "all models", "n/a", "none", "null", "nan", "unknown", "tbd", "undefined",
+    "category", "family", "series", "main series", "complete series", "complete serie", "expansion units",
+    "all models", "all modules", "all units", "the whole series", "whole series", "affects the complete series",
+    "includes the whole series", "includes all modules", "includes the following models",
+    "includes the following models:", "replacement manual", "qans - main series", "ans - main series",
+    "ana/ann/anu - main series", "n/a", "none", "null", "nan", "unknown", "tbd", "undefined",
+    "mini", "micro", "nano", "sfp", "sfp+", "qsfp", "qsfp+", "accessories", "licenses",
+    "antenna mounts", "mount kits", "power supplies and fans", "power supplies",
+    # Hardware packaging, accessories, categories rejected by LLM
+    "controllers", "controller", "vision components", "vision component", "cables", "cable",
+    "trunk case", "carrying case", "battery adapter", "sub-batterypack", "charger",
+    "wall plug", "solar", "indoor", "outdoor", "booster amplifier", "measurement system",
+    "5y", "7y", "10y", "1y", "3y", "1 year", "3 year", "5 year", "7 year", "10 year",
+    "gp-ib control system", "ppp",
+    "document", "document id", "page", "lang page", "security level", "external en",
+    "all rights reserved", "copyright",
     "model", "models", "part number", "part numbers", "product", "item", "description",
     "catalog number", "order number", "order code", "article number", "type code",
     "model number", "model name", "product name", "product number", "part no", "part no.",
@@ -142,6 +192,8 @@ TABLE_HEADER_TOKENS = {
     "quantity", "qty", "unit price", "list price", "price", "total", "subtotal",
     "availability", "stock status", "lead time", "action", "actions", "details",
     "datasheet", "manual", "specifications", "features", "overview",
+    "milestone", "milestones", "milestone name", "milestones name", "definition", "definitions",
+    "key milestone", "key milestones", "milestone date", "milestone dates",
     # Japanese
     "形名", "形式", "型番", "品名", "品目", "仕様", "概要", "代替品", "代替推奨品",
     "標準価格", "納期", "備考", "後継品", "後継機種", "対象機種", "対象形名", "旧機種", "現行機種",
@@ -164,14 +216,17 @@ SPECIFICATION_PATTERN = re.compile(
     # Engineering units: e.g. 24VDC, 100-240VAC, 50/60Hz, 0.75kW, 4-20mA, 10A, 250g, 100mm, 10bar, 100psi, 120ohm
     r'\d+(?:\.\d+)?(?:\s*[-~/]\s*\d+(?:\.\d+)?)?\s*(?:vac|vdc|vac/vdc|vdc/vac|v\s*ac|v\s*dc|v|a|ma|w|kw|mw|hp|hz|khz|mhz|ghz|ohm|kohm|mohm|rpm|bar|psi|kg|g|mg|mm|cm|m)'
     r'|'
+    # Electrical phase ratings: e.g. 1-phase, 3-phase, single-phase, three-phase
+    r'(?:\d+|single|three|poly|split)[- ]?phase'
+    r'|'
     # Ingress Protection or NEMA enclosures: IP67, IP20, NEMA 4X, NEMA 12
     r'(?:ip\s*[0-6][0-9][a-z]?|nema\s*\d+[a-z]?)'
     r'|'
     # Physical dimensions: 100x50x25mm, 100 x 50 mm, 50x50mm
     r'\d+(?:\.\d+)?\s*[xX*]\s*\d+(?:\.\d+)?(?:\s*[xX*]\s*\d+(?:\.\d+)?)?\s*(?:mm|cm|m|in|inch)?'
     r'|'
-    # Standalone connector / serial interfaces: RJ45, M12, M8, RS-485, USB-C
-    r'(?:rj45|rj11|rj12|m12|m8|m5|rs-?232[a-z]?|rs-?485[a-z]?|rs-?422[a-z]?|usb[- ]?[a-c]|usb[- ]?[1-3](?:\.[0-2])?)'
+    # Standalone connector / serial interfaces: RJ45, M12, M8, RS-485, USB-C, SFP
+    r'(?:rj45|rj11|rj12|m12|m8|m5|rs-?232[a-z]?|rs-?485[a-z]?|rs-?422[a-z]?|usb[- ]?[a-c]|usb[- ]?[1-3](?:\.[0-2])?|sfp\+?|qsfp\+?)'
     r')$',
     re.IGNORECASE
 )
@@ -208,8 +263,80 @@ UI_AND_BREADCRUMB_PATTERN = re.compile(
     re.IGNORECASE
 )
 
+# Generic Industrial / IT product categories, solution overviews, and marketing classifications
+GENERIC_PRODUCT_CATEGORY_TOKENS = {
+    "human machine interface", "human machine interfaces", "hmi", "hmis",
+    "circuit and load protection", "circuit-and-load-protection",
+    "circuit breaker & load protection", "circuit breakers", "motor circuit protectors",
+    "variable frequency drive", "variable frequency drives", "variable frequency drives (vfds)", "vfd", "vfds",
+    "cubic modular system", "cubic modular system enclosures", "cubic-modular-system",
+    "programmable controller", "programmable controllers", "plc", "plcs",
+    "programmable automation controller", "programmable automation controllers", "pac", "pacs",
+    "distributed control system", "distributed control systems", "dcs",
+    "industrial automation", "industrial computers", "industrial computers and monitors",
+    "motion control", "motor control", "motor controls",
+    "sensors and switches", "safety products", "safety components",
+    "lighting and relays", "condition monitoring",
+    "network security and infrastructure", "networks and security", "ethernet networks", "ethernet-networks",
+    "power supplies", "power supply", "in-cabinet distributed i/o", "distributed i/o",
+    "allen-bradley", "allen-bradley products", "rockwell automation",
+    "low voltage ac drive", "architecture drive",
+    "remote access router", "stratix 4300 remote access router",
+    "5g-routers", "5g routers", "routers", "switches", "gateways", "firewalls",
+    "web-ui", "web ui", "timing-relays", "safety-relays", "safety relays",
+    "soft-starter", "soft starter", "soft-starters", "soft starters",
+    "air-circuit-breakers", "air circuit breakers", "molded-case-circuit-breaker",
+    "molded case circuit breaker", "solid-state-relay", "solid state relay",
+    "intelligent-link-module", "intelligent link module",
+    "1718 ex i/o", "1718-ex-i-o", "20g-powerflex-755t", "2098-ultraware-software",
+    "2094-kinetix-6000m-integrated"
+}
+
+# Boilerplate non-model phrases commonly appearing in replacement fields across vendors
+BOILERPLATE_REPLACEMENT_TOKENS = {
+    "contact repair & replacement", "contact repair and replacement", "contact repair",
+    "not applicable", "n/a", "none", "-", "--", "na",
+    "see product details", "view product details", "see details", "product details",
+    "contact local distributor or sales office", "contact local distributor", "contact distributor",
+    "contact local sales office", "contact sales office", "contact local sales", "contact sales",
+    "contact customer support", "contact support", "call for replacement",
+    "repair only", "repair service", "repair services", "repair & replacement services",
+    "no planned replacement", "no planned ra replacement", "no replacement", "no ra replacement",
+    "refer to compatibility", "refer to migration solutions", "consult sales", "consult factory",
+    "direct replacement", "engineering replacement", "functional replacement",
+    "custom engineered solution", "replacement available",
+    "contact your local distributor", "contact your authorized distributor"
+}
+
 # Table row index numbers: 1, 2, 99, 100, #1, #25 (table row numbers, not product models)
 ROW_INDEX_PATTERN = re.compile(r'^#?\d{1,3}$')
+
+
+def is_valid_replacement_model(name: Optional[str]) -> bool:
+    """
+    Validates whether a replacement string represents an authentic successor hardware/software model.
+    Strictly rejects boilerplate instructional text (e.g. 'CONTACT REPAIR & REPLACEMENT', 'NOT APPLICABLE',
+    'No planned RA replacement', 'No Honeywell Replacement - contact NCR', 'See Product Details', 'Engineering Replacement')
+    and ensures only genuine model SKUs are populated in the replacement column.
+    """
+    if not name or not isinstance(name, str):
+        return False
+    cleaned = name.strip()
+    if not cleaned or len(cleaned) < 2 or len(cleaned) > 100:
+        return False
+    c_lower = cleaned.lower()
+    c_norm = re.sub(r'[\s_\-]+', ' ', c_lower).strip()
+    if c_lower in ("n/a", "none", "null", "nan", "-", "--", "na", "unknown") or c_norm in ("n/a", "none", "null", "nan", "na", "unknown"):
+        return False
+    if re.search(r'\b(?:contact|consult|representative|distributor|no\s+.*replacement|no\s+replacement|not\s+applicable|refer\s+to|see\s+|view\s+|call\s+|repair\s+only|repair\s+service)\b', c_norm):
+        return False
+    if c_lower in BOILERPLATE_REPLACEMENT_TOKENS or c_norm in BOILERPLATE_REPLACEMENT_TOKENS:
+        return False
+    for phrase in BOILERPLATE_REPLACEMENT_TOKENS:
+        if phrase in c_norm and len(phrase) >= 6:
+            return False
+    # Must also pass general product model validity
+    return is_valid_product_model(cleaned)
 
 
 def is_valid_product_model(name: Optional[str]) -> bool:
@@ -256,6 +383,12 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     # Reject table header and column labels masquerading as product models
     if c_lower in TABLE_HEADER_TOKENS:
         return False
+    # Reject generic product categories, solution overviews, and marketing classifications
+    if c_lower in GENERIC_PRODUCT_CATEGORY_TOKENS:
+        return False
+    c_slug = re.sub(r'[\-_/]+', ' ', c_lower).strip()
+    if c_slug in GENERIC_PRODUCT_CATEGORY_TOKENS:
+        return False
     # Reject table row index numbers (e.g. 1, 2, 99, 100, #1, #25)
     if ROW_INDEX_PATTERN.match(check_str):
         return False
@@ -271,11 +404,39 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     # Reject lifecycle statuses masquerading as product models
     if c_lower in LIFECYCLE_STATUS_TOKENS:
         return False
-    # Reject pure date strings (e.g. 2023-03-31, 2023/03/31, 31.03.2023, 15-May-2024, or 4-digit years)
-    if re.match(r'^(?:(?:19|20)\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|\d{1,2}[-/\s]+[A-Za-z]{3,9}[-/\s]+(?:19|20)\d{2}|(?:19|20)\d{2}[-/.]\d{1,2})$', check_str):
+    # Reject lifecycle milestone descriptions masquerading as product models
+    if any(m in c_lower for m in ("end of sale", "end of life", "last ship", "last date of support", "end of support", "sw maintenance", "routine failure", "service attachment", "contract renewal", "order date", "ship date")) and any(d in c_lower for d in ("date", "announcement", "milestone")):
         return False
-    if re.match(r'^(?:19|20)\d{2}$', check_str):
+
+    # Reject documentation artifacts and manuals masquerading as product models
+    if any(c_lower.endswith(sfx) for sfx in (" manual", " manuals", " guide", " guides", " datasheet", " datasheets", " brochure", " handbook", " literature", "-literature", "-brochure", "-whitepaper", "-case-study")):
         return False
+    if any(k in c_lower for k in ("replacement manual", "instruction manual", "user manual", "hardware manual", "programming manual", "product-line-literature", "product line literature", "case-study", "case study", "whitepaper", "press-release")):
+        return False
+
+    # Reject series descriptors, lead-in phrases, and headings masquerading as product models
+    if any(c_lower.endswith(sfx) for sfx in ("- main series", " main series", " sub series", " product series", " complete serie", " power supplies and fans", " power supplies", " mount kits", " antenna mounts", " accessories", " licenses")):
+        return False
+    if any(k in c_lower for k in ("main series", "includes the following", "affects the following", "following models", "replacement manual")):
+        return False
+    # Reject pure date strings or strings containing calendar dates (e.g. 2023-03-31, April 30 - 2026, 15-May-2024, or 4-digit years)
+    if not is_well_known_os_or_software(model_name=check_str):
+        if parse_to_utc_iso(check_str):
+            return False
+        if re.search(r'\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*\d{1,2}[^\w\n]*(?:19|20)\d{2}\b', c_lower):
+            return False
+        if re.search(r'\b\d{1,2}[^\w\n]*(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*(?:19|20)\d{2}\b', c_lower):
+            return False
+        if re.search(r'\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*(?:19|20)\d{2}\b', c_lower):
+            return False
+        if re.search(r'\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s\-]+(?:\d{1,2}[\s\-]+)?\d{2,4}\b', c_lower):
+            return False
+        if re.search(r'\b(?:\d{1,2}[\s\-]+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s\-]+\d{2,4}\b', c_lower):
+            return False
+        if re.match(r'^(?:(?:19|20)\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|\d{1,2}[-/\s]+[A-Za-z]{3,9}[-/\s]+(?:19|20)\d{2}|(?:19|20)\d{2}[-/.]\d{1,2})$', check_str):
+            return False
+        if re.match(r'^(?:19|20)\d{2}$', check_str):
+            return False
     # Reject strings that start with conversational / instructional text
     if any(c_lower.startswith(p) for p in ("consult ", "see ", "official ", "click ", "read ", "download ", "view ", "affects ", "please ", "refer ")):
         return False
@@ -293,8 +454,8 @@ def is_valid_product_model(name: Optional[str]) -> bool:
     if not re.search(r'[A-Za-z0-9]', check_str):
         return False
 
-    # Strictly enforce alphanumeric + standard sensible symbols: - / : . _ + & ( ) # space
-    if not re.match(r'^[A-Za-z0-9\-_/:.+&()# ]+$', check_str):
+    # Strictly enforce alphanumeric + standard sensible symbols: - / : . _ + & ( ) # space ,
+    if not re.match(r'^[A-Za-z0-9\-_/:.+&()# ,]+$', check_str):
         return False
 
     return True
@@ -364,7 +525,8 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
     cleaned = re.sub(r'\b(?:de|del|le|du)\b', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
 
-    # Normalize commas in dates (e.g. "September, 2024" -> "September 2024")
+    # Normalize commas and dashes in dates (e.g. "September, 2024" -> "September 2024", "April 30 - 2026" -> "April 30 2026")
+    cleaned = re.sub(r'([A-Za-z]+)\s+(\d{1,2})\s*[-,\s]+\s*(\d{2,4})', r'\1 \2 \3', cleaned)
     cleaned = re.sub(r'([A-Za-z]+),\s*(\d{2,4})', r'\1 \2', cleaned)
     cleaned = re.sub(r'(\d{1,2})\s+([A-Za-z]+),\s*(\d{2,4})', r'\1 \2 \3', cleaned)
     cleaned = re.sub(r'([A-Za-z]+)\s+(\d{1,2}),\s*(\d{2,4})', r'\1 \2 \3', cleaned)
@@ -443,11 +605,18 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
         y, m = int(m_asian_m.group(1)), int(m_asian_m.group(2))
         return _safe_make_utc(y, m, 31)
 
-    # Pattern: Standard YYYY-MM-DD or YYYY/MM/DD
-    m_iso = re.search(r'(\d{4})[-/](\d{1,2})[-/](\d{1,2})', cleaned)
+    # Pattern: Standard YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD
+    m_iso = re.search(r'(\d{4})[-/\.](\d{1,2})[-/\.](\d{1,2})', cleaned)
     if m_iso:
         y, m, d = int(m_iso.group(1)), int(m_iso.group(2)), int(m_iso.group(3))
         return _safe_make_utc(y, m, d)
+
+    # Pattern: YYYY.MM or YYYY-MM or YYYY/MM (Year and month only)
+    m_ym = re.fullmatch(r'(\d{4})[-/\.](\d{1,2})', cleaned)
+    if m_ym:
+        y, m = int(m_ym.group(1)), int(m_ym.group(2))
+        if 1 <= m <= 12:
+            return _safe_make_utc(y, m, 31)
 
     # Pattern: DD.MM.YYYY or DD/MM/YYYY or MM/DD/YYYY
     m_euro = re.search(r'(\d{1,2})[\./-](\d{1,2})[\./-](\d{4})', cleaned)
@@ -491,7 +660,7 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
         return _safe_make_utc(y, 12, 31)
 
     # Standalone 4-digit Calendar Year (e.g. 2026, 1999) -> clamp to end of year
-    m_yr = re.search(r'\b(20\d{2}|19\d{2})\b', cleaned)
+    m_yr = re.fullmatch(r'^(20\d{2}|19\d{2})$', cleaned)
     if m_yr:
         y = int(m_yr.group(1))
         return _safe_make_utc(y, 12, 31)
@@ -499,8 +668,10 @@ def parse_to_utc_iso(date_val: Optional[str]) -> Optional[str]:
     return None
 
 
-def _safe_make_utc(year: int, month: int, day: int) -> str:
-    """Clamps invalid days (e.g. Nov 31 -> Nov 30) and produces UTC ISO string."""
+def _safe_make_utc(year: int, month: int, day: int) -> Optional[str]:
+    """Clamps invalid days (e.g. Nov 31 -> Nov 30) and produces UTC ISO string for realistic lifecycle years (1970-2099)."""
+    if year < 1970 or year > 2099:
+        return None
     month = max(1, min(12, month))
     max_day = calendar.monthrange(year, month)[1]
     day = max(1, min(max_day, day))
@@ -522,6 +693,69 @@ def extract_date_from_bulletin_code(bulletin: Optional[str]) -> Optional[str]:
         if 1 <= mm <= 12 and 1 <= dd <= 31:
             return _safe_make_utc(year, mm, dd)
     return None
+
+
+def sanitize_alias_string(v: Any) -> Optional[str]:
+    """Cleans and validates an aliases string or list of alias candidates."""
+    if not v:
+        return None
+    if isinstance(v, list):
+        items = [str(x).strip() for x in v if str(x).strip()]
+    elif isinstance(v, str):
+        items = [x.strip() for x in re.split(r'[,;]+', v) if x.strip()]
+    else:
+        items = [str(v).strip()]
+    valid_items = []
+    for itm in items:
+        if not itm or itm.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown", "undefined"):
+            continue
+        itm_clean = itm.rstrip(":").strip()
+        itm_low = itm_clean.lower()
+        # Reject lead-in phrases, table headers, instructional noise, or documentation artifacts
+        if re.search(r'\b(?:includes|including|following|affects|affected|applicable)\s+(?:the\s+)?(?:following\s+)?(?:models?|modules?|cpus?)', itm_low):
+            continue
+        if re.search(r'\b(?:replacement|instruction|user|hardware|programming)\s+(?:manual|guide|handbook)\b', itm_low) or itm_low.endswith((" manual", " manuals", " guide", " handbook")):
+            continue
+        if re.search(r'^(?:example of\s+)?main\s+units\b', itm_low) or itm_low.endswith(("- main series", " main series", "- sub series", " sub series")):
+            continue
+        if any(kw in itm_low for kw in ("includes the following", "following models", "replacement manual", "affects the following")):
+            continue
+        # Strictly reject calendar dates from aliases column
+        if parse_to_utc_iso(itm_clean):
+            continue
+        if re.search(r'\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*\d{1,2}[^\w\n]*(?:19|20)\d{2}\b', itm_clean, re.I):
+            continue
+        if re.search(r'\b\d{1,2}[^\w\n]*(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*(?:19|20)\d{2}\b', itm_clean, re.I):
+            continue
+        if re.search(r'\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b[^\w\n]*(?:19|20)\d{2}\b', itm_clean, re.I):
+            continue
+        if re.search(r'\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s\-]+(?:\d{1,2}[\s\-]+)?\d{2,4}\b', itm_clean, re.I):
+            continue
+        if re.search(r'\b(?:\d{1,2}[\s\-]+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s\-]+\d{2,4}\b', itm_clean, re.I):
+            continue
+        inspect_security_threats(itm_clean, field_name="aliases", raise_error=True)
+        if not is_valid_product_model(itm_clean):
+            continue
+        valid_items.append(itm_clean)
+    deduped = list(dict.fromkeys(valid_items))
+    return ", ".join(deduped) if deduped else None
+
+
+def sanitize_replacement_string(v: Any) -> Optional[str]:
+    """Cleans and validates a replacement model string."""
+    if not v:
+        return None
+    s = str(v).strip()
+    if not s or s.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown", "undefined"):
+        return None
+    # Strictly reject calendar dates from replacement column
+    if parse_to_utc_iso(s) or re.search(r'\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s\-]+\d{2,4}\b', s, re.I):
+        return None
+    if re.search(r'\b(?:contact|consult|representative|distributor|no\s+.*replacement|no\s+replacement|not\s+applicable|refer\s+to|see\s+bulletin|official sales|sales rep)\b', s.lower()):
+        return None
+    if not is_valid_replacement_model(s):
+        return None
+    return s
 
 
 class ProductRecord(BaseModel):
@@ -632,25 +866,9 @@ class ProductRecord(BaseModel):
         return cleaned
 
     @field_validator("aliases", mode="before")
-    def clean_aliases(cls, v):
-        if not v:
-            return None
-        if isinstance(v, list):
-            items = [str(x).strip() for x in v if str(x).strip()]
-        elif isinstance(v, str):
-            items = [x.strip() for x in re.split(r'[,;]+', v) if x.strip()]
-        else:
-            items = [str(v).strip()]
-        valid_items = []
-        for itm in items:
-            if not itm or itm.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown"):
-                continue
-            inspect_security_threats(itm, field_name="aliases", raise_error=True)
-            if not is_valid_product_model(itm):
-                continue
-            valid_items.append(itm)
-        deduped = list(dict.fromkeys(valid_items))
-        return ", ".join(deduped) if deduped else None
+    @classmethod
+    def clean_aliases(cls, v: Any) -> Optional[str]:
+        return sanitize_alias_string(v)
 
     @field_validator("status", mode="before")
     def validate_status(cls, v):
@@ -677,15 +895,9 @@ class ProductRecord(BaseModel):
         return parsed
 
     @field_validator("replacement", mode="before")
-    def clean_replacement(cls, v):
-        if not v:
-            return None
-        s = str(v).strip()
-        if not s or s.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown"):
-            return None
-        if any(kw in s.lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
-            return None
-        return s
+    @classmethod
+    def clean_replacement(cls, v: Any) -> Optional[str]:
+        return sanitize_replacement_string(v)
 
     @model_validator(mode="after")
     def compute_fingerprint_and_defaults(self):
@@ -716,28 +928,16 @@ class ProductRecord(BaseModel):
             meta_repl = (self.metadata or {}).get("replacement")
             if meta_repl:
                 candidate_repl = str(meta_repl).strip()
+        self.replacement = sanitize_replacement_string(candidate_repl) if candidate_repl else None
 
-        if candidate_repl:
-            c_str = str(candidate_repl).strip()
-            if c_str.lower() in ("n/a", "none", "null", "-", "--", "nan", "unknown") or any(kw in c_str.lower() for kw in ["consult", "representative", "official sales", "contact your", "sales rep"]):
-                self.replacement = None
-            else:
-                self.replacement = c_str
-        else:
-            self.replacement = None
-
-        # Synchronize aliases from metadata if not explicitly provided
+        # Synchronize aliases from metadata if not explicitly provided, and sanitize strictly
         if not self.aliases:
             meta = self.metadata or {}
             meta_al = meta.get("aliases") or meta.get("model_aliases") or meta.get("common_name")
             if meta_al:
-                if isinstance(meta_al, list):
-                    items = [str(x).strip() for x in meta_al if str(x).strip()]
-                else:
-                    items = [x.strip() for x in re.split(r'[,;]+', str(meta_al)) if x.strip()]
-                clean_items = [x for x in items if x.lower() not in ("n/a", "none", "null", "-", "--", "nan", "unknown")]
-                if clean_items:
-                    self.aliases = ", ".join(dict.fromkeys(clean_items))
+                self.aliases = sanitize_alias_string(meta_al)
+        elif self.aliases:
+            self.aliases = sanitize_alias_string(self.aliases)
 
         # Filter out aliases that match model_name exactly (case-insensitive)
         if self.aliases and self.model_name:
