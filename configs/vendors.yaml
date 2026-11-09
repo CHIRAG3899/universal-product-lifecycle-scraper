@@ -49,6 +49,14 @@ vendors:
       - EOL date
       - LTB date
       - EOS date
+      confidence: low
+      confidence_reason: The page structure is highly inconsistent and poorly formatted
+        for programmatic ingestion. The table rows lack semantic headers, and the
+        content is fragmented (e.g., separating model names from dates). Furthermore,
+        the 'tested_product_pattern' resulted in false-positive noise ('cnt', 'cncs')
+        which does not represent valid Mitsubishi Electric SKUs, indicating the current
+        regex approach is ineffective for this layout.
+      review_needed: true
     - name: Nordic_FA_EOL_Portal
       url: https://no-fa.mitsubishielectric.com/fa/no_en/support/Product-Life-Cycle-Information
       strategy: dom_table
@@ -61,6 +69,27 @@ vendors:
       - dated_EOL_LTB_EOS
       - lifecycle_source_candidate
       - model_status_or_notice_candidate
+      confidence: low
+      confidence_reason: The endpoint provides lifecycle information, but the current
+        regex pattern is entirely ineffective. The extracted models ('cnt', 'cncs')
+        are generic stopwords or non-specific segments rather than valid Mitsubishi
+        Electric SKUs (which typically follow patterns like 'GT25-WLAN', 'Q03UDVCPU',
+        etc.). Furthermore, the table structure is non-standard, and the data is often
+        buried in unstructured text or PDF links rather than a parsable catalog table.
+      review_needed: true
+    - name: Mitsubishi Electric Factory Automation Product Life Cycle Table
+      url: https://no-fa.mitsubishielectric.com/fa/support/Product-Life-Cycle-Information?redirect_from_legacy=1
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: The provided URL is an authoritative official source, but
+        the current extraction logic is failing. The 'sample_extracted_models' output
+        shows generic noise ('cnt', 'cncs') instead of actual SKUs like 'GT25-WLAN'.
+        Furthermore, the tested regex pattern does not match the actual structure
+        of the provided page content, indicating a failure to correctly parse the
+        DOM table for product identifiers.
+      evidence_authority: official_model_status_or_notice_evidence
+      review_needed: true
   siemens:
     id: siemens
     name: Siemens
@@ -260,6 +289,9 @@ vendors:
           replacement: replacementText
           replacement_category: replacementCategory
           url: url
+      confidence: high
+      confidence_reason: Verified active search portal with configured API authentication
+        and endpoints
     - name: Rockwell_En_US_Sitemap_Index
       url: https://www.rockwellautomation.com/en-us/sitemapindex.xml
       strategy: sitemap
@@ -275,6 +307,10 @@ vendors:
       evidence_authority: official_model_status_or_notice_evidence
       ingestion_priority: high
       max_sitemaps: 3
+      confidence: low
+      confidence_reason: Blocked by AKAMAI_CHALLENGE (HTTP 403); requires headless
+        browser or bypass
+      review_needed: true
   omron:
     id: omron
     name: Omron Corporation
@@ -859,10 +895,18 @@ vendors:
       endpoint_role: active_product_catalog_authority
       evidence_authority: vendor_direct_model_status_source
       ingestion_priority: high
-      product_pattern: /products/(?:[a-z0-9\-]+/)+([a-z0-9\-]+)/?$
+      product_pattern: /products/(?:dps|drives)/[a-z0-9-]+/(?:[a-z0-9-]+-series|vlt|vacon)/([a-z0-9-]+)
       model_group_index: 1
       default_status: Active
       category: Drives & Power Solutions
+      confidence: low
+      confidence_reason: The sitemap URL provides high-level navigational paths but
+        the tested pattern is failing to extract unique product SKUs. The extraction
+        results in redundant tokens like 'dps' (a product category/division) rather
+        than specific hardware models or EOL notices. The provided URL is a general
+        site map, not a dedicated lifecycle/EOL index, making it unsuitable for automated
+        integrity validation of specific hardware revisions.
+      review_needed: true
     - name: Danfoss_DrivePro_AC_Drive_Lifecycle_Terminology_Explainer
       url: https://www.danfoss.com/en/products/dds/drivepro-services/overview/drivepro-services/
       crawler_type: inspect_source_adapter
@@ -878,6 +922,13 @@ vendors:
       - Active
       - Limited
       - Inactive
+      confidence: low
+      confidence_reason: The candidate URL points to a high-level marketing overview
+        page ('DrivePro Services') rather than a product catalog or EOL/lifecycle
+        database. The tested regex is overly broad, capturing navigation slugs ('dds')
+        rather than specific hardware SKUs or product models. There is no structured
+        product data or table present.
+      review_needed: true
     - name: Danfoss_VLT2800_Inactive_Status_And_Successor
       url: https://www.danfoss.com/en-in/products/dds/low-voltage-drives/vlt-and-vacon-legacy-drives/vlt-2800/
       crawler_type: product_detail
@@ -891,6 +942,101 @@ vendors:
       expected_fields:
       - product family/model
       - successor product
+      confidence: medium
+      confidence_reason: The URL is an authoritative Danfoss product page for legacy
+        drives. However, the current regex pattern is too broad, capturing URL path
+        segments (e.g., 'dds', 'low-voltage-drives') as product models rather than
+        restricting captures to specific alphanumeric SKU patterns associated with
+        Danfoss VLT/VACON series naming conventions.
+      review_needed: true
+    - name: danfoss_v16_source
+      url: https://www.danfoss.com/en/service-and-support/drives/lifecycle-services/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: 'HTTP reachability failure: status 404 (None)'
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: danfoss_v16_source
+      url: https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-frequency-converters/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: 'HTTP reachability failure: status 404 (None)'
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: danfoss_v16_source
+      url: https://www.danfoss.com/en/service-and-support/drives-lifecycle-management/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: 'HTTP reachability failure: status 404 (None)'
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: Danfoss Global Product Catalog Portal
+      url: https://www.danfoss.com/en/products/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: The provided URL is a high-level marketing/product category
+        landing page rather than a specific product catalog or EOL documentation repository.
+        The 'sample_extracted_models' consist of broad category slugs (e.g., 'cylinders',
+        'hoses-and-fittings') rather than granular manufacturer SKUs or model identifiers.
+        The regex currently matches navigation segments, resulting in high noise and
+        low signal for lifecycle integrity validation.
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: Danfoss Low Voltage Drives Product Listing
+      url: https://www.danfoss.com/en/products/dds/low-voltage-drives/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: The provided endpoint is a high-level marketing category
+        page, not a product catalog or EOL/lifecycle database. The tested pattern
+        fails to extract actual product SKUs (e.g., 'FC-302', 'VLT-5000'), instead
+        capturing breadcrumb navigation slugs like 'dds' and 'low-voltage-drives'.
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: Danfoss VLT/VACON Legacy Drives Model Identifier
+      url: https://www.danfoss.com/en-in/products/dds/low-voltage-drives/vlt-and-vacon-legacy-drives/vlt-3000/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: The tested regex is too broad; it captures navigation breadcrumbs
+        ('dds', 'low-voltage-drives') rather than specific hardware SKUs. Furthermore,
+        the provided endpoint is a marketing/legacy landing page that lacks structured
+        product tables or lifecycle status matrices, making it insufficient for automated
+        lifecycle integrity validation.
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: Danfoss Legacy Drives Product Page
+      url: https://www.danfoss.com/en-in/products/dds/low-voltage-drives/vlt-and-vacon-legacy-drives/vlt-6000/
+      strategy: dom_table
+      crawler_type: dom_table
+      confidence: low
+      confidence_reason: The endpoint is an authoritative Danfoss documentation page,
+        but it is a marketing/catalog landing page rather than a structured lifecycle
+        table. The provided regex captures URL slugs (including category breadcrumbs
+        like 'dds' or 'low-voltage-drives') rather than isolating specific product
+        SKUs. It fails to distinguish between navigational folders and actual model
+        identifiers.
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+    - name: Danfoss Drives Product Catalog
+      url: https://www.danfoss.com/sitemap_index
+      strategy: sitemap
+      crawler_type: sitemap
+      confidence: low
+      confidence_reason: The sitemap index points to general marketing/navigational
+        hierarchies rather than specific product catalogs or lifecycle documentation.
+        The tested regex is failing to capture unique product SKUs, returning only
+        generic category slugs like 'dps', which are not granular enough for hardware
+        lifecycle validation. This endpoint is insufficient for identifying specific
+        product models.
+      evidence_authority: general_support_or_discovery_only
+      review_needed: true
+      product_pattern: /products/(?:dps|drives|ac-drives|soft-starters)/[a-zA-Z0-9\-]+(?:-[0-9]+[a-zA-Z0-9]*)+
+      child_filter: en
   endress_hauser:
     id: endress_hauser
     name: Endress+Hauser
@@ -1649,9 +1795,9 @@ vendors:
       - replacement_model_mapping
       evidence_authority: official_model_status_or_notice_evidence
       ingestion_priority: high
-      expected_fields: "AC1365/AC1366/AC1376 immediate discontinuation due to component\
-        \ obsolescence; replacement mapping AC1365\u2192AC1411 and AC1366/AC1376\u2192\
-        AC1412; compatibility note."
+      expected_fields: AC1365/AC1366/AC1376 immediate discontinuation due to component
+        obsolescence; replacement mapping AC1365→AC1411 and AC1366/AC1376→AC1412;
+        compatibility note.
   pilz:
     id: pilz
     name: Pilz Automation Safety
@@ -8594,7 +8740,7 @@ vendors:
       - availability/service context
   hilscher:
     id: hilscher
-    name: "Hilscher Gesellschaft f\xFCr Systemautomation"
+    name: Hilscher Gesellschaft für Systemautomation
     sector: OT
     sectors:
     - OT
@@ -8717,8 +8863,8 @@ vendors:
       - replacement_model
       evidence_authority: official_model_status_or_notice_evidence
       ingestion_priority: high
-      expected_fields: "Product BUS002M; Classic product \u2014 No New Design-In (NNDI);\
-        \ extended availability; recommended successor BUS002K."
+      expected_fields: Product BUS002M; Classic product — No New Design-In (NNDI);
+        extended availability; recommended successor BUS002K.
     - name: Balluff_BOS00UA_Canceled_Status_And_Successor
       url: https://www.balluff.com/en-in/products/BOS00UA
       crawler_type: product_detail
@@ -9192,7 +9338,7 @@ vendors:
       - support status or lifecycle notice when published
   drager:
     id: drager
-    name: "Dr\xE4ger"
+    name: Dräger
     sector: IoT
     sectors:
     - IoMT
@@ -9201,7 +9347,7 @@ vendors:
     allowed_domains:
     - draeger.com
     entry_points:
-    - name: "Dr\xE4ger_Official_Support_and_Product_Discovery"
+    - name: Dräger_Official_Support_and_Product_Discovery
       url: https://www.draeger.com/en-us/Service
       crawler_type: dom_table
       region: Global
