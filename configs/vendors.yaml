@@ -350,7 +350,23 @@ vendors:
     - abb.com
     - www.abb.com
     - library.e.abb.com
+    - electrification.us.abb.com
     entry_points:
+    - name: ABB_Electrification_Lifecycle_Management
+      url: https://electrification.us.abb.com/life-cycle-management
+      crawler_type: dom_table
+      strategy: dom_table
+      region: North America
+      category: Electrification & Protection Relays
+      endpoint_role: model_status_table
+      source_tags:
+      - dated_EOL_LTB_EOS
+      - lifecycle_source
+      - official_bulletin
+      evidence_authority: official_model_status_or_notice_evidence
+      ingestion_priority: high
+      confidence: high
+      confidence_reason: Official ABB Electrification lifecycle portal with active notice table and dates
     - name: ABB_Drives_ACS550_Lifecycle_Statement
       url: https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf
       crawler_type: dom_table
@@ -522,6 +538,15 @@ vendors:
       ingestion_priority: high
       evidence_authority: official_model_status_or_notice_evidence
       endpoint_role: model_status_and_replacement_catalogue
+    - name: Eaton_EOSL_Master_List
+      url: https://www.eaton.com/us/en-us/catalog/services/eaton-end-of-service-life--eosl--program.html
+      strategy: dom_table
+      crawler_type: dom_table
+      category: Backup Power & UPS
+      default_status: Discontinued
+      ingestion_priority: high
+      evidence_authority: official_model_status_or_notice_evidence
+      endpoint_role: model_status_and_replacement_catalogue
     - name: Eaton_EOSL_Master_Table_PDF
       url: https://www.eaton.com/content/dam/eaton/products/backup-power-ups-surge-it-power-distribution/backup-power-ups/services-resources/eaton-end-of-service-life-master-table-us-pl161010en.pdf
       strategy: pdf_table
@@ -537,9 +562,9 @@ vendors:
       crawler_type: sitemap
       category: Power Distribution & Controls
       default_status: Active
-      product_pattern: /products/(?:[a-z0-9\-]+/)+eaton-([a-z0-9\-]+?)(?:-ups)?(?:\.html)?$
+      product_pattern: /catalog/[a-z0-9\-]+/([a-z0-9\-]+)\.html
       model_group_index: 1
-      max_sitemaps: 1
+      max_sitemaps: 10
       ingestion_priority: medium
       evidence_authority: official_model_status_or_notice_evidence
       endpoint_role: model_status_and_replacement_catalogue

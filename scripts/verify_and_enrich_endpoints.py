@@ -95,10 +95,10 @@ STOPWORD_URL_SLUGS = {
 class EndpointProber:
     """Probes live HTTP endpoints, detects WAF barriers, and parses sitemaps / HTML tables."""
 
-    def __init__(self, timeout: float = 8.0) -> None:
+    def __init__(self, timeout: float = 10.0) -> None:
         self.timeout = timeout
         self.session = requests.Session()
-        retries = Retry(total=2, backoff_factor=0.3, status_forcelist=[500, 502, 503, 504], raise_on_status=False)
+        retries = Retry(total=1, backoff_factor=0.2, status_forcelist=[500, 502, 503, 504], raise_on_status=False)
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
         self.session.mount("http://", HTTPAdapter(max_retries=retries))
         self.session.headers.update({
@@ -355,10 +355,10 @@ class EndpointProber:
         parsed = urlparse(base_url)
         domain_root = f"{parsed.scheme}://{parsed.netloc}"
 
-        # 1. robots.txt
+        # 1. robots.txt (fast probe, timeout=3.5s)
         robots_url = f"{domain_root}/robots.txt"
         try:
-            r = self.session.get(robots_url, timeout=self.timeout)
+            r = self.session.get(robots_url, timeout=3.5)
             if r.status_code == 200:
                 for line in r.text.splitlines():
                     if line.strip().lower().startswith("sitemap:"):
@@ -368,15 +368,18 @@ class EndpointProber:
         except Exception:
             pass
 
-        # 2. Candidate locations
+        # 2. Candidate locations (fast stream probe, timeout=2.5s, no hanging HEAD)
         for cand in COMMON_SITEMAP_CANDIDATES:
             full_cand = f"{domain_root}{cand}"
             if full_cand in discovered:
                 continue
             try:
-                head_resp = self.session.head(full_cand, timeout=self.timeout, allow_redirects=True)
-                if head_resp.status_code == 200:
-                    discovered.append(full_cand)
+                resp = self.session.get(full_cand, timeout=2.5, stream=True, allow_redirects=True)
+                if resp.status_code == 200:
+                    ct = resp.headers.get("Content-Type", "").lower()
+                    if "xml" in ct or "text" in ct:
+                        discovered.append(full_cand)
+                resp.close()
             except Exception:
                 pass
 
@@ -879,8 +882,9 @@ def enrich_and_update_vendor_yaml(
             if target_url in existing_urls or target_url in global_urls:
                 continue
 
+            candidate_name = v_ep.get("suggested_name") or v_ep.get("name") or f"{vendor_id}_{len(current_eps) + 1}"
             new_ep: Dict[str, Any] = {
-                "name": v_ep.get("suggested_name", f"{vendor_id}_{len(current_eps) + 1}"),
+                "name": candidate_name,
                 "url": target_url,
                 "strategy": v_ep.get("endpoint_type", "dom_table"),
                 "crawler_type": v_ep.get("endpoint_type", "dom_table"),
@@ -888,6 +892,11 @@ def enrich_and_update_vendor_yaml(
                 "confidence_reason": conf_reason,
                 "evidence_authority": v_ep.get("evidence_authority", "official_model_status_or_notice_evidence"),
             }
+
+            if v_ep.get("category"):
+                new_ep["category"] = v_ep["category"]
+            if v_ep.get("selectors"):
+                new_ep["selectors"] = v_ep["selectors"]
 
             if review_needed:
                 new_ep["review_needed"] = True
@@ -1025,15 +1034,35 @@ def main() -> int:
         if vid in enriched_v16_data:
             v16_eps = enriched_v16_data[vid].get("entry_points", [])
             for ep16 in v16_eps:
-                u16 = ep16.get("url") if isinstance(ep16, dict) else (ep16 if isinstance(ep16, str) else None)
+                if isinstance(ep16, dict):
+                    u16 = ep16.get("url")
+                    name16 = ep16.get("name") or f"{vid}_v16_source"
+                    strat16 = ep16.get("strategy") or ep16.get("crawler_type") or "unknown"
+                    pat16 = ep16.get("product_pattern") or ep16.get("pattern")
+                    cat16 = ep16.get("category")
+                    sel16 = ep16.get("selectors")
+                    api16 = ep16.get("api_config")
+                elif isinstance(ep16, str):
+                    u16 = ep16
+                    name16 = f"{vid}_v16_source"
+                    strat16 = "unknown"
+                    pat16 = None
+                    cat16 = None
+                    sel16 = None
+                    api16 = None
+                else:
+                    u16 = None
+
                 if u16 and not any(c["url"] == u16 for c in candidate_urls):
                     candidate_urls.append({
                         "url": u16,
                         "source": "enriched_v16",
-                        "configured_pattern": None,
-                        "name": f"{vid}_v16_source",
-                        "strategy": "unknown",
-                        "api_config": None,
+                        "configured_pattern": pat16,
+                        "name": name16,
+                        "strategy": strat16,
+                        "category": cat16,
+                        "selectors": sel16,
+                        "api_config": api16,
                     })
 
         # 3. Discovered XML Sitemaps
@@ -1088,6 +1117,8 @@ def main() -> int:
                 "waf_challenge": http_probe["waf_challenge"],
                 "error": http_probe["error"],
                 "name": cand.get("name"),
+                "category": cand.get("category"),
+                "selectors": cand.get("selectors"),
                 "has_data": False,
             }
 

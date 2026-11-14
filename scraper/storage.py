@@ -50,7 +50,9 @@ def is_genuine_lifecycle_record(data: Dict[str, Any]) -> bool:
     }
     if st_val in disallowed_statuses or "video" in st_val or "sitemap" in st_val:
         return False
-    if any(kw in src for kw in ("sitemap", "videos", "newsroom", "professional-services")):
+    if any(kw in src for kw in ("videos", "newsroom", "professional-services")):
+        return False
+    if "sitemap" in m_name or m_name.endswith(".xml"):
         return False
     if any(kw in cat for kw in ("topic", "consulting", "support services", "fan", "refrigerator")):
         return False
