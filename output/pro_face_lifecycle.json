@@ -1,0 +1,322 @@
+{
+  "vendor_id": "pro_face",
+  "vendor_name": "Pro-face",
+  "total_records": 15,
+  "products": [
+    {
+      "fingerprint": "2ee08e9b075df176",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXLT3300TADC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "3aacfb0e3e503861",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXLT3300TADK",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "e7084a2c1b742fe2",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADCA",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "2cafa51442312ec9",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADDC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "495f73334ff73bca",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADDK",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "7d8f95524c923b05",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADFN",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "ba7ed839f40376d7",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXZFNX32TS",
+      "aliases": "FLEXNETWORK IO Unit",
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "3b39d5e8e57f9ab2",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXZC7EUCL1B",
+      "aliases": "CC-Link unit",
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "7ff991994ed97fb2",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXZC8CF21",
+      "aliases": "CF Card",
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "979b1d8887d9c458",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXLT3300TADC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "8beed34d41770e61",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXLT3300TADK",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "edb6493cdba86c7a",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADCA",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "d1703975a95f4ced",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADDC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "4eabb47dca2c0115",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADDK",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "d021f3e4fbf16dc1",
+      "vendor_name": "Pro-face",
+      "model_name": "PFXGP3300TADFN",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Support",
+      "stage": "End of Support",
+      "vendor_status": "End of Support",
+      "stage_date_utc": "2030-12-31T00:00:00Z",
+      "source_url": "https://www.proface.com/en/news/2023/0913-1",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:58:39Z",
+      "last_updated_utc": "2026-11-14T13:58:39Z",
+      "metadata": {
+        "region": "Global"
+      }
+    }
+  ]
+}

@@ -18,8 +18,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "U1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -39,14 +39,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "U1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "6e33af59a5e1a9cc",
+      "fingerprint": "670ea0922c5ca631",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CVSR",
       "aliases": null,
@@ -55,20 +55,21 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "70ce8f54df78ec2e",
+      "fingerprint": "9f4d3aeee8da59bf",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CVSR",
       "aliases": null,
@@ -77,20 +78,21 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "f26cf726dcaf2aef",
+      "fingerprint": "64065c86696930bd",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JGSM",
       "aliases": null,
@@ -99,20 +101,21 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "85a3e0b6b79e3af1",
+      "fingerprint": "98fff567ad926bea",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JGSM",
       "aliases": null,
@@ -121,20 +124,21 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "2457e944c3adbce4",
+      "fingerprint": "35710c8dbb1d1f09",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JZSP",
       "aliases": null,
@@ -143,20 +147,21 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "180028d18966d2a2",
+      "fingerprint": "bd0cba2e539900c7",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JZSP",
       "aliases": null,
@@ -165,20 +170,21 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "2a9a22cdcdfca6de",
+      "fingerprint": "abef15bd35b29f0e",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JVOP",
       "aliases": null,
@@ -187,20 +193,21 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "779b319018d4547e",
+      "fingerprint": "ccc111b45267a964",
       "vendor_name": "Yaskawa Electric",
       "model_name": "JVOP",
       "aliases": null,
@@ -209,15 +216,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -236,8 +244,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "R1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -257,8 +265,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "R1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -278,8 +286,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "D1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -299,8 +307,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "D1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -320,8 +328,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -341,8 +349,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -362,8 +370,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -383,8 +391,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -404,8 +412,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -425,8 +433,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:54Z",
+      "last_updated_utc": "2026-11-14T13:46:54Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -446,8 +454,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -467,8 +475,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -488,8 +496,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -509,8 +517,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -530,8 +538,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -551,14 +559,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "c3c046b4c3ca8453",
+      "fingerprint": "76763c35890d0fad",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-L5A",
       "aliases": null,
@@ -567,15 +575,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -594,14 +603,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "49d22806f922fb69",
+      "fingerprint": "5fdf956f0d642f33",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-L5P",
       "aliases": null,
@@ -610,15 +619,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -637,14 +647,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "a0d74dd02796a308",
+      "fingerprint": "aa7a41a8f13b8994",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-L5R",
       "aliases": null,
@@ -653,15 +663,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -680,14 +691,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "8af369fd1391423a",
+      "fingerprint": "33018a56cfec720d",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-L5S",
       "aliases": null,
@@ -696,15 +707,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -723,14 +735,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "4fe1a731c9d5852c",
+      "fingerprint": "215924036c18d412",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-L5H",
       "aliases": null,
@@ -739,15 +751,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -766,8 +779,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "L1000A - L1000S",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -787,14 +800,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "ba30ae1e0796e7c4",
+      "fingerprint": "e2ff3329dd40e989",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-V7",
       "aliases": null,
@@ -803,15 +816,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -830,8 +844,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -851,8 +865,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -872,8 +886,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -893,8 +907,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -914,8 +928,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -935,8 +949,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -956,14 +970,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "J1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "4088274d2ee3a7bd",
+      "fingerprint": "01157ea1193c458f",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-J7",
       "aliases": "VS mini J7",
@@ -972,15 +986,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "J1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -999,14 +1014,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "V1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "ad183ac5c3ab7797",
+      "fingerprint": "a685517a1c17bf31",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-PC",
       "aliases": null,
@@ -1015,20 +1030,21 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "V1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "96f2845b4d185549",
+      "fingerprint": "41a437900bbbfcda",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-DCA",
       "aliases": null,
@@ -1037,15 +1053,16 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "D1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1064,8 +1081,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "D1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1085,14 +1102,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "27e0468cb53a9ae4",
+      "fingerprint": "75a83d732752dc3b",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-V7LA",
       "aliases": "Varispeed V7 pico",
@@ -1101,15 +1118,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1128,8 +1146,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700 - R1000 - U1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1149,14 +1167,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700 - R1000 - U1000",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "d3c20e229a8d289e",
+      "fingerprint": "4dba1688016dd6c9",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-XC",
       "aliases": null,
@@ -1165,20 +1183,21 @@
       "status": "Discontinued",
       "stage": "Discontinued",
       "vendor_status": "Discontinued",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "82a091dffb31eada",
+      "fingerprint": "1e18982334dd05bc",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-XC",
       "aliases": null,
@@ -1187,15 +1206,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1214,8 +1234,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1235,8 +1255,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1256,8 +1276,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1277,8 +1297,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1298,14 +1318,14 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "a110d121a437b57c",
+      "fingerprint": "0684955133482812",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CIMR-PB",
       "aliases": "VS-606PB3",
@@ -1314,15 +1334,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/inverter/disc_pdct.html",
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA500",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1341,8 +1362,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1362,8 +1383,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1383,8 +1404,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1404,8 +1425,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:55Z",
+      "last_updated_utc": "2026-11-14T13:46:55Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1425,8 +1446,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1446,8 +1467,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1467,8 +1488,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1488,8 +1509,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1509,8 +1530,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1530,8 +1551,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1551,8 +1572,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1572,8 +1593,8 @@
       "category": "Inverters",
       "product_category": "Inverters",
       "replacement": "GA700",
-      "first_discovered_utc": "2026-11-03T06:29:09Z",
-      "last_updated_utc": "2026-11-03T06:29:09Z",
+      "first_discovered_utc": "2026-11-14T13:46:56Z",
+      "last_updated_utc": "2026-11-14T13:46:56Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1593,8 +1614,8 @@
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1614,8 +1635,8 @@
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1635,8 +1656,8 @@
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1656,8 +1677,8 @@
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1761,14 +1782,14 @@
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "6bb4e53472a2e945",
+      "fingerprint": "6db06c1a56065a3e",
       "vendor_name": "Yaskawa Electric",
       "model_name": "SJDE",
       "aliases": null,
@@ -1777,15 +1798,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/servo/disc_pdct.html",
       "category": "Servos",
       "product_category": "Servos",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:17Z",
-      "last_updated_utc": "2026-11-03T06:29:17Z",
+      "first_discovered_utc": "2026-11-14T13:50:12Z",
+      "last_updated_utc": "2026-11-14T13:50:12Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1804,8 +1826,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1825,8 +1847,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1846,8 +1868,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1867,8 +1889,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -1888,14 +1910,14 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "4fcb50cf30c5c058",
+      "fingerprint": "f0b630013df568f5",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CPMC-MPMS700B",
       "aliases": null,
@@ -1904,15 +1926,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/controller/disc_pdct.html",
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1931,14 +1954,14 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
     },
     {
-      "fingerprint": "73c15c9ca03e056c",
+      "fingerprint": "837b5d48475d2c8c",
       "vendor_name": "Yaskawa Electric",
       "model_name": "CPMC-MPG700",
       "aliases": null,
@@ -1947,15 +1970,16 @@
       "status": "End of Support",
       "stage": "End of Support",
       "vendor_status": "End of Support",
-      "stage_date_utc": null,
+      "stage_date_utc": "2026-10-15T00:00:00Z",
       "source_url": "https://www.e-mechatronics.com/support/afterservice/controller/disc_pdct.html",
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Japan / Global"
       }
     },
@@ -1974,8 +1998,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-MC2100-EJAPMC-MC2140-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2016,8 +2040,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-BU2200-EJEPMC-BU2210-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2058,8 +2082,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-MP2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2079,8 +2103,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-MP2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2100,8 +2124,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-CP2200-EJAPMC-CP2210-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2142,8 +2166,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-EX2200-E - JAPMC-EX2100-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2184,8 +2208,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-MC2310-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2205,8 +2229,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-MC2310-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2310,8 +2334,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-DO2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2331,8 +2355,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-DO2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2352,8 +2376,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-AN2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2373,8 +2397,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAPMC-AN2300-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2394,8 +2418,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-IO2310-EJEPMC-IO2330-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2436,8 +2460,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-PL2900-E - JEPMC-PL2910-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2478,8 +2502,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-AN2900-E - JEPMC-AN2910-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2520,8 +2544,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-REP2000-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2541,8 +2565,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEPMC-REP2000-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2562,8 +2586,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "MP2100",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2583,8 +2607,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "MP2100",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2604,8 +2628,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "MP2100",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2625,8 +2649,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "MP2100",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2646,8 +2670,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2667,8 +2691,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2688,8 +2712,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2709,8 +2733,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2730,8 +2754,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2751,8 +2775,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2772,8 +2796,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2793,8 +2817,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2814,8 +2838,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEVSA-YV260A1-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2835,8 +2859,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEVSA-YV260A1-E",
-      "first_discovered_utc": "2026-11-03T06:29:24Z",
-      "last_updated_utc": "2026-11-03T06:29:24Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2856,8 +2880,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEVSA-YV260D1-E",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2877,8 +2901,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JEVSA-YV260D1-E",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2898,8 +2922,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAVSA-YV260S1-E",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2919,8 +2943,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "JAVSA-YV260S1-E",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2940,8 +2964,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "YV260",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2961,8 +2985,8 @@
       "category": "Controllers",
       "product_category": "Controllers",
       "replacement": "YV260",
-      "first_discovered_utc": "2026-11-03T06:29:25Z",
-      "last_updated_utc": "2026-11-03T06:29:25Z",
+      "first_discovered_utc": "2026-11-14T13:51:45Z",
+      "last_updated_utc": "2026-11-14T13:51:45Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -2982,8 +3006,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP700",
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3003,8 +3027,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400L",
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3024,8 +3048,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOWELD-X500",
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3045,8 +3069,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3066,8 +3090,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3087,8 +3111,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3108,8 +3132,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-S500F",
-      "first_discovered_utc": "2026-11-03T06:29:32Z",
-      "last_updated_utc": "2026-11-03T06:29:32Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3129,8 +3153,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-S500F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3150,8 +3174,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3171,8 +3195,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-S1000F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3192,8 +3216,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3213,8 +3237,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-D250F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3234,8 +3258,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-D500F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3255,8 +3279,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3276,8 +3300,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3297,8 +3321,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-D700F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3318,8 +3342,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3339,8 +3363,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3360,8 +3384,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-T5000F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3381,8 +3405,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-T5000F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3402,8 +3426,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3423,8 +3447,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3444,8 +3468,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP100",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3465,8 +3489,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3486,8 +3510,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3507,8 +3531,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3528,8 +3552,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3549,8 +3573,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOPOS-T2000F",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3570,8 +3594,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3591,8 +3615,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR2010",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3612,8 +3636,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440E",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3633,8 +3657,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP80",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3654,8 +3678,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP100",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3675,8 +3699,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP130",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3696,8 +3720,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP165",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3717,8 +3741,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP210",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3738,8 +3762,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP150R",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3759,8 +3783,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP185R",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3780,8 +3804,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP100B",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3801,8 +3825,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3822,8 +3846,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP7",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3843,8 +3867,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3864,8 +3888,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3885,8 +3909,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP25-12",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3906,8 +3930,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP25",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3927,8 +3951,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP35L",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3948,8 +3972,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP20HL",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3969,8 +3993,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP50",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -3990,8 +4014,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP88",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4011,8 +4035,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP110",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4032,8 +4056,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180-120",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4053,8 +4077,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4074,8 +4098,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP215",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4095,8 +4119,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP225",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4116,8 +4140,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP250",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4137,8 +4161,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP280",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:09Z",
+      "last_updated_utc": "2026-11-14T13:52:09Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4158,8 +4182,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4179,8 +4203,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4200,8 +4224,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP25",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4221,8 +4245,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4242,8 +4266,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4263,8 +4287,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4284,8 +4308,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOWELD-X350",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4305,8 +4329,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4326,8 +4350,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4347,8 +4371,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4368,8 +4392,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4389,8 +4413,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4410,8 +4434,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL15D(S)-875",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4431,8 +4455,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL15D(S)-1600",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4452,8 +4476,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL15D(S)W-875",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4473,8 +4497,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL15D(S)W-1400",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4494,8 +4518,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4515,8 +4539,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL15DW-2400",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4536,8 +4560,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4557,8 +4581,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL1200D(S)-1600",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4578,8 +4602,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL1200D(S)-1200",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4599,8 +4623,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4620,8 +4644,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL1200D(S)-2400",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4641,8 +4665,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL2200D(S)-1840",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4662,8 +4686,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFL2200D(S)-2440",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4683,8 +4707,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4704,8 +4728,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4725,8 +4749,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4746,8 +4770,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4767,8 +4791,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4788,8 +4812,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4809,8 +4833,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4830,8 +4854,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4851,8 +4875,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4872,8 +4896,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4893,8 +4917,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4914,8 +4938,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4935,8 +4959,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4956,8 +4980,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4977,8 +5001,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -4998,8 +5022,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MFS2500D-4000",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5019,8 +5043,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5040,8 +5064,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180-120",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5061,8 +5085,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180-120",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5082,8 +5106,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5103,8 +5127,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5124,8 +5148,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5145,8 +5169,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP80",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5166,8 +5190,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5187,8 +5211,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5208,8 +5232,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5229,8 +5253,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL80",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5250,8 +5274,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL190",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5271,8 +5295,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL190",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5292,8 +5316,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL320",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5313,8 +5337,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL500",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5334,8 +5358,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL800",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5355,8 +5379,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5376,8 +5400,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440E",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5397,8 +5421,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GA50",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5418,8 +5442,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5439,8 +5463,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5460,8 +5484,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5481,8 +5505,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP50",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5502,8 +5526,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP88",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5523,8 +5547,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5544,8 +5568,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP225",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5565,8 +5589,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP215",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5586,8 +5610,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP250",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5607,8 +5631,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5628,8 +5652,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP25",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5649,8 +5673,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5670,8 +5694,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400",
-      "first_discovered_utc": "2026-11-03T06:29:33Z",
-      "last_updated_utc": "2026-11-03T06:29:33Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5691,8 +5715,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5712,8 +5736,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5733,8 +5757,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR2010",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5754,8 +5778,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR2010",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5775,8 +5799,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5796,8 +5820,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5817,8 +5841,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5838,8 +5862,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5859,8 +5883,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5880,8 +5904,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5901,8 +5925,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5922,8 +5946,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP7",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5943,8 +5967,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP20HL",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5964,8 +5988,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP35L",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -5985,8 +6009,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6006,8 +6030,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP165",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6027,8 +6051,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP150R",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6048,8 +6072,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP210",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6069,8 +6093,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP185R",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6090,8 +6114,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6111,8 +6135,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP280",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6132,8 +6156,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP210",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6153,8 +6177,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPK2F",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6174,8 +6198,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPK2F-5",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6195,8 +6219,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPP3H",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6216,8 +6240,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP4",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6237,8 +6261,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6258,8 +6282,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP7",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6279,8 +6303,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6300,8 +6324,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6321,8 +6345,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6342,8 +6366,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6363,8 +6387,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6384,8 +6408,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6405,8 +6429,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6426,8 +6450,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6447,8 +6471,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6468,8 +6492,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6489,8 +6513,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6510,8 +6534,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6531,8 +6555,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6552,8 +6576,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6573,8 +6597,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6594,8 +6618,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MCL20",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6615,8 +6639,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MCL50",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6636,8 +6660,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MCL130",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6657,8 +6681,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MCL165",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6678,8 +6702,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MCL165-100",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6699,8 +6723,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6720,8 +6744,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:10Z",
+      "last_updated_utc": "2026-11-14T13:52:10Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6741,8 +6765,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6762,8 +6786,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6783,8 +6807,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6804,8 +6828,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6825,8 +6849,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6846,8 +6870,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6867,8 +6891,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6888,8 +6912,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6909,8 +6933,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6930,8 +6954,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6951,8 +6975,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6972,8 +6996,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -6993,8 +7017,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7014,8 +7038,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7035,8 +7059,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7056,8 +7080,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7077,8 +7101,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7098,8 +7122,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7119,8 +7143,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7140,8 +7164,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7161,8 +7185,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7182,8 +7206,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7203,8 +7227,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7224,8 +7248,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7245,8 +7269,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7266,8 +7290,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7287,8 +7311,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7308,8 +7332,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7329,8 +7353,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD10S",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7350,8 +7374,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD20S",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7371,8 +7395,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD35S",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7392,8 +7416,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7413,8 +7437,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD10D",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7434,8 +7458,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD20D",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7455,8 +7479,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD35D",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7476,8 +7500,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "SEMISTAR-VD40D",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7497,8 +7521,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7518,8 +7542,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX1150",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7539,8 +7563,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7560,8 +7584,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX2600",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7581,8 +7605,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7602,8 +7626,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-MPX3500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7623,8 +7647,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7644,8 +7668,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP7",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7665,8 +7689,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7686,8 +7710,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP8",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7707,8 +7731,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7728,8 +7752,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7749,8 +7773,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP12",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7770,8 +7794,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7791,8 +7815,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP25",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7812,8 +7836,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7833,8 +7857,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7854,8 +7878,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7875,8 +7899,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP20HL",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7896,8 +7920,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP50",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7917,8 +7941,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP35L",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7938,8 +7962,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7959,8 +7983,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -7980,8 +8004,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8001,8 +8025,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8022,8 +8046,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8043,8 +8067,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP400",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8064,8 +8088,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8085,8 +8109,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8106,8 +8130,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8127,8 +8151,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8148,8 +8172,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8169,8 +8193,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR1440",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8190,8 +8214,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR2010",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8211,8 +8235,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-AR2010",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8232,8 +8256,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP165",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8253,8 +8277,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP150R",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8274,8 +8298,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP210",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8295,8 +8319,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8316,8 +8340,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP235",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8337,8 +8361,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP185R",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8358,8 +8382,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8379,8 +8403,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP165-105",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8400,8 +8424,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP80",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8421,8 +8445,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SP130",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8442,8 +8466,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL80",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8463,8 +8487,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL190",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8484,8 +8508,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL320",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8505,8 +8529,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-PL500",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8526,8 +8550,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP88",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8547,8 +8571,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8568,8 +8592,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP180",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8589,8 +8613,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP225",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8610,8 +8634,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-GP215",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8631,8 +8655,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-DX1350D",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8652,8 +8676,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SIA10D/10F",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8673,8 +8697,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SIA20D/20F",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8694,8 +8718,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SDA10D/10F",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8715,8 +8739,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": "MOTOMAN-SDA20D/20F",
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8736,8 +8760,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }
@@ -8757,8 +8781,8 @@
       "category": "Robotics",
       "product_category": "Robotics",
       "replacement": null,
-      "first_discovered_utc": "2026-11-03T06:29:34Z",
-      "last_updated_utc": "2026-11-03T06:29:34Z",
+      "first_discovered_utc": "2026-11-14T13:52:11Z",
+      "last_updated_utc": "2026-11-14T13:52:11Z",
       "metadata": {
         "region": "Japan / Global"
       }

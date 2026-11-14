@@ -1,0 +1,36 @@
+{
+  "vendor_id": "danfoss_drives",
+  "vendor_name": "Danfoss Drives",
+  "total_records": 1,
+  "products": [
+    {
+      "fingerprint": "81f477693262668b",
+      "vendor_name": "Danfoss Drives",
+      "model_name": "VLT 2800",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Inactive",
+      "stage": "Inactive",
+      "vendor_status": "Inactive",
+      "stage_date_utc": "2026-10-15T00:00:00Z",
+      "source_url": "https://www.danfoss.com/en-in/products/dds/low-voltage-drives/vlt-and-vacon-legacy-drives/vlt-2800/",
+      "category": "Low-voltage drive",
+      "product_category": "Low-voltage drive",
+      "replacement": "VLT Midi Drive FC 280",
+      "first_discovered_utc": "2026-11-14T13:52:22Z",
+      "last_updated_utc": "2026-11-14T13:52:22Z",
+      "metadata": {
+        "replacement": "VLT Midi Drive FC 280",
+        "family": "Low-voltage drive",
+        "source_url": "https://www.danfoss.com/en-in/products/dds/low-voltage-drives/vlt-and-vacon-legacy-drives/vlt-2800/",
+        "bulletin_title": "Official Lifecycle Notice",
+        "raw_stage_label": "Inactive",
+        "missing_date": true,
+        "notes": "The product is discontinued and no longer in production. Spare parts and service options are no longer available.",
+        "fallback_date_applied": true,
+        "region": "Global"
+      }
+    }
+  ]
+}

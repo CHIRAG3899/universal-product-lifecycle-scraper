@@ -1,0 +1,30 @@
+{
+  "vendor_id": "hirschmann_belden",
+  "vendor_name": "Hirschmann (Belden)",
+  "total_records": 1,
+  "products": [
+    {
+      "fingerprint": "912fc7012429938b",
+      "vendor_name": "Hirschmann (Belden)",
+      "model_name": "72654",
+      "aliases": "Neckartenzlingen St. Louis",
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2026-10-15T00:00:00Z",
+      "source_url": "https://catalog.belden.com/prodimgs/AllAssets-approved/std.lang.all/6-/en/PDN-BAT-Family-11n-2024-06-EN.pdf",
+      "category": "OT",
+      "product_category": "OT",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:53:37Z",
+      "last_updated_utc": "2026-11-14T13:53:37Z",
+      "metadata": {
+        "missing_date": true,
+        "fallback_date_applied": true,
+        "region": "EMEA and North America"
+      }
+    }
+  ]
+}

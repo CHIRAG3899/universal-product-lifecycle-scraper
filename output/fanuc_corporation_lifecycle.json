@@ -1,7 +1,7 @@
 {
   "vendor_id": "fanuc_corporation",
   "vendor_name": "FANUC Corporation",
-  "total_records": 208,
+  "total_records": 210,
   "products": [
     {
       "fingerprint": "383e763b8e1ec6e3",
@@ -4576,6 +4576,56 @@
       "last_updated_utc": "2026-11-03T06:23:08Z",
       "metadata": {
         "missing_date": true,
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "7bc4459b69217a31",
+      "vendor_name": "FANUC Corporation",
+      "model_name": "31-b5-plus",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2026-08-14T00:00:00Z",
+      "source_url": "https://www.fanucamerica.com/products/cnc/31-b5-plus",
+      "category": "Robotics & CNC Automation",
+      "product_category": "Robotics & CNC Automation",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:39:26Z",
+      "last_updated_utc": "2026-11-14T13:39:26Z",
+      "metadata": {
+        "lastmod": "2026-08-14T11:49:31-04:00",
+        "page_creation_date": "2026-08-14T11:49:31-04:00",
+        "missing_date": true,
+        "fallback_date_applied": true,
+        "region": "Global"
+      }
+    },
+    {
+      "fingerprint": "7036a07b284d2308",
+      "vendor_name": "FANUC Corporation",
+      "model_name": "502i-a",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2026-09-22T00:00:00Z",
+      "source_url": "https://www.fanucamerica.com/products/cnc/502i-a",
+      "category": "Robotics & CNC Automation",
+      "product_category": "Robotics & CNC Automation",
+      "replacement": null,
+      "first_discovered_utc": "2026-11-14T13:39:26Z",
+      "last_updated_utc": "2026-11-14T13:39:26Z",
+      "metadata": {
+        "lastmod": "2026-09-22T16:44:03-04:00",
+        "page_creation_date": "2026-09-22T16:44:03-04:00",
+        "missing_date": true,
+        "fallback_date_applied": true,
         "region": "Global"
       }
     }
