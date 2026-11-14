@@ -19,9 +19,11 @@ from scraper.dlq import DeadLetterQueue
 from scraper.models import (
     GENERIC_PRODUCT_CATEGORY_TOKENS,
     ProductRecord,
+    extract_candidate_article_or_page_date,
     is_valid_product_model,
     is_valid_replacement_model,
     parse_to_utc_iso,
+    resolve_fallback_stage_date,
 )
 from scraper.security import clean_csv_field
 from scraper.state import VendorRunState
@@ -336,7 +338,10 @@ class BaseScrapingStrategy(ABC):
                 raw_replacement_category
             )
         if not clean_date:
+            cand_dt = extract_candidate_article_or_page_date(meta)
+            clean_date = resolve_fallback_stage_date(None, candidate_date=cand_dt, metadata=meta)
             meta["missing_date"] = True
+            meta["fallback_date_applied"] = True
 
         return ProductRecord(
             vendor_name=vendor_name,

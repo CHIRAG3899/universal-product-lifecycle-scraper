@@ -1,15 +1,15 @@
 # Multi-Vendor Lifecycle Scraper - Coverage & Delta Tracker
 
-> **Last Synchronized:** `2026-11-03T08:18:38.884156+00:00`
+> **Last Synchronized:** `2026-11-14T12:41:31.385326+00:00`
 
 ## 1. Global Coverage Summary
 
 - **Total Vendors Monitored:** `18`
-- **Total Covered Endpoints/URLs:** `42,204`
-- **Total Unique Models Harvested:** `44,570`
-- **Total Master Records:** `58,504`
-- **Latest Run Vendor:** `eaton` (Cycle 1)
-- **Latest Run Delta:** `+1` new URLs, `+151` new models, `+157` records
+- **Total Covered Endpoints/URLs:** `43,243`
+- **Total Unique Models Harvested:** `45,608`
+- **Total Master Records:** `59,542`
+- **Latest Run Vendor:** `eaton` (Cycle 2)
+- **Latest Run Delta:** `+1039` new URLs, `+1038` new models, `+1038` records
 
 ---
 
@@ -21,7 +21,7 @@
 | `advantech` | 1 | 1,502 | **1,500** | 1,500 | 0 | 1,500 | `ACTIVE_DATA` | `+1502 URLs / +1500 models` | `2026-11-03T06:36:49` |
 | `beckhoff` | 1 | 193 | **647** | 1,299 | 647 | 0 | `ACTIVE_DATA` | `+0 URLs / +0 models` | `2026-11-03T04:40:42` |
 | `cisco_meraki` | 1 | 144 | **218** | 1,200 | 368 | 0 | `ACTIVE_DATA` | `+0 URLs / +0 models` | `2026-11-03T04:00:50` |
-| `eaton` | 1 | 11 | **160** | 174 | 151 | 6 | `ACTIVE_DATA` | `+1 URLs / +151 models` | `2026-11-03T08:18:38` |
+| `eaton` | 2 | 1,050 | **1,198** | 1,212 | 151 | 1,044 | `ACTIVE_DATA` | `+1039 URLs / +1038 models` | `2026-11-14T12:41:30` |
 | `emerson` | 1 | 1 | **158** | 158 | 158 | 0 | `ACTIVE_DATA` | `+1 URLs / +158 models` | `2026-11-03T04:20:38` |
 | `fanuc` | 1 | 214 | **208** | 208 | 21 | 187 | `ACTIVE_DATA` | `+214 URLs / +208 models` | `2026-11-03T06:25:31` |
 | `keyence` | 1 | 1,502 | **1,500** | 1,501 | 1 | 1,499 | `ACTIVE_DATA` | `+1502 URLs / +1500 models` | `2026-11-03T06:42:30` |
@@ -71,11 +71,16 @@
 - **Newly Discovered Models in Latest Run:** None
 
 ### Vendor: `eaton`
-- **Total URLs:** 11 | **Total Models:** 160
-- **Newly Discovered URLs in Latest Run (1):**
-  - `https://www.eaton.com/in/en-us/products/electronic-components/eol-notifications.html`
+- **Total URLs:** 1050 | **Total Models:** 1198
+- **Newly Discovered URLs in Latest Run (1039):**
+  - `https://www.eaton.com/us/en-us/catalog/aerial-refueling/ma-2.html`
+  - `https://www.eaton.com/us/en-us/catalog/aerial-refueling/ma-3.html`
+  - `https://www.eaton.com/us/en-us/catalog/aerial-refueling/ma-4.html`
+  - `https://www.eaton.com/us/en-us/catalog/aerospace-conveyance/1817-series.html`
+  - `https://www.eaton.com/us/en-us/catalog/aerospace-conveyance/601-ae701-series-hose.html`
+  - *...and 1034 more URLs*
 - **Newly Discovered Models Sample (50):**
-  `41206ESDA-TR1`, `0402ESDA-MLPT`, `0603ESDA-TR1`, `0805ESDA-TR1`, `C310FH- EOL`, `TDC180- EOL BLANK PACKAGING OPTION`, `6125TD`, `6125FF`, `TCP70 TELECOM FUSE`, `A304 FAMILY 1/4 X 1-1/4 GLASS FUSE`, `VARIOUS CUT BASE 1/4 FUSE BLOCKS`, `TDC17`
+  `MA-2`, `MA-3`, `MA-4`, `1817-SERIES`, `601-AE701-SERIES-HOSE`, `666-667-SERIES-HOSE`, `AE246-SERIES-HOSE`, `AE318-AE333-SERIES-HOSE`, `AE334-SERIES-HOSE`, `AE641-SERIES-HOSE`, `AE645-SERIES-HOSE`, `EXCEDER-LED-3-HORN-STROBES`
   *(and 38 more models)*
 
 ### Vendor: `emerson`
@@ -235,6 +240,7 @@
 
 | Timestamp (UTC) | Vendor ID | Cycle | New URLs | New Models | New Records | Cumulative Models | Cumulative Records |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| `2026-11-14T12:41:30` | `eaton` | 2 | +1039 | +1038 | +1038 | 1,198 | 1,212 |
 | `2026-11-03T08:18:38` | `eaton` | 1 | +1 | +151 | +157 | 160 | 174 |
 | `2026-11-03T08:13:15` | `rockwell_automation` | 1 | +22946 | +22836 | +29061 | 30,997 | 40,405 |
 | `2026-11-03T07:20:46` | `rockwell_automation` | 1 | +2857 | +2747 | +2911 | 8,161 | 11,344 |
@@ -259,4 +265,3 @@
 | `2026-11-03T04:28:46` | `beckhoff` | 1 | +1 | +0 | +0 | 0 | 0 |
 | `2026-11-03T04:24:10` | `abb` | 1 | +0 | +14 | +14 | 16 | 16 |
 | `2026-11-03T04:22:15` | `abb` | 1 | +2 | +2 | +2 | 2 | 2 |
-| `2026-11-03T04:21:32` | `siemens` | 1 | +4 | +67 | +67 | 67 | 67 |

@@ -14,11 +14,13 @@ import pandas as pd
 
 from scraper.models import (
     ProductRecord,
+    extract_candidate_article_or_page_date,
     extract_date_from_bulletin_code,
     is_valid_product_model,
     is_valid_replacement_model,
     is_well_known_os_or_software,
     parse_to_utc_iso,
+    resolve_fallback_stage_date,
     sanitize_alias_string,
     sanitize_replacement_string,
 )
@@ -216,7 +218,7 @@ class MasterStorageManager:
                                 d_utc = parsed_d
                                 row_dict["stage_date_utc"] = parsed_d
                     else:
-                        # Attempt date recovery from bulletin metadata
+                        # Attempt date recovery from bulletin metadata or candidate fallback
                         meta_raw = row_dict.get("metadata", "{}")
                         try:
                             meta_obj = json.loads(meta_raw) if isinstance(meta_raw, str) else {}
@@ -226,11 +228,14 @@ class MasterStorageManager:
                                 d_utc = recovered
                                 row_dict["stage_date_utc"] = recovered
                             else:
-                                d_utc = ""
-                                row_dict["stage_date_utc"] = ""
+                                cand_dt = extract_candidate_article_or_page_date(meta_obj)
+                                fb_dt = resolve_fallback_stage_date(None, candidate_date=cand_dt, metadata=meta_obj)
+                                d_utc = fb_dt
+                                row_dict["stage_date_utc"] = fb_dt
                         except Exception:
-                            d_utc = ""
-                            row_dict["stage_date_utc"] = ""
+                            fb_dt = resolve_fallback_stage_date(None)
+                            d_utc = fb_dt
+                            row_dict["stage_date_utc"] = fb_dt
 
                     # Recompute deterministic canonical case-insensitive SHA-256 hash
                     model_part = (model or os_val).strip().upper()
@@ -284,19 +289,25 @@ class MasterStorageManager:
             if not status_val or status_val.lower() in ("n/a", "none", "null", "nan") or len(status_val) > 40:
                 continue
 
-            # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
+            # Missing date fallback logic: use article, page creation, or release date (at least 1 month old), or 1 month old from current date
+            meta = dict(p.metadata or {})
             if d_utc and d_utc.lower() not in ("n/a", "none", "null", "nan", ""):
                 if not (d_utc.endswith("Z") and "T" in d_utc):
                     parsed = parse_to_utc_iso(d_utc)
                     if parsed:
                         d_utc = parsed
+                    else:
+                        cand_d = extract_candidate_article_or_page_date(meta)
+                        d_utc = resolve_fallback_stage_date(None, candidate_date=cand_d, metadata=meta)
+                        meta["fallback_date_applied"] = True
             else:
-                d_utc = ""
+                cand_d = extract_candidate_article_or_page_date(meta)
+                d_utc = resolve_fallback_stage_date(None, candidate_date=cand_d, metadata=meta)
+                meta["fallback_date_applied"] = True
 
             model_part = (m_name or p.os or "").strip().upper()
             fp_key = f"{v_name.strip().upper()}|{model_part}|{status_val.strip().upper()}|{d_utc.strip()}"
             fp = hashlib.sha256(fp_key.encode("utf-8")).hexdigest()[:16]
-            meta = dict(p.metadata or {})
 
             # Consolidate all secondary attributes cleanly into metadata dictionary
             if p.first_discovered_utc:
@@ -389,24 +400,32 @@ class MasterStorageManager:
                     export_df = export_df.dropna(subset=[col])
                     export_df = export_df[~export_df[col].astype(str).str.strip().str.lower().isin(["", "nan", "none", "null", "n/a"])]
 
-            # Clean stage_date_utc: keep valid dates or normalize to empty string (never drop records for missing dates)
+            # Clean stage_date_utc: keep valid dates or populate fallback (never drop records for missing dates)
             if "stage_date_utc" in export_df.columns:
                 export_df["stage_date_utc"] = export_df["stage_date_utc"].fillna("").astype(str).str.strip()
                 export_df["stage_date_utc"] = export_df["stage_date_utc"].apply(
-                    lambda v: "" if v.lower() in ("nan", "none", "null", "n/a", "unknown", "tbd") else v
+                    lambda v: resolve_fallback_stage_date(None) if v.lower() in ("nan", "none", "null", "n/a", "unknown", "tbd", "") else v
                 )
 
             # model_name must be non-empty unless software/well-known OS
             if "model_name" in export_df.columns:
-                def _is_valid_row_model(r):
-                    m = str(r.get("model_name") or "").strip()
-                    c = str(r.get("category") or "").strip()
-                    o = str(r.get("os") or "").strip()
-                    if is_well_known_os_or_software(category=c, os_name=o, model_name=m):
-                        return True if not m else (m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m))
-                    return bool(m and m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m))
+                m_series = export_df["model_name"].astype(str).str.strip()
+                c_series = export_df["category"].astype(str).str.strip() if "category" in export_df.columns else pd.Series([""] * len(export_df))
+                o_series = export_df["os"].astype(str).str.strip() if "os" in export_df.columns else pd.Series([""] * len(export_df))
 
-                valid_mask = export_df.apply(_is_valid_row_model, axis=1)
+                # Fast memoized check over unique (model, category, os) combinations
+                unique_combos = pd.DataFrame({"m": m_series, "c": c_series, "o": o_series}).drop_duplicates()
+                valid_combo_set = set()
+                for _, r in unique_combos.iterrows():
+                    m, c, o = r["m"], r["c"], r["o"]
+                    if is_well_known_os_or_software(category=c, os_name=o, model_name=m):
+                        if not m or (m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m)):
+                            valid_combo_set.add((m, c, o))
+                    elif m and m.lower() not in ("nan", "none", "null", "n/a") and is_valid_product_model(m):
+                        valid_combo_set.add((m, c, o))
+
+                row_combos = list(zip(m_series, c_series, o_series))
+                valid_mask = [combo in valid_combo_set for combo in row_combos]
                 export_df = export_df[valid_mask]
 
             # Clean string columns: purge any residual 'nan', 'none', 'null', boilerplate or date leaks
@@ -454,16 +473,15 @@ class MasterStorageManager:
             eol_df = export_df[eol_mask]
             active_candidate_df = export_df[~eol_mask]
             if not eol_df.empty and not active_candidate_df.empty:
-                eol_keys = set(
-                    (str(r.get("vendor_name", "")).strip().upper(), str(r.get("model_name", "")).strip().upper())
-                    for r in eol_df.to_dict("records")
+                eol_key_set = set(
+                    eol_df["vendor_name"].astype(str).str.strip().str.upper() + "|||" +
+                    eol_df["model_name"].astype(str).str.strip().str.upper()
                 )
-                active_df = active_candidate_df[
-                    ~active_candidate_df.apply(
-                        lambda r: (str(r["vendor_name"]).strip().upper(), str(r["model_name"]).strip().upper()) in eol_keys,
-                        axis=1
-                    )
-                ]
+                act_keys = (
+                    active_candidate_df["vendor_name"].astype(str).str.strip().str.upper() + "|||" +
+                    active_candidate_df["model_name"].astype(str).str.strip().str.upper()
+                )
+                active_df = active_candidate_df[~act_keys.isin(eol_key_set)]
             else:
                 active_df = active_candidate_df
         else:

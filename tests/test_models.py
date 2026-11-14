@@ -10,7 +10,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
-from scraper.models import ProductRecord, is_valid_product_model, normalize_firmware_version, parse_to_utc_iso
+from scraper.models import (
+    ProductRecord,
+    is_valid_product_model,
+    normalize_firmware_version,
+    parse_to_utc_iso,
+    resolve_fallback_stage_date,
+)
 
 
 class TestModels(unittest.TestCase):
@@ -417,17 +423,22 @@ class TestModels(unittest.TestCase):
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="", stage="", vendor_status="", stage_date_utc="2026-09-30")
 
-        # 4. stage_date_utc missing/empty/None: MUST NOT drop record, sets stage_date_utc=None and metadata.missing_date=True
+        # 4. stage_date_utc missing/empty/None: MUST NOT drop record, populates fallback date (at least 1 month old) and metadata.missing_date=True
         rec_empty = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="")
-        self.assertIsNone(rec_empty.stage_date_utc)
+        self.assertIsNotNone(rec_empty.stage_date_utc)
+        self.assertTrue(rec_empty.stage_date_utc.endswith("Z"))
         self.assertTrue(rec_empty.metadata.get("missing_date"))
+        self.assertTrue(rec_empty.metadata.get("fallback_date_applied"))
 
         rec_none = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc=None)
-        self.assertIsNone(rec_none.stage_date_utc)
+        self.assertIsNotNone(rec_none.stage_date_utc)
+        self.assertTrue(rec_none.stage_date_utc.endswith("Z"))
         self.assertTrue(rec_none.metadata.get("missing_date"))
+        self.assertTrue(rec_none.metadata.get("fallback_date_applied"))
 
         rec_unparseable = ProductRecord(vendor_name="Mitsubishi Electric", model_name="FX2N-16MR", status="Discontinued", stage_date_utc="not-a-date")
-        self.assertIsNone(rec_unparseable.stage_date_utc)
+        self.assertIsNotNone(rec_unparseable.stage_date_utc)
+        self.assertTrue(rec_unparseable.stage_date_utc.endswith("Z"))
 
     def test_bulletin_code_date_recovery(self):
         """Verifies that stage_date_utc is automatically recovered from bulletin code in metadata if not directly passed."""
@@ -531,7 +542,8 @@ class TestModels(unittest.TestCase):
         with self.assertRaises(ValueError):
             ProductRecord(vendor_name="", model_name="", category="Operating System", os="Windows 7", status="End of Support", stage_date_utc="2020-01-14")
         win_undated = ProductRecord(vendor_name="Microsoft", model_name="", category="Operating System", os="Windows 7", status="End of Support", stage_date_utc="")
-        self.assertIsNone(win_undated.stage_date_utc)
+        self.assertIsNotNone(win_undated.stage_date_utc)
+        self.assertTrue(win_undated.stage_date_utc.endswith("Z"))
 
 
 
@@ -587,6 +599,89 @@ class TestModels(unittest.TestCase):
             stage_date_utc="2023-08-17"
         )
         self.assertEqual(rec.aliases, "GOT2000 Wireless LAN Unit, GT25 WLAN Adapter")
+
+
+    def test_lifecycle_fallback_date_logic(self):
+        """
+        Verifies fallback date resolution according to user directive:
+        - Authentic milestone dates must NEVER be overwritten.
+        - Fallback uses article, page creation, or release date if at least 1 month old (>= 30 days).
+        - If candidate date is less than 1 month old or missing, uses 1 month old from current date.
+        """
+        from datetime import datetime, timedelta, timezone
+
+        ref_now = datetime(2026, 11, 14, 12, 0, 0, tzinfo=timezone.utc)
+        expected_30_days_ago = "2026-10-15T00:00:00Z"
+
+        # 1. Authentic milestone date is present -> Strictly preserved without modification
+        self.assertEqual(
+            resolve_fallback_stage_date("2024-05-01T00:00:00Z", reference_now=ref_now),
+            "2024-05-01T00:00:00Z"
+        )
+        self.assertEqual(
+            resolve_fallback_stage_date("2023-11-20", reference_now=ref_now),
+            "2023-11-20T00:00:00Z"
+        )
+
+        # 2. Candidate article date is older than 30 days -> Candidate date is used
+        self.assertEqual(
+            resolve_fallback_stage_date(None, candidate_date="2023-01-15", reference_now=ref_now),
+            "2023-01-15T00:00:00Z"
+        )
+        self.assertEqual(
+            resolve_fallback_stage_date("", metadata={"article_date": "2022-06-30"}, reference_now=ref_now),
+            "2022-06-30T00:00:00Z"
+        )
+        self.assertEqual(
+            resolve_fallback_stage_date(None, metadata={"page_creation_date": "2024-01-01T00:00:00Z"}, reference_now=ref_now),
+            "2024-01-01T00:00:00Z"
+        )
+        self.assertEqual(
+            resolve_fallback_stage_date(None, metadata={"release_date": "2021-12-01"}, reference_now=ref_now),
+            "2021-12-01T00:00:00Z"
+        )
+
+        # 3. Candidate date is less than 30 days old (e.g. 5 days ago) -> Clamped to 1 month old from current
+        recent_date = (ref_now - timedelta(days=5)).strftime("%Y-%m-%d")
+        self.assertEqual(
+            resolve_fallback_stage_date(None, candidate_date=recent_date, reference_now=ref_now),
+            expected_30_days_ago
+        )
+
+        # 4. Candidate date is in the future -> Clamped to 1 month old from current
+        future_date = (ref_now + timedelta(days=60)).strftime("%Y-%m-%d")
+        self.assertEqual(
+            resolve_fallback_stage_date(None, candidate_date=future_date, reference_now=ref_now),
+            expected_30_days_ago
+        )
+
+        # 5. Missing / None candidate date -> Clamped to 1 month old from current
+        self.assertEqual(
+            resolve_fallback_stage_date(None, candidate_date=None, metadata={}, reference_now=ref_now),
+            expected_30_days_ago
+        )
+
+        # 6. End-to-end integration with ProductRecord
+        rec_with_art = ProductRecord(
+            vendor_name="Rockwell Automation",
+            model_name="1756-L85E",
+            status="Active",
+            stage_date_utc="",
+            metadata={"article_date": "2023-03-15"}
+        )
+        self.assertEqual(rec_with_art.stage_date_utc, "2023-03-15T00:00:00Z")
+        self.assertTrue(rec_with_art.metadata.get("fallback_date_applied"))
+
+        rec_with_authentic = ProductRecord(
+            vendor_name="Rockwell Automation",
+            model_name="1756-L75",
+            status="End of Life",
+            stage_date_utc="2025-10-31",
+            metadata={"article_date": "2023-03-15"}
+        )
+        # Authentic date must NOT be replaced by article_date
+        self.assertEqual(rec_with_authentic.stage_date_utc, "2025-10-31T00:00:00Z")
+        self.assertFalse(rec_with_authentic.metadata.get("fallback_date_applied", False))
 
 
 if __name__ == "__main__":

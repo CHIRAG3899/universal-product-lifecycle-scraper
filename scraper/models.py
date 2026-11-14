@@ -7,7 +7,7 @@ UTC date normalization, and record fingerprinting for append/upsert operations.
 import calendar
 import hashlib
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -695,6 +695,94 @@ def extract_date_from_bulletin_code(bulletin: Optional[str]) -> Optional[str]:
     return None
 
 
+def extract_candidate_article_or_page_date(metadata: Optional[Dict[str, Any]]) -> Optional[str]:
+    """
+    Extracts article, page creation, release, or sitemap publication dates
+    from metadata dictionary.
+    """
+    if not metadata or not isinstance(metadata, dict):
+        return None
+    candidate_keys = [
+        "article_date",
+        "page_creation_date",
+        "release_date",
+        "publication_date",
+        "published_date",
+        "date_published",
+        "lastmod",
+        "page_date",
+        "created_at",
+        "announcement_date_utc",
+        "news_date",
+        "post_date",
+    ]
+    for key in candidate_keys:
+        val = metadata.get(key)
+        if val and isinstance(val, str) and val.strip():
+            v_clean = val.strip()
+            if v_clean.lower() not in ("nan", "none", "null", "n/a", "unknown", "tbd", "undefined"):
+                return v_clean
+    return None
+
+
+def resolve_fallback_stage_date(
+    current_stage_date: Optional[str],
+    candidate_date: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    reference_now: Optional[datetime] = None,
+) -> str:
+    """
+    Resolves lifecycle stage date with deterministic fallback:
+    1. If an authentic lifecycle date exists, it is strictly preserved without modification.
+    2. If no lifecycle date exists, falls back to article, page creation, or release date.
+       - If that candidate date is at least 1 month old (>= 30 days), it is used.
+       - If it is younger than 1 month old, in the future, or missing, a date exactly
+         1 month old (30 days ago) from current date is used.
+    """
+    now = reference_now if reference_now is not None else datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=30)
+    one_month_ago_iso = cutoff.strftime("%Y-%m-%dT00:00:00Z")
+
+    # Invariant: Never overwrite an existing authentic lifecycle date
+    if current_stage_date and isinstance(current_stage_date, str):
+        c = current_stage_date.strip()
+        if c and c.lower() not in ("nan", "none", "null", "n/a", "unknown", "tbd", "undefined", ""):
+            if c.endswith("Z") and "T" in c:
+                return c
+            parsed_auth = parse_to_utc_iso(c)
+            if parsed_auth:
+                return parsed_auth
+
+    # No authentic lifecycle date found -> Attempt candidate date fallback
+    cand = candidate_date or extract_candidate_article_or_page_date(metadata)
+    if cand and isinstance(cand, str):
+        cand_str = cand.strip()
+        cand_iso = parse_to_utc_iso(cand_str)
+        if cand_iso:
+            try:
+                cand_dt = datetime.strptime(cand_iso[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                if cand_dt <= cutoff:
+                    return cand_iso
+            except Exception:
+                pass
+        else:
+            try:
+                from dateutil import parser as dt_parser
+                parsed_dt = dt_parser.parse(cand_str, fuzzy=True)
+                if parsed_dt.tzinfo is None:
+                    parsed_dt = parsed_dt.replace(tzinfo=timezone.utc)
+                else:
+                    parsed_dt = parsed_dt.astimezone(timezone.utc)
+                if 1970 <= parsed_dt.year <= 2099:
+                    if parsed_dt <= cutoff:
+                        return parsed_dt.strftime("%Y-%m-%dT00:00:00Z")
+            except Exception:
+                pass
+
+    # Younger than 1 month, unparseable, or missing -> exactly 1 month old from current date
+    return one_month_ago_iso
+
+
 def sanitize_alias_string(v: Any) -> Optional[str]:
     """Cleans and validates an aliases string or list of alias candidates."""
     if not v:
@@ -811,7 +899,7 @@ class ProductRecord(BaseModel):
                 if not data.get("stage"):
                     data["stage"] = chosen
 
-            # If stage_date_utc is missing or empty, attempt recovery from bulletin code or metadata
+            # If stage_date_utc is missing or empty, attempt recovery from bulletin code or fallback logic
             dt = data.get("stage_date_utc")
             if not dt or (isinstance(dt, str) and dt.strip().lower() in ("", "n/a", "none", "null", "nan")):
                 b_code = data.get("bulletin_code")
@@ -823,10 +911,13 @@ class ProductRecord(BaseModel):
                 if rec_dt:
                     data["stage_date_utc"] = rec_dt
                 else:
-                    data["stage_date_utc"] = None
                     if "metadata" not in data or not isinstance(data.get("metadata"), dict):
                         data["metadata"] = {}
+                    cand_dt = extract_candidate_article_or_page_date(data.get("metadata"))
+                    fallback_dt = resolve_fallback_stage_date(None, candidate_date=cand_dt, metadata=data.get("metadata"))
+                    data["stage_date_utc"] = fallback_dt
                     data["metadata"]["missing_date"] = True
+                    data["metadata"]["fallback_date_applied"] = True
 
             # Model is allowed empty ONLY for software applications or well-known OS entries (e.g. Linux, Debian, Windows)
             cat = (data.get("category") or data.get("product_category") or "").strip()
@@ -884,14 +975,13 @@ class ProductRecord(BaseModel):
     @field_validator("stage_date_utc", mode="before")
     def validate_utc(cls, v):
         if not v or not isinstance(v, str) or not v.strip() or v.strip().lower() in ("n/a", "none", "null", "nan", "unknown", "tbd", "undefined", ""):
-            return None
+            return resolve_fallback_stage_date(None)
         cleaned = v.strip()
         if cleaned.endswith("Z") and "T" in cleaned:
             return cleaned
         parsed = parse_to_utc_iso(cleaned)
         if not parsed:
-            # Missing or unparseable dates should not drop genuine lifecycle models
-            return None
+            return resolve_fallback_stage_date(None)
         return parsed
 
     @field_validator("replacement", mode="before")

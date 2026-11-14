@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-09T15:10:39.461148+00:00",
+  "updated_utc": "2026-11-14T12:55:32.610951+00:00",
   "vendors": {
     "mitsubishi": {
       "vendor_id": "mitsubishi",
@@ -10,7 +10,7 @@
       "batch_size": 1,
       "batches_completed": 1,
       "batches_remaining": 2,
-      "total_records_harvested": 2585,
+      "total_records_harvested": 2645,
       "eol_records_count": 1470,
       "active_records_count": 0,
       "cross_entrypoint_duplicates_count": 0,
@@ -21,7 +21,7 @@
       "data_status": "ACTIVE_DATA",
       "progress_percent": 33.33,
       "status": "IN_PROGRESS",
-      "last_run_utc": "2026-11-09T15:10:34.684076+00:00"
+      "last_run_utc": "2026-11-14T12:55:28.524211+00:00"
     },
     "schneider_electric": {
       "vendor_id": "schneider_electric",
@@ -393,25 +393,25 @@
     },
     "eaton": {
       "vendor_id": "eaton",
-      "cycle": 1,
-      "total_discovered_units": 3,
-      "completed_units": 2,
+      "cycle": 2,
+      "total_discovered_units": 4,
+      "completed_units": 3,
       "pending_units": 0,
-      "batch_size": 2,
+      "batch_size": 4,
       "batches_completed": 1,
       "batches_remaining": 0,
-      "total_records_harvested": 194,
+      "total_records_harvested": 1232,
       "eol_records_count": 151,
-      "active_records_count": 6,
-      "cross_entrypoint_duplicates_count": 2,
+      "active_records_count": 1044,
+      "cross_entrypoint_duplicates_count": 0,
       "step4_purged_noise_count": 0,
-      "llm_rejected_count": 35,
-      "reconciliation_explanation": "Out of 194 raw records harvested across all entry points, 2 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 35 non-model/noise elements were rejected by the LLM Gate, yielding 157 authentic persisted records (151 EOL, 6 Active).",
+      "llm_rejected_count": 0,
+      "reconciliation_explanation": "Out of 1038 raw records harvested across all entry points, 0 were duplicate SKU milestones across multi-region portals, 0 were purged by sanity checks, and 0 non-model/noise elements were rejected by the LLM Gate, yielding 1038 authentic persisted records (0 EOL, 1038 Active).",
       "has_data": true,
       "data_status": "ACTIVE_DATA",
-      "progress_percent": 66.67,
+      "progress_percent": 75.0,
       "status": "CYCLE_COMPLETE",
-      "last_run_utc": "2026-11-03T08:16:03.908272+00:00"
+      "last_run_utc": "2026-11-14T12:36:47.684713+00:00"
     }
   }
 }

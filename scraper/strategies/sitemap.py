@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlsplit
 
 from bs4 import BeautifulSoup
@@ -256,13 +256,25 @@ class SitemapStrategy(BaseScrapingStrategy):
                                 return clean
                             return None
 
-                        # Fast regex extraction of <loc> tags (0.05s vs 30s BeautifulSoup DOM parsing)
-                        loc_matches = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", c_html)
-                        if not loc_matches:
-                            c_soup = BeautifulSoup(c_html, "html.parser")
-                            loc_matches = [t.get_text().strip() for t in c_soup.find_all("loc")]
+                        # Fast extraction of <url> blocks with <loc> and optional <lastmod>
+                        url_entries: List[Tuple[str, Optional[str]]] = []
+                        raw_url_blocks = re.findall(r"<url>(.*?)</url>", c_html, flags=re.DOTALL | re.IGNORECASE)
+                        if raw_url_blocks:
+                            for u_block in raw_url_blocks:
+                                m_loc = re.search(r"<loc>\s*([^<\s]+)\s*</loc>", u_block, flags=re.IGNORECASE)
+                                if m_loc:
+                                    loc_t = m_loc.group(1).strip()
+                                    m_lmod = re.search(r"<lastmod>\s*([^<\s]+)\s*</lastmod>", u_block, flags=re.IGNORECASE)
+                                    lmod_t = m_lmod.group(1).strip() if m_lmod else None
+                                    url_entries.append((loc_t, lmod_t))
+                        if not url_entries:
+                            loc_matches = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", c_html)
+                            if not loc_matches:
+                                c_soup = BeautifulSoup(c_html, "html.parser")
+                                loc_matches = [t.get_text().strip() for t in c_soup.find_all("loc")]
+                            url_entries = [(loc_item, None) for loc_item in loc_matches]
 
-                        for loc_text in loc_matches:
+                        for loc_text, lastmod_text in url_entries:
                             if max_pages > 0 and (len(records) + len(batch_records)) >= max_pages:
                                 break
 
@@ -271,14 +283,18 @@ class SitemapStrategy(BaseScrapingStrategy):
                                 status_val = "Discontinued" if any(k in loc_text.lower() for k in ("discontinue", "/discon/", "obsolete", "eol", "legacy", "phased-out", "phase-out")) else entry_point.get("default_status")
                                 if not status_val:
                                     continue
+                                extra_m: Optional[Dict[str, Any]] = None
+                                if lastmod_text:
+                                    extra_m = {"lastmod": lastmod_text, "page_creation_date": lastmod_text}
                                 rec = self.create_sanitized_record(
                                     vendor_name=vendor_name,
                                     raw_model=model_sku,
                                     raw_alias=None,
                                     raw_status=status_val,
-                                    raw_date=None,  # Zero-inference: sitemap lastmod is a web page update date, NOT a product lifecycle milestone date
+                                    raw_date=None,
                                     source_url=loc_text,
                                     category=category_name,
+                                    extra_meta=extra_m,
                                 )
                                 if rec:
                                     batch_records.append(rec)
