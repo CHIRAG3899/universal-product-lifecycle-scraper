@@ -4,18 +4,18 @@
 
 Data integrity in enterprise lifecycle intelligence requires absolute authenticity. The scraper operates under a strict **Zero-Inference Doctrine**:
 
-1. **Zero Date Inference**:
-   - `stage_date_utc` must ONLY be populated when an explicit calendar date is stated by the manufacturer for that specific lifecycle milestone.
-   - **Forbidden Practices**:
-     - Never use XML sitemap `<lastmod>` timestamps as product milestone dates. (Sitemap `<lastmod>` reflects web server HTML update time, not product phase transitions).
-     - Never use HTTP `Last-Modified` headers, crawl execution timestamps, or page publication dates.
-     - Never guess year-ends, quarter-ends, or fiscal boundaries unless explicitly noted.
-   - **Missing Date Rule**: If a product is stated as Discontinued / EOL without an explicit milestone date, set `stage_date_utc` to an empty string (`""`) and record `{"missing_date": true}` in `metadata`. Never drop or discard a legitimate product record because its date is missing!
+1. **Deterministic Date Precedence**:
+   - `stage_date_utc` prioritizes explicit calendar dates stated by the manufacturer for that specific lifecycle milestone.
+   - **Fallback Date Rule**: If an authentic lifecycle date exists, it is strictly preserved without modification. If no lifecycle date exists, the framework falls back to article, page creation, or release date (provided it is >= 30 days old). If that candidate date is younger than 30 days, future, or missing, a deterministic date exactly 30 days old from the current date is assigned.
+   - **Zero Date Leaks**: Calendar dates belong exclusively in `stage_date_utc`. Under no circumstances may dates leak into `model_name`, `aliases`, or `replacement`.
 
-2. **Zero Status Inference**:
-   - The `status` field must reflect the authentic lifecycle milestone designated by the vendor.
-   - Never assume or infer "Active" status simply because an HTML page or URL exists on a website.
-   - Never assign default active statuses from config unless the source document or catalog is explicitly titled and structured as an active product portfolio.
+2. **Canonical Status Normalization**:
+   - The `status` column strictly contains one of the 6 Canonical Status ENUMs: `Active`, `Active Mature`, `Phase Out`, `End of Sale`, `End of Support`, or `Obsolete`.
+   - The manufacturer's authentic raw status is preserved losslessly inside `metadata["raw_vendor_status"]`.
+
+3. **Single Record Invariant per Canonical Status**:
+   - For each canonical status, there must be **strictly ONE record per `(vendor_name, model_name, canonical_status)` combination**.
+   - When duplicate records collide on `(vendor, model, canonical_status)`, the record with the latest date is preserved and secondary attributes are merged.
 
 3. **Zero Model Inference from URL Slugs**:
    - Never convert URL path segments (e.g., `/products/ruggedcom/terms/`, `/tools/`, `/timing-relays/`, `/top-connect/`, `/overview/`) into model numbers.
@@ -35,11 +35,11 @@ Data integrity in enterprise lifecycle intelligence requires absolute authentici
 The scraper enforces a strict **Dual-CSV Output Contract**:
 
 1. **`output/eol_products_lifecycle.csv`**:
-   - Contains all records where the product has entered or announced an End-of-Lifecycle stage based on manufacturer terminology:
-     - `Discontinued`, `End of Life (EOL)`, `End of Sale (EOS)`, `End of Support (EOSL)`, `Last Time Buy (LTB)`, `Phase-Out Announced`, `Obsolete`, `Classic`, `Limited`, `Stop Shipment`, `Withdrawal`, `Auslauftyp`, `Produktabkündigung`, `PM400`, `PM410`, `PM490`.
+   - Contains all records where the product has entered or announced an End-of-Lifecycle milestone:
+     - `Phase Out`, `End of Sale`, `End of Support`, `Obsolete`.
 2. **`output/active_products_lifecycle.csv`**:
-   - Contains all records where the product is verified to be in standard active production or commercial delivery:
-     - `Active`, `Active Mature`, `Current`, `Supported`, `Available`, `Delivery Release`.
+   - Contains all records where the product is in standard active production or commercial delivery:
+     - `Active`, `Active Mature`.
 3. **Decommissioned Files**:
    - `output/all_vendors_lifecycle.csv` is permanently removed to prevent accidental consumption of unsegmented data.
 

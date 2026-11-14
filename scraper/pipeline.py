@@ -244,13 +244,22 @@ class LifecyclePipeline:
                     continue
                 seen_canonical_urls.add(canon_url)
 
-                # Auto-assign strategies from newly added roles & recommendations
+                # Auto-assign strategies from crawler types, recommendations, roles, and URL patterns
                 strat = ep.get("strategy")
                 rec_strat = str(ep.get("recommended_crawler_type") or "").lower()
+                c_type = str(ep.get("crawler_type") or "").lower()
+                url_lower = str(url or "").lower()
+
                 if not strat or str(strat).lower() in ("none", "inspect_source_adapter"):
-                    if rec_strat in ("html_table", "dom_table", "html_notice_index", "html_filterable_table") or role in (
+                    if c_type in ("sitemap", "sitemap_auto", "sitemap_index", "sitemap_gzip_auto", "sitemap_probe") or url_lower.endswith((".xml", ".xml.gz")) or "sitemap" in url_lower:
+                        ep["strategy"] = "sitemap"
+                    elif c_type in ("search_portal", "lifecycle_search", "interactive_search") or "product-lifecycle-status" in url_lower:
+                        ep["strategy"] = "search_portal"
+                    elif c_type in ("rest_api", "json_api", "api") or "/api/" in url_lower:
+                        ep["strategy"] = "rest_api"
+                    elif rec_strat in ("html_table", "dom_table", "html_notice_index", "html_filterable_table", "dom_listing") or role in (
                         "dated_eol_notice_index", "dated_model_lifecycle_notice", "dated_model_notice_index",
-                        "direct_model_or_version_status_source", "model_status_table"
+                        "direct_model_or_version_status_source", "model_status_table", "html_table", "dom_table"
                     ):
                         ep["strategy"] = "dom_table"
                     elif rec_strat in ("interactive_search", "search_portal") or role in (
@@ -306,6 +315,8 @@ class LifecyclePipeline:
                 name = ep.get("name", "entry")
                 region = ep.get("region", "Global")
                 strategy_name = str(ep.get("strategy") or ep.get("crawler_type") or "").lower()
+                if strategy_name in ("none", "null"):
+                    strategy_name = ""
 
                 # Unified Strategy Pattern Dispatch
                 is_search_portal = strategy_name in ("search_portal", "lifecycle_search") or (

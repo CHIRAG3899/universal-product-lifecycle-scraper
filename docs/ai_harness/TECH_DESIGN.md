@@ -133,12 +133,17 @@ The pipeline decouples vendor parsing into four pluggable strategy classes exten
 ## 6. Storage & State Persistence (`scraper/storage.py`)
 
 1. **Dual-CSV Partitioning**:
-   - `eol_products_lifecycle.csv`: Filtered via `is_eol_status(status)`.
-   - `active_products_lifecycle.csv`: Filtered via `~is_eol_status(status)`.
-2. **Deterministic Fingerprinting & Deduplication**:
+   - `eol_products_lifecycle.csv`: Products in `{"Phase Out", "End of Sale", "End of Support", "Obsolete"}`.
+   - `active_products_lifecycle.csv`: Products in `{"Active", "Active Mature"}`.
+2. **SQLite Incremental Staging Buffer (`output/staging_buffer.db`)**:
+   - Solves the disk I/O bottleneck in `--all-vendors` runs across 219 vendors.
+   - Crawlers write updates incrementally into an append-only SQLite database using `INSERT ... ON CONFLICT DO UPDATE`.
+   - Dual master CSVs are exported in a single consolidated batch upon completion via `flush_consolidated_csvs()`.
+3. **Deterministic Fingerprinting & Latest-Date Deduplication**:
    - Each record receives a canonical SHA-256 fingerprint:
-     $$\text{Fingerprint} = \text{SHA256}(\text{VENDOR} \parallel \text{MODEL} \parallel \text{STATUS} \parallel \text{DATE})[:16]$$
-   - Ensures idempotent updates without duplicate rows.
-3. **Atomic Safe File Writes**:
-   - Records are written to `.tmp` files and committed via atomic replacement (`safe_atomic_replace`), eliminating partial or corrupt writes.
+     $$\text{Fingerprint} = \text{SHA256}(\text{VENDOR} \parallel \text{MODEL} \parallel \text{CANONICAL\_STATUS})[:16]$$
+   - Guarantees strictly ONE record per `(vendor, model, canonical_status)` milestone.
+   - When milestone collisions occur, `compare_and_select_latest_record` preserves the record with the most recent `stage_date_utc` and losslessly merges non-empty attributes.
+4. **Atomic Safe File Writes**:
+   - CSV and JSON files are written to `.tmp` files and committed via atomic replacement (`safe_atomic_replace`), eliminating partial or corrupt writes.
 

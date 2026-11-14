@@ -88,3 +88,11 @@ When scraping repetitive web structures, leverage Google's native API features t
 - **Cost Impact**: **50% discount** on BOTH input and output tokens across bulk extraction workloads.
 - **Why**: Lifecycle obsolescence audits do not require millisecond interactive latency.
 - **Config**: Enable via CLI flag `--batch-mode` or env `GEMINI_BATCH_MODE=true`. `GeminiExtractor.extract_batch()` packages requests into `InlinedRequest` batch jobs polled until completion.
+
+### 4. Code-First Hybrid Gate (Zero Token Overhead)
+- **Fast Path First**: High-speed regex and BeautifulSoup CSS selectors run first (2ms, \$0 token cost).
+- **Fallback Trigger**: AI models are invoked strictly as a fallback when deterministic parsers extract 0 records from unstructured text or narrative bulletins.
+- **Deterministic Routing**: Structured DOM tables and REST API payloads are never sent to an LLM.
+
+### 5. Strict Pydantic JSON Schemas
+- Set `response_mime_type="application/json"` with `ProductRecord` JSON schema definitions to eliminate markdown fence wrapping and guarantee strict schema compliance.

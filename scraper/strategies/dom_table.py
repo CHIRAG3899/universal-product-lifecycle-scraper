@@ -21,6 +21,7 @@ from dateutil import parser as date_parser
 from scraper.config import HEADLESS_BROWSER
 from scraper.dlq import DeadLetterQueue
 from scraper.models import ProductRecord, is_valid_product_model
+from scraper.security import validate_safe_css_selector
 from scraper.state import VendorRunState
 from scraper.strategies.base import (
     BaseScrapingStrategy,
@@ -325,8 +326,14 @@ class DomTableStrategy(BaseScrapingStrategy):
 
         selectors = entry_point.get("selectors", {})
         table_selector = selectors.get("table", "table")
+        if not validate_safe_css_selector(table_selector):
+            table_selector = "table"
         row_selector = selectors.get("row", "tr")
+        if not validate_safe_css_selector(row_selector):
+            row_selector = "tr"
         wait_selector = selectors.get("wait_for")
+        if wait_selector and not validate_safe_css_selector(wait_selector):
+            wait_selector = None
         col_map = entry_point.get("columns", {})
 
         browser_cfg = BrowserConfig(headless=HEADLESS_BROWSER, verbose=False, user_agent_mode="random")

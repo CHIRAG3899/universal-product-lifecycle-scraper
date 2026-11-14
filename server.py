@@ -21,7 +21,6 @@ sys.path.insert(0, str(BASE_DIR))
 from scraper.config import (
     DEFAULT_ACTIVE_CSV_OUTPUT,
     DEFAULT_CSV_OUTPUT,
-    DEFAULT_JSON_OUTPUT,
     GEMINI_API_KEY,
     GEMINI_MODEL,
 )
@@ -92,7 +91,8 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
             target = ACTIVE_CSV if ACTIVE_CSV.exists() else DEFAULT_ACTIVE_CSV_OUTPUT
             self.handle_export_file(target, "text/csv", "active_products_lifecycle.csv")
         elif path == "/api/export/json":
-            self.handle_export_file(DEFAULT_JSON_OUTPUT, "application/json", "lifecycle_dataset.json")
+            target = OUTPUT_DIR / "eol_products_lifecycle.json"
+            self.handle_export_file(target, "application/json", "eol_products_lifecycle.json")
         else:
             super().do_GET()
 
@@ -217,7 +217,7 @@ class ScraperAPIHandler(SimpleHTTPRequestHandler):
         # Check master vendor json or default output json
         target_json = OUTPUT_DIR / "mitsubishi_electric_lifecycle.json"
         if not target_json.exists():
-            target_json = DEFAULT_JSON_OUTPUT
+            target_json = OUTPUT_DIR / "eol_products_lifecycle.json"
 
         if not target_json.exists():
             if MASTER_CSV.exists():

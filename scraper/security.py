@@ -468,3 +468,31 @@ def sanitize_crawl_url(raw_url: str) -> str:
     return clean
 
 
+def validate_safe_css_selector(selector: Optional[str]) -> bool:
+    """
+    Validates CSS selectors against polynomial ReDoS (Catastrophic Backtracking) vulnerabilities
+    (guards against CVE-2026-126190, CVE-2026-126191, and CVE-2026-126193).
+    Rejects nested pseudo-classes, deeply chained combinators, and unbounded wildcard repetitions.
+    """
+    if not selector or not isinstance(selector, str):
+        return True
+    sel = selector.strip()
+    if not sel:
+        return True
+    # Length guard
+    if len(sel) > 250:
+        return False
+    # Reject deeply nested pseudo-classes: :not(:not(...)), :is(:is(...)), :has(:has(...))
+    if re.search(r':(?:not|is|has|where)\s*\([^)]*:(?:not|is|has|where)', sel, re.IGNORECASE):
+        return False
+    # Reject catastrophic backtracking on wildcard / universal combinator repetitions
+    if re.search(r'(?:\*\s+){4,}', sel):
+        return False
+    # Reject unbalanced brackets or quotes
+    if sel.count("(") != sel.count(")") or sel.count("[") != sel.count("]"):
+        return False
+    if sel.count('"') % 2 != 0 or sel.count("'") % 2 != 0:
+        return False
+    return True
+
+

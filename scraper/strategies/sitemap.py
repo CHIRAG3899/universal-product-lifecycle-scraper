@@ -33,11 +33,21 @@ def stream_iterparse_sitemap_urls(xml_data: Union[str, bytes]) -> Iterator[Tuple
     """
     Streaming XML parser using xml.etree.ElementTree.iterparse with O(1) memory consumption.
     Extracts <loc> and <lastmod> pairs on the fly and immediately frees element DOM tree memory.
+    Automatically decompresses gzip-compressed payloads (.xml.gz) transparently.
     """
     if isinstance(xml_data, str):
         raw_bytes = xml_data.encode("utf-8", errors="ignore")
     else:
         raw_bytes = xml_data
+
+    # Transparent gzip decompression if magic header is present
+    if raw_bytes[:2] == b"\x1f\x8b":
+        import gzip
+        try:
+            raw_bytes = gzip.decompress(raw_bytes)
+        except Exception as gz_err:
+            logger.warning(f"Failed to decompress gzip sitemap payload: {gz_err}")
+            return
 
     bio = io.BytesIO(raw_bytes)
     yielded = 0

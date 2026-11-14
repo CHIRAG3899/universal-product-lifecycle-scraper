@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-11-14T17:23:53.451838+00:00",
+  "updated_utc": "2026-11-14T18:05:02.876668+00:00",
   "vendors": {
     "mitsubishi": {
       "vendor_id": "mitsubishi",
@@ -10,7 +10,7 @@
       "batch_size": 1,
       "batches_completed": 1,
       "batches_remaining": 3,
-      "total_records_harvested": 6648,
+      "total_records_harvested": 6717,
       "eol_records_count": 1422,
       "active_records_count": 0,
       "cross_entrypoint_duplicates_count": 0,
@@ -21,7 +21,7 @@
       "data_status": "ACTIVE_DATA",
       "progress_percent": 25.0,
       "status": "IN_PROGRESS",
-      "last_run_utc": "2026-11-14T17:23:45.017159+00:00"
+      "last_run_utc": "2026-11-14T18:04:56.907892+00:00"
     },
     "schneider_electric": {
       "vendor_id": "schneider_electric",

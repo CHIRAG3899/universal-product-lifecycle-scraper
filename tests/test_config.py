@@ -12,8 +12,9 @@ sys.path.insert(0, str(BASE_DIR))
 
 from scraper.config import BASE_DIR as CFG_BASE_DIR
 from scraper.config import (
+    DEFAULT_ACTIVE_CSV_OUTPUT,
     DEFAULT_CSV_OUTPUT,
-    DEFAULT_JSON_OUTPUT,
+    DEFAULT_EOL_CSV_OUTPUT,
     GEMINI_MODEL,
     MITSUBISHI_EOL_URLS,
     OUTPUT_DIR,
@@ -45,7 +46,8 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(REQUEST_TIMEOUT_SEC > 0)
 
     def test_export_file_paths(self):
-        self.assertTrue(str(DEFAULT_JSON_OUTPUT).endswith(".json"))
+        self.assertTrue(str(DEFAULT_EOL_CSV_OUTPUT).endswith(".csv"))
+        self.assertTrue(str(DEFAULT_ACTIVE_CSV_OUTPUT).endswith(".csv"))
         self.assertTrue(str(DEFAULT_CSV_OUTPUT).endswith(".csv"))
 
     def test_universal_ai_token_optimization_settings(self):
