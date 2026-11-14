@@ -683,6 +683,125 @@ class TestModels(unittest.TestCase):
         self.assertEqual(rec_with_authentic.stage_date_utc, "2025-10-31T00:00:00Z")
         self.assertFalse(rec_with_authentic.metadata.get("fallback_date_applied", False))
 
+    def test_canonical_status_normalization(self):
+        """
+        Verifies Requirement 12:
+        Canonical status normalization to 6 ENUM values across multi-lingual terminology.
+        """
+        from scraper.models import CanonicalStatus, normalize_to_canonical_status
+
+        test_cases = [
+            # Active
+            ("Active", CanonicalStatus.ACTIVE.value),
+            ("Current", CanonicalStatus.ACTIVE.value),
+            ("Regular Availability", CanonicalStatus.ACTIVE.value),
+            ("Special Order Products from HID Global", CanonicalStatus.ACTIVE.value),
+            ("Buy American", CanonicalStatus.ACTIVE.value),
+            ("PowerG Life Safety", CanonicalStatus.ACTIVE.value),
+            # Active Mature
+            ("Active Mature", CanonicalStatus.ACTIVE_MATURE.value),
+            ("Mature", CanonicalStatus.ACTIVE_MATURE.value),
+            ("NRND", CanonicalStatus.ACTIVE_MATURE.value),
+            ("Classic", CanonicalStatus.ACTIVE_MATURE.value),
+            ("Limited", CanonicalStatus.ACTIVE_MATURE.value),
+            # Phase Out
+            ("Phase Out", CanonicalStatus.PHASE_OUT.value),
+            ("Phase-out", CanonicalStatus.PHASE_OUT.value),
+            ("Auslauftyp", CanonicalStatus.PHASE_OUT.value),
+            ("Retiring", CanonicalStatus.PHASE_OUT.value),
+            # End of Sale
+            ("End of Sale", CanonicalStatus.END_OF_SALE.value),
+            ("End of Sale (EOS)", CanonicalStatus.END_OF_SALE.value),
+            ("Last Time Buy", CanonicalStatus.END_OF_SALE.value),
+            ("LTB", CanonicalStatus.END_OF_SALE.value),
+            ("End-Of-Build", CanonicalStatus.END_OF_SALE.value),
+            ("Letzte Bestellmöglichkeit", CanonicalStatus.END_OF_SALE.value),
+            # End of Support
+            ("End of Support", CanonicalStatus.END_OF_SUPPORT.value),
+            ("End of Service (EOS)", CanonicalStatus.END_OF_SUPPORT.value),
+            ("EOSL", CanonicalStatus.END_OF_SUPPORT.value),
+            ("End of Engineering", CanonicalStatus.END_OF_SUPPORT.value),
+            ("End of Updates", CanonicalStatus.END_OF_SUPPORT.value),
+            ("Einstellung der Reparatur", CanonicalStatus.END_OF_SUPPORT.value),
+            # Obsolete
+            ("Discontinued", CanonicalStatus.OBSOLETE.value),
+            ("Obsolete", CanonicalStatus.OBSOLETE.value),
+            ("End of Life", CanonicalStatus.OBSOLETE.value),
+            ("EOL", CanonicalStatus.OBSOLETE.value),
+            ("Vintage", CanonicalStatus.OBSOLETE.value),
+            ("Retired", CanonicalStatus.OBSOLETE.value),
+            ("Produktabkündigung", CanonicalStatus.OBSOLETE.value),
+            ("生産終了", CanonicalStatus.OBSOLETE.value),
+        ]
+
+        for raw, expected in test_cases:
+            with self.subTest(raw=raw):
+                self.assertEqual(normalize_to_canonical_status(raw), expected)
+
+    def test_compare_and_select_latest_record(self):
+        """
+        Verifies Requirement 11 & 12:
+        Record with latest date is kept when other key attributes match,
+        and secondary attributes (replacement, aliases, metadata) are cleanly merged.
+        """
+        from scraper.models import compare_and_select_latest_record
+
+        rec_old = {
+            "vendor_name": "Rockwell Automation",
+            "model_name": "1756-L75",
+            "status": "Obsolete",
+            "stage_date_utc": "2023-01-01T00:00:00Z",
+            "replacement": "1756-L85E",
+            "aliases": "ControlLogix 5570",
+            "metadata": '{"doc_id": "123", "notice": "old"}'
+        }
+
+        rec_new = {
+            "vendor_name": "Rockwell Automation",
+            "model_name": "1756-L75",
+            "status": "Obsolete",
+            "stage_date_utc": "2025-06-30T00:00:00Z",
+            "replacement": "",
+            "aliases": "",
+            "metadata": '{"doc_id": "456", "bulletin": "latest"}'
+        }
+
+        winner = compare_and_select_latest_record(rec_old, rec_new)
+        # Winner must have latest date
+        self.assertEqual(winner["stage_date_utc"], "2025-06-30T00:00:00Z")
+        # Winner merges non-empty replacement and aliases from older record
+        self.assertEqual(winner["replacement"], "1756-L85E")
+        self.assertEqual(winner["aliases"], "ControlLogix 5570")
+
+    def test_classify_hardware_or_software(self):
+        """
+        Verifies Requirement 15:
+        Accurately extracts OS names from model fields and categorizes products.
+        """
+        from scraper.models import classify_hardware_or_software
+
+        # Apple OS models
+        p_cls, ext_os = classify_hardware_or_software("Apple Inc.", "iOS 12.5.8", "", "IT")
+        self.assertEqual(p_cls, "Software - OS")
+        self.assertEqual(ext_os, "iOS 12.5.8")
+
+        p_cls, ext_os = classify_hardware_or_software("Apple Inc.", "macOS Sonoma 14.7.1", "", "IT")
+        self.assertEqual(p_cls, "Software - OS")
+        self.assertEqual(ext_os, "macOS Sonoma 14.7.1")
+
+        p_cls, ext_os = classify_hardware_or_software("Apple Inc.", "watchOS 10.6.1", "", "IT")
+        self.assertEqual(p_cls, "Software - OS")
+        self.assertEqual(ext_os, "watchOS 10.6.1")
+
+        # Hardware models
+        p_cls, ext_os = classify_hardware_or_software("Apple Inc.", "iPhone 15 Pro", "", "IT")
+        self.assertEqual(p_cls, "Hardware")
+        self.assertIsNone(ext_os)
+
+        p_cls, ext_os = classify_hardware_or_software("Siemens", "6ES7511-1AK02-0AB0", "", "OT")
+        self.assertEqual(p_cls, "Hardware")
+        self.assertIsNone(ext_os)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -38,9 +38,9 @@ class TestEnterpriseFramework(unittest.TestCase):
         self.assertGreaterEqual(len(vendors), 140, f"Expected at least 140 vendors, got {len(vendors)}")
 
     def test_02_sector_distribution(self):
-        """Verifies proper representation across OT (54), IoT (44+), and IT (42+)."""
+        """Verifies proper representation across OT (54+), IoT (44+), IT (42+), and IoMT (20+)."""
         vendors = self.config.get("vendors", {})
-        sectors = {"OT": 0, "IoT": 0, "IT": 0}
+        sectors = {"OT": 0, "IoT": 0, "IT": 0, "IoMT": 0}
         for v_id, v_cfg in vendors.items():
             sec = v_cfg.get("sector")
             self.assertIn(sec, sectors, f"Vendor {v_id} has invalid sector: {sec}")
@@ -49,6 +49,7 @@ class TestEnterpriseFramework(unittest.TestCase):
         self.assertGreaterEqual(sectors["OT"], 54, f"Expected at least 54 OT vendors, got {sectors['OT']}")
         self.assertGreaterEqual(sectors["IoT"], 44, f"Expected at least 44 IoT vendors, got {sectors['IoT']}")
         self.assertGreaterEqual(sectors["IT"], 42, f"Expected at least 42 IT vendors, got {sectors['IT']}")
+        self.assertGreaterEqual(sectors["IoMT"], 20, f"Expected at least 20 IoMT vendors, got {sectors['IoMT']}")
 
     def test_03_zero_hardcoded_defaults(self):
         """Verifies NO vendor config contains hardcoded default_os or default_firmware."""

@@ -444,11 +444,15 @@ class UniversalAIExtractor:
         Setting thinking_budget=0 disables internal chain-of-thought generation,
         eliminating unnecessary output token billing on deterministic extraction tasks.
         """
-        if types is None or self.thinking_budget is None or self.thinking_budget < 0:
+        if types is None:
+            return None
+        # Enforce zero-thinking fast path for pure extraction tasks: default to budget 0
+        budget = 0 if self.thinking_budget is None else self.thinking_budget
+        if budget < 0:
             return None
         try:
             return types.ThinkingConfig(
-                thinking_budget=self.thinking_budget,
+                thinking_budget=budget,
                 include_thoughts=False
             )
         except Exception:

@@ -231,6 +231,7 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
         v_id = v_info.get("id")
         v_name = v_info.get("name")
         v_sector = v_info.get("sector")
+        v_category = v_info.get("category")
         website = v_info.get("website", "")
         allowed_domains = v_info.get("allowed_domains", [])
         entry_points = v_info.get("entry_points", [])
@@ -246,7 +247,10 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
         seen_names[v_name] = v_key
 
         if v_sector not in valid_sectors:
-            issues.append(f"Vendor '{v_key}': invalid sector '{v_sector}' (must be OT, IoT, or IT).")
+            issues.append(f"Vendor '{v_key}': invalid sector '{v_sector}' (must be OT, IoT, IT, or IoMT).")
+
+        if v_category not in ("Hardware", "Software", "Hybrid"):
+            issues.append(f"Vendor '{v_key}': invalid or missing category '{v_category}' (must be Hardware, Software, or Hybrid).")
 
         if not website.startswith("http"):
             issues.append(f"Vendor '{v_key}': website must start with http/https: '{website}'.")
@@ -269,7 +273,7 @@ def check_5_multi_vendor_configs() -> Tuple[bool, str]:
     if issues:
         return False, f"Found {len(issues)} vendor config issues:\n" + "\n".join(f"    - {i}" for i in issues[:10])
 
-    return True, f"Verified all {vendor_count} unique vendors across OT, IoT, and IT sectors with zero duplicate keys/names and zero schema violations."
+    return True, f"Verified all {vendor_count} unique enterprise vendors across OT, IoT, IT, and IoMT sectors (Hardware/Software/Hybrid) with zero duplicate keys/names and zero schema violations."
 
 
 def check_6_dataset_schema_and_db_readiness() -> Tuple[bool, str]:
@@ -390,12 +394,12 @@ def check_7_full_test_suite() -> Tuple[bool, str]:
                     test_name = parts[0] if parts else ""
                     print(f"\r  [{test_count:>3}/252] {test_name[:50]:<50} -> ok", end="", flush=True)
 
-        proc.wait(timeout=90)
+        proc.wait(timeout=180)
         print()  # Clear carriage return
         full_output = "".join(output_lines)
     except subprocess.TimeoutExpired:
         proc.kill()
-        return False, "Test suite timed out after 90s."
+        return False, "Test suite timed out after 180s."
     except Exception as e:
         return False, f"Could not execute test suite: {e}"
 

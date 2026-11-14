@@ -372,17 +372,48 @@ class UniversalAICrawler:
             "Upgrade-Insecure-Requests": "1",
         }
 
+        # Inject persistent conditional HTTP caching headers (ETag, Last-Modified)
+        if hasattr(self, "delta_cache") and self.delta_cache:
+            cond_headers = self.delta_cache.get_conditional_headers(clean_url)
+            headers.update(cond_headers)
+
         try:
             resp = session.get(clean_url, headers=headers, timeout=25, allow_redirects=True)
             status = resp.status_code
 
-            # If rate-limited (429), respect Retry-After or apply jittered backoff
+            # Handle HTTP 304 Not Modified (Requirement 4): bypass redundant downloading and parsing
+            if status == 304:
+                logger.info(f"[HTTP 304 NOT MODIFIED] Server confirmed content unchanged for {clean_url}. Skipping payload download.")
+                cached_page = self.run_cache.get_crawled_page(self.run_cache.normalize_url(clean_url))
+                if cached_page is not None:
+                    return cached_page
+                return {
+                    "url": clean_url,
+                    "markdown": "",
+                    "html": "",
+                    "status_code": 304,
+                    "extracted_content": None
+                }
+
+            # Dynamic adaptive rate limit tracking (Requirement 14)
+            rem_hdr = resp.headers.get("X-RateLimit-Remaining") or resp.headers.get("RateLimit-Remaining")
+            if rem_hdr is not None:
+                try:
+                    rem_val = int(rem_hdr)
+                    if rem_val <= 2:
+                        jitter = random.uniform(1.2, 3.0)
+                        logger.debug(f"[ADAPTIVE RATE LIMIT] Quota remaining ({rem_val}) is low. Throttling with {jitter:.2f}s jitter.")
+                        time.sleep(jitter)
+                except ValueError:
+                    pass
+
+            # If rate-limited (429), respect Retry-After or apply exponential jittered backoff
             if status == 429:
                 retry_after_str = resp.headers.get("Retry-After")
                 try:
-                    wait_sec = float(retry_after_str) if retry_after_str else random.uniform(1.0, 2.5)
+                    wait_sec = float(retry_after_str) if retry_after_str else random.uniform(2.0, 5.0)
                 except ValueError:
-                    wait_sec = random.uniform(1.0, 2.5)
+                    wait_sec = random.uniform(2.0, 5.0)
                 time.sleep(wait_sec)
                 resp = session.get(clean_url, headers=headers, timeout=20, allow_redirects=True)
                 status = resp.status_code
@@ -881,8 +912,8 @@ class UniversalAICrawler:
                         "source_url": target_url
                     })
 
-        # 3. Process crawled body markdown (if no tables present or to capture unlisted items)
-        if markdown and not dom_tables:
+        # 3. Process crawled body markdown (strictly when NO tables are present - Deterministic Fast Path)
+        if markdown and not dom_tables and not pre_extracted:
             filtered_lines = []
             if len(markdown) < 2000:
                 filtered_lines = [line_str.strip() for line_str in markdown.split("\n") if line_str.strip()]

@@ -90,6 +90,7 @@ vendors:
         DOM table for product identifiers.
       evidence_authority: official_model_status_or_notice_evidence
       review_needed: true
+    category: Hardware
   siemens:
     id: siemens
     name: Siemens
@@ -140,6 +141,7 @@ vendors:
       - dated_EOL_LTB_EOS
       - lifecycle_source_candidate
       - model_status_table
+    category: Hybrid
   schneider_electric:
     id: schneider_electric
     name: Schneider Electric
@@ -171,6 +173,7 @@ vendors:
         item: li.product-finder-result__item--commercial-status
         model: a.product-finder-result__link
         status: .commercial-status-label, .commercial-status-color
+    category: Hybrid
   rockwell_automation:
     id: rockwell_automation
     name: Rockwell Automation (Allen-Bradley)
@@ -311,6 +314,7 @@ vendors:
       confidence_reason: Blocked by AKAMAI_CHALLENGE (HTTP 403); requires headless
         browser or bypass
       review_needed: true
+    category: Hybrid
   omron:
     id: omron
     name: Omron Corporation
@@ -338,6 +342,7 @@ vendors:
       - replacement_or_successor_mapping
       evidence_authority: direct_model_or_version_status_evidence
       ingestion_priority: high
+    category: Hardware
   abb:
     id: abb
     name: ABB
@@ -366,7 +371,8 @@ vendors:
       evidence_authority: official_model_status_or_notice_evidence
       ingestion_priority: high
       confidence: high
-      confidence_reason: Official ABB Electrification lifecycle portal with active notice table and dates
+      confidence_reason: Official ABB Electrification lifecycle portal with active
+        notice table and dates
     - name: ABB_Drives_ACS550_Lifecycle_Statement
       url: https://library.e.abb.com/public/a085ee0feabb43b99dc92ae829a70105/Life_cycle_statement_ACS550_revD.pdf
       crawler_type: dom_table
@@ -379,6 +385,7 @@ vendors:
       - dated_EOL_LTB_EOS
       - lifecycle_source
       - official_bulletin
+    category: Hardware
   yokogawa:
     id: yokogawa
     name: Yokogawa Electric
@@ -424,6 +431,7 @@ vendors:
         date: 1
         replacement: 2
         default_status: Discontinued
+    category: Hardware
   emerson:
     id: emerson
     name: Emerson Electric
@@ -448,6 +456,7 @@ vendors:
       - dated_EOL_LTB_EOS
       - direct_status_source
       - official_discontinued_bulletin
+    category: Hardware
   beckhoff:
     id: beckhoff
     name: Beckhoff Automation
@@ -493,6 +502,7 @@ vendors:
       source_tags:
       - dated_EOL_LTB_EOS
       - direct_status_source
+    category: Hardware
   phoenix_contact:
     id: phoenix_contact
     name: Phoenix Contact
@@ -515,6 +525,7 @@ vendors:
       model_group_index: 1
       default_status: Active
       max_sitemaps: 1
+    category: Hardware
   eaton:
     id: eaton
     name: Eaton Electrical
@@ -568,6 +579,7 @@ vendors:
       ingestion_priority: medium
       evidence_authority: official_model_status_or_notice_evidence
       endpoint_role: model_status_and_replacement_catalogue
+    category: Hardware
   fanuc:
     id: fanuc
     name: FANUC Corporation
@@ -648,6 +660,7 @@ vendors:
       - lifetime maintenance
       - models no longer in production
       - repair parts
+    category: Hardware
   yaskawa:
     id: yaskawa
     name: Yaskawa Electric
@@ -753,6 +766,7 @@ vendors:
       product_pattern: /product/(?:inverter|servo|controller|robot)/([a-z0-9\-_]+)/
       model_group_index: 1
       default_status: Active
+    category: Hardware
   advantech:
     id: advantech
     name: Advantech
@@ -787,6 +801,7 @@ vendors:
       - Phase Out
       - End of Life (EOL)
       - Last Time Buy (LTB)
+    category: Hardware
   moxa:
     id: moxa
     name: Moxa Technologies
@@ -816,6 +831,7 @@ vendors:
       - lifecycle_phase_definitions
       - policy_or_glossary
       evidence_authority: terminology_definition_not_model_status_unless_rows_present
+    category: Hardware
   wago:
     id: wago
     name: WAGO Kontakttechnik
@@ -863,6 +879,7 @@ vendors:
       ingestion_priority: high
       expected_fields: 750-8101 PFC100 controller; discontinued since 2026-01-02;
         successor 750-8111.
+    category: Hardware
   keyence:
     id: keyence
     name: Keyence Corporation
@@ -904,6 +921,7 @@ vendors:
       expected_fields:
       - This model has been discontinued
       - recommended replaceable products
+    category: Hardware
   danfoss:
     id: danfoss
     name: Danfoss Drives
@@ -1062,6 +1080,7 @@ vendors:
       review_needed: true
       product_pattern: /products/(?:dps|drives|ac-drives|soft-starters)/[a-zA-Z0-9\-]+(?:-[0-9]+[a-zA-Z0-9]*)+
       child_filter: en
+    category: Hardware
   endress_hauser:
     id: endress_hauser
     name: Endress+Hauser
@@ -1091,6 +1110,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   br_automation:
     id: br_automation
     name: B&R Industrial Automation
@@ -1150,6 +1170,7 @@ vendors:
       - Active
       - Limited
       - Obsolete
+    category: Hardware
   kuka:
     id: kuka
     name: Kuka Robotics
@@ -1188,6 +1209,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   turck:
     id: turck
     name: Hans Turck GmbH
@@ -1217,6 +1239,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   festo:
     id: festo
     name: Festo SE & Co. KG
@@ -1283,6 +1306,7 @@ vendors:
       - not_model_status_table
       - not_terminology_glossary
       evidence_authority: replacement_search_guidance_not_product_lifecycle_status_authority
+    category: Hardware
   hirschmann:
     id: hirschmann
     name: Hirschmann (Belden)
@@ -1318,6 +1342,7 @@ vendors:
       - last_firmware_maintenance_date
       - replacement_guidance
       evidence_authority: direct_affected_unaffected_part_families_and_order_delivery_service_firmware_milestones
+    category: Hardware
   red_lion:
     id: red_lion
     name: Red Lion Controls
@@ -1347,6 +1372,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   weidmuller:
     id: weidmuller
     name: Weidmuller Interface
@@ -1396,6 +1422,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: product_status_or_notice_candidate_retain_raw_vendor_fields
       ingestion_priority: high
+    category: Hardware
   delta_electronics:
     id: delta_electronics
     name: Delta Electronics
@@ -1452,6 +1479,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   hms_networks:
     id: hms_networks
     name: HMS Networks
@@ -1512,6 +1540,7 @@ vendors:
       - category
       - product type
       - direct replacement
+    category: Hardware
   pro_face:
     id: pro_face
     name: Pro-face
@@ -1575,6 +1604,7 @@ vendors:
       - model
       - end of sales
       - end of service
+    category: Hardware
   cognex:
     id: cognex
     name: Cognex Corporation
@@ -1625,6 +1655,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   sick:
     id: sick
     name: SICK Sensor Intelligence
@@ -1671,6 +1702,7 @@ vendors:
       - sitemap_discovery_only
       evidence_authority: url_discovery_only_not_lifecycle_status
       ingestion_priority: discovery_only
+    category: Hardware
   pepperl_fuchs:
     id: pepperl_fuchs
     name: Pepperl+Fuchs
@@ -1699,6 +1731,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   ifm_electronic:
     id: ifm_electronic
     name: ifm electronic
@@ -1823,6 +1856,7 @@ vendors:
       expected_fields: AC1365/AC1366/AC1376 immediate discontinuation due to component
         obsolescence; replacement mapping AC1365→AC1411 and AC1366/AC1376→AC1412;
         compatibility note.
+    category: Hardware
   pilz:
     id: pilz
     name: Pilz Automation Safety
@@ -1857,6 +1891,7 @@ vendors:
       - at end of product lifecycle
       - no longer available
       - alternative or successor
+    category: Hardware
   ge_digital:
     id: ge_digital
     name: GE Vernova / GE Digital
@@ -1921,6 +1956,7 @@ vendors:
       - Active Manufacturing
       - Limited Production
       - End-of-Life Support
+    category: Software
   banner_engineering:
     id: banner_engineering
     name: Banner Engineering
@@ -1950,6 +1986,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: low
+    category: Hardware
   smc:
     id: smc
     name: SMC Corporation
@@ -1988,6 +2025,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: product_status_or_notice_candidate_retain_raw_vendor_fields
       ingestion_priority: high
+    category: Hardware
   valmet:
     id: valmet
     name: Valmet Automation
@@ -2017,6 +2055,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   intel:
     id: intel
     name: Intel Corporation
@@ -2133,6 +2172,7 @@ vendors:
       ingestion_priority: high
       expected_fields: PCN 858946-00; Atom C3314/C3324/C3364/C3534/C3544/C3734/C3754/C3934;
         last discontinuance order 2026-08-14; last shipment 2027-12-01.
+    category: Hardware
   qualcomm:
     id: qualcomm
     name: Qualcomm
@@ -2162,6 +2202,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   texas_instruments:
     id: texas_instruments
     name: Texas Instruments
@@ -2213,6 +2254,7 @@ vendors:
       - crawler_adapter_selection_pending
       expected_fields:
       - status alongside TI standard product number
+    category: Hardware
   nxp:
     id: nxp
     name: NXP Semiconductors
@@ -2298,6 +2340,7 @@ vendors:
       - availability status
       - last-time-buy/last-delivery if given
       - replacement/impact
+    category: Hardware
   stmicroelectronics:
     id: stmicroelectronics
     name: STMicroelectronics
@@ -2333,6 +2376,7 @@ vendors:
       ingestion_priority: medium
       expected_fields: PTN notice and last-customer-order acceptance period; delivery
         window after the order period; product termination process.
+    category: Hardware
   microchip:
     id: microchip
     name: Microchip Technology
@@ -2373,6 +2417,7 @@ vendors:
       - replacement_part_guidance
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   espressif:
     id: espressif
     name: Espressif Systems
@@ -2439,6 +2484,7 @@ vendors:
       - EOL datasheet watermark
       - NRND
       - latest chip revision
+    category: Hardware
   silicon_labs:
     id: silicon_labs
     name: Silicon Laboratories
@@ -2466,6 +2512,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   telit:
     id: telit
     name: Telit Cinterion
@@ -2495,6 +2542,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   quectel:
     id: quectel
     name: Quectel Wireless Solutions
@@ -2524,6 +2572,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   nordic_semi:
     id: nordic_semi
     name: Nordic Semiconductor
@@ -2550,6 +2599,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: low
+    category: Hardware
   particle:
     id: particle
     name: Particle Industries
@@ -2614,6 +2664,7 @@ vendors:
       - Lifecycle
       - Replacement
       - End of support
+    category: Hardware
   arduino:
     id: arduino
     name: Arduino Pro & IoT
@@ -2648,6 +2699,7 @@ vendors:
       - shields
       - kits
       - legacy products
+    category: Hardware
   raspberry_pi:
     id: raspberry_pi
     name: Raspberry Pi Ltd
@@ -2674,6 +2726,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   digi_intl:
     id: digi_intl
     name: Digi International
@@ -2732,6 +2785,7 @@ vendors:
       - Legacy
       - Obsolete
       - Not for New Designs
+    category: Hardware
   eurotech:
     id: eurotech
     name: Eurotech Edge Gateway
@@ -2762,6 +2816,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   multitech:
     id: multitech
     name: MultiTech Systems
@@ -2813,6 +2868,7 @@ vendors:
       - NEOL
       - EOL date
       - Replacement Model Number
+    category: Hardware
   teltonika:
     id: teltonika
     name: Teltonika Networks
@@ -2869,6 +2925,7 @@ vendors:
       - end of ordering
       - end of production
       - end of support
+    category: Hardware
   kerlink:
     id: kerlink
     name: Kerlink LoRaWAN
@@ -2886,6 +2943,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   libelium:
     id: libelium
     name: Libelium IoT
@@ -2905,6 +2963,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   seeed_studio:
     id: seeed_studio
     name: Seeed Studio Industrial
@@ -2933,6 +2992,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   laird_connect:
     id: laird_connect
     name: Laird Connectivity
@@ -2963,6 +3023,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   ublox:
     id: ublox
     name: u-blox
@@ -2980,6 +3041,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   semtech:
     id: semtech
     name: Semtech
@@ -3030,6 +3092,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   sensirion:
     id: sensirion
     name: Sensirion Environmental
@@ -3058,6 +3121,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: low
+    category: Hardware
   murata:
     id: murata
     name: Murata Manufacturing
@@ -3076,6 +3140,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   kontron:
     id: kontron
     name: Kontron Embedded
@@ -3105,6 +3170,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   dragino:
     id: dragino
     name: Dragino Technology
@@ -3122,6 +3188,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   hpe:
     id: hpe
     name: Hewlett Packard Enterprise
@@ -3193,6 +3260,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hybrid
   dell:
     id: dell
     name: Dell Technologies
@@ -3273,6 +3341,7 @@ vendors:
       - End of Primary Support (EOPS)
       - End of Service Life (EOSL)
       - Termination of Support on a Software Release (TSSR)
+    category: Hybrid
   ibm:
     id: ibm
     name: IBM Systems
@@ -3364,6 +3433,7 @@ vendors:
       - Other
       - EOS / End of Support
       - XaaS support ends with cloud service
+    category: Hybrid
   juniper:
     id: juniper
     name: Juniper Networks
@@ -3479,6 +3549,7 @@ vendors:
       - model_status_table
       evidence_authority: direct_model_or_version_status_evidence
       ingestion_priority: high
+    category: Hybrid
   arista:
     id: arista
     name: Arista Networks
@@ -3602,6 +3673,7 @@ vendors:
       - last software bug-fix date
       - last hardware repair/replacement
       - last TAC support/EOL
+    category: Hybrid
   fortinet:
     id: fortinet
     name: Fortinet
@@ -3672,6 +3744,7 @@ vendors:
       - RSS feed URLs
       - hardware/software/services tabs
       - portal access instructions
+    category: Hybrid
   palo_alto:
     id: palo_alto
     name: Palo Alto Networks
@@ -3744,6 +3817,7 @@ vendors:
       - EOL/end-of-support date where stated
       - support commitment
       - replacement/migration path
+    category: Hybrid
   check_point:
     id: check_point
     name: Check Point Software
@@ -3770,6 +3844,7 @@ vendors:
       - End of Sale
       - End of Engineering Support
       - End of Support
+    category: Hybrid
   netapp:
     id: netapp
     name: NetApp Storage Systems
@@ -3858,6 +3933,7 @@ vendors:
       - N-2
       - EOES
       - EOVS
+    category: Hybrid
   pure_storage:
     id: pure_storage
     name: Pure Storage
@@ -3886,6 +3962,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   lenovo:
     id: lenovo
     name: Lenovo
@@ -4001,6 +4078,7 @@ vendors:
       - Machine Type
       - Model
       - WW - Notice of Services Withdrawal
+    category: Hardware
   supermicro:
     id: supermicro
     name: Supermicro
@@ -4043,6 +4121,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   oracle:
     id: oracle
     name: Oracle
@@ -4124,6 +4203,7 @@ vendors:
       - Premier Support ends
       - Extended Support ends
       - Sustaining Support ends
+    category: Software
   vmware:
     id: vmware
     name: VMware
@@ -4185,6 +4265,7 @@ vendors:
       - crawler_adapter_selection_pending
       expected_fields:
       - VMware/CA/Symantec product family names
+    category: Software
   red_hat:
     id: red_hat
     name: Red Hat Enterprise
@@ -4290,6 +4371,7 @@ vendors:
       - Maintenance Support
       - ELS-1
       - ELS-2
+    category: Software
   microsoft:
     id: microsoft
     name: Microsoft
@@ -4401,6 +4483,7 @@ vendors:
       - Fixed Policy
       - End of Support
       - Lifecycle Terms and Definitions
+    category: Software
   canonical:
     id: canonical
     name: Canonical
@@ -4443,6 +4526,7 @@ vendors:
       - release series
       - LTS
       - standard security maintenance
+    category: Software
   suse:
     id: suse
     name: SUSE Linux Enterprise
@@ -4489,6 +4573,7 @@ vendors:
       - LTSS Extended Security
       - EOM
       - EOL
+    category: Software
   extreme_networks:
     id: extreme_networks
     name: Extreme Networks
@@ -4548,6 +4633,7 @@ vendors:
       - End of Sale (EOS)
       - End of Service Life (EOSL)
       - End of Software Maintenance
+    category: Hybrid
   synology:
     id: synology
     name: Synology NAS & Enterprise
@@ -4565,6 +4651,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: low
+    category: Hybrid
   qnap:
     id: qnap
     name: QNAP Systems
@@ -4582,6 +4669,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   ubiquiti:
     id: ubiquiti
     name: Ubiquiti Inc.
@@ -4611,6 +4699,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   sonicwall:
     id: sonicwall
     name: SonicWall Security
@@ -4639,6 +4728,7 @@ vendors:
       - Limited Retirement Mode (LRM)
       - End of Support (EOS)
       - Limited Support
+    category: Hybrid
   sophos:
     id: sophos
     name: Sophos Cybersecurity
@@ -4657,6 +4747,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   watchguard:
     id: watchguard
     name: WatchGuard Technologies
@@ -4676,6 +4767,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: product_status_or_notice_candidate_retain_raw_vendor_fields
       ingestion_priority: high
+    category: Hybrid
   nutanix:
     id: nutanix
     name: Nutanix HCI
@@ -4715,6 +4807,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   zebra:
     id: zebra
     name: Zebra Technologies
@@ -4786,6 +4879,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   parker_hannifin:
     id: parker_hannifin
     name: Parker Hannifin
@@ -4878,6 +4972,7 @@ vendors:
       - Parker obsolete part number
       - new Parker equivalent
       - regional cross-reference link
+    category: Hardware
   lenze:
     id: lenze
     name: Lenze
@@ -4961,6 +5056,7 @@ vendors:
       - 1 Care/maintenance
       - 2 Discontinued
       - previous product download list
+    category: Hardware
   fuji_electric:
     id: fuji_electric
     name: Fuji Electric
@@ -5001,6 +5097,7 @@ vendors:
       - product change announcements
       - new-product information
       - links to discontinued-product search
+    category: Hardware
   idec:
     id: idec
     name: IDEC Corporation
@@ -5029,6 +5126,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   national_instruments:
     id: national_instruments
     name: National Instruments
@@ -5077,6 +5175,7 @@ vendors:
       - Standard Support
       - Limited Support
       - Discontinued
+    category: Hardware
   unitronics:
     id: unitronics
     name: Unitronics
@@ -5095,6 +5194,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   baumuller:
     id: baumuller
     name: Baumuller
@@ -5124,6 +5224,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   moog:
     id: moog
     name: Moog Industrial
@@ -5188,6 +5289,7 @@ vendors:
       - phase-out
       - discontinued
       - service end
+    category: Hardware
   nidec_control_techniques:
     id: nidec_control_techniques
     name: Nidec Control Techniques
@@ -5235,6 +5337,7 @@ vendors:
       - obsolete drive
       - replacement product
       - upgrade path
+    category: Hardware
   axis_communications:
     id: axis_communications
     name: Axis Communications
@@ -5312,6 +5415,7 @@ vendors:
       - End of hardware support
       - End of software support
       - Product discontinuation statement
+    category: Hardware
   hikvision:
     id: hikvision
     name: Hikvision Digital Technology
@@ -5356,6 +5460,7 @@ vendors:
       - discontinuation date
       - maintenance period
       - after-sales service
+    category: Hardware
   dahua:
     id: dahua
     name: Dahua Technology
@@ -5421,6 +5526,7 @@ vendors:
       expected_fields:
       - discontinued product categories
       - legacy archive
+    category: Hardware
   hanwha_vision:
     id: hanwha_vision
     name: Hanwha Vision
@@ -5468,6 +5574,7 @@ vendors:
       - total count
       - product model
       - replacement model
+    category: Hardware
   flir:
     id: flir
     name: Teledyne FLIR
@@ -5498,6 +5605,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   basler:
     id: basler
     name: Basler AG
@@ -5527,6 +5635,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   mobotix:
     id: mobotix
     name: Mobotix AG
@@ -5556,6 +5665,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   avigilon:
     id: avigilon
     name: Avigilon (Motorola Solutions)
@@ -5586,6 +5696,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   uniview:
     id: uniview
     name: Uniview Technologies
@@ -5605,6 +5716,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: high
+    category: Hardware
   allied_telesis:
     id: allied_telesis
     name: Allied Telesis
@@ -5634,6 +5746,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   dlink:
     id: dlink
     name: D-Link
@@ -5666,6 +5779,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   netgear_business:
     id: netgear_business
     name: NETGEAR Business
@@ -5703,6 +5817,7 @@ vendors:
       - last sale date
       - firmware updates
       - security updates
+    category: Hardware
   tplink:
     id: tplink
     name: TP-Link
@@ -5746,6 +5861,7 @@ vendors:
       evidence_authority: product_status_or_notice_candidate_retain_raw_vendor_fields
       ingestion_priority: validate_before_full_ingestion
       expected_fields: Product/model EOS list by product family
+    category: Hardware
   zyxel_networks:
     id: zyxel_networks
     name: Zyxel Networks
@@ -5784,6 +5900,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   westermo:
     id: westermo
     name: Westermo Network Technologies
@@ -5820,6 +5937,7 @@ vendors:
       - Mature
       - Limited
       - Discontinued
+    category: Hardware
   alcatel_lucent_enterprise:
     id: alcatel_lucent_enterprise
     name: Alcatel-Lucent Enterprise
@@ -5848,6 +5966,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   ruckus_networks:
     id: ruckus_networks
     name: Ruckus Networks (CommScope)
@@ -5950,6 +6069,7 @@ vendors:
       - GA
       - GD
       - MR
+    category: Hardware
   huawei:
     id: huawei
     name: Huawei
@@ -6020,6 +6140,7 @@ vendors:
       - EOFS
       - EOS
       - export data
+    category: Hardware
   toyoda:
     id: toyoda
     name: JTEKT Toyoda (JTEKT Electronics)
@@ -6079,6 +6200,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   verkada:
     id: verkada
     name: Verkada
@@ -6117,6 +6239,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   shibaura_machine:
     id: shibaura_machine
     name: Shibaura Machine (Toshiba Machine)
@@ -6153,6 +6276,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   dragos:
     id: dragos
     name: Dragos Industrial Cybersecurity
@@ -6190,6 +6314,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Software
   nozomi_networks:
     id: nozomi_networks
     name: Nozomi Networks
@@ -6249,6 +6374,7 @@ vendors:
       - Full Support
       - Limited Support
       - End of Hardware Support
+    category: Software
   barracuda_networks:
     id: barracuda_networks
     name: Barracuda Networks
@@ -6286,6 +6412,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hybrid
   fluke_networks:
     id: fluke_networks
     name: Fluke Networks
@@ -6325,6 +6452,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   cisco:
     id: cisco
     name: Cisco Systems
@@ -6506,6 +6634,7 @@ vendors:
       - model_status_table
       evidence_authority: direct_model_or_version_status_evidence
       ingestion_priority: high
+    category: Hybrid
   honeywell:
     id: honeywell
     name: Honeywell
@@ -6535,6 +6664,7 @@ vendors:
       - model_status_table
       evidence_authority: model_status_authority
       ingestion_priority: high
+    category: Hybrid
   bosch:
     id: bosch
     name: Bosch
@@ -6578,6 +6708,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   panasonic:
     id: panasonic
     name: Panasonic
@@ -6650,6 +6781,7 @@ vendors:
       - maintenance_period_end
       - replacement_explicitly_none
       evidence_authority: direct_series_model_count_and_discontinuation_notice
+    category: Hardware
   yamaha:
     id: yamaha
     name: Yamaha Motor Robotics
@@ -6749,6 +6881,7 @@ vendors:
       - service discontinuation/service period
       - incoming or maintenance replacement model
       - linked PDF where present
+    category: Hardware
   sony:
     id: sony
     name: Sony Professional
@@ -6779,6 +6912,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   kyocera:
     id: kyocera
     name: Kyocera AVX
@@ -6811,6 +6945,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   hitachi:
     id: hitachi
     name: Hitachi
@@ -6865,6 +7000,7 @@ vendors:
       - product_identity_discovery_only
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: medium
+    category: Hardware
   milesight:
     id: milesight
     name: Milesight
@@ -6928,6 +7064,7 @@ vendors:
       expected_fields:
       - EOL model
       - recommended replacement
+    category: Hardware
   citrix:
     id: citrix
     name: Citrix Systems
@@ -6993,6 +7130,7 @@ vendors:
       - General Availability
       - End of Maintenance
       - End of Life
+    category: Software
   trend_micro:
     id: trend_micro
     name: Trend Micro
@@ -7033,6 +7171,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Software
   commvault:
     id: commvault
     name: Commvault
@@ -7063,6 +7202,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Software
   apple:
     id: apple
     name: Apple Inc.
@@ -7132,6 +7272,7 @@ vendors:
       expected_fields:
       - Vintage
       - Obsolete
+    category: Hybrid
   igel:
     id: igel
     name: IGEL Technology
@@ -7193,11 +7334,13 @@ vendors:
       - EOS (End of Sales)
       - Stable Release
       - Rolling Release
+    category: Hardware
   philips:
     id: philips
     name: Philips
-    sector: IoT
+    sector: IoMT
     sectors:
+    - IoMT
     - IoT
     website: https://www.philips.com
     allowed_domains:
@@ -7248,6 +7391,7 @@ vendors:
       - generic_support_or_product_discovery_only
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   sew_eurodrive:
     id: sew_eurodrive
     name: SEW-Eurodrive
@@ -7271,6 +7415,7 @@ vendors:
       - replacement_product_discovery_only
       evidence_authority: replacement_mapping_only_status_not_proven
       ingestion_priority: low
+    category: Hardware
   belden:
     id: belden
     name: Belden Inc.
@@ -7332,6 +7477,7 @@ vendors:
       - discontinued_no_longer_manufactured
       - replacement_product_mapping
       evidence_authority: direct_product_status_and_replacement_record
+    category: Hardware
   aveva:
     id: aveva
     name: AVEVA Group
@@ -7374,6 +7520,7 @@ vendors:
       - End of Sales (EoS)
       - End of Renewal (EoR)
       - End of Life (EoL)
+    category: Software
   inductive_automation:
     id: inductive_automation
     name: Inductive Automation
@@ -7418,6 +7565,7 @@ vendors:
       - Limited
       - End of Life (EOL)
       - Long-Term Support (LTS)
+    category: Software
   opto22:
     id: opto22
     name: Opto 22
@@ -7441,6 +7589,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   johnson_controls:
     id: johnson_controls
     name: Johnson Controls
@@ -7480,6 +7629,7 @@ vendors:
       - End of Life
       - End of Sales
       - no longer receiving development or security patching
+    category: Hardware
   vertiv:
     id: vertiv
     name: Vertiv Co.
@@ -7556,6 +7706,7 @@ vendors:
       - replacement_item_and_model_numbers
       - explicit_no_replacement_rows
       evidence_authority: direct_dated_model_lifecycle_notice_with_replacement_mapping
+    category: Hardware
   cisco_meraki:
     id: cisco_meraki
     name: Cisco Meraki
@@ -7596,6 +7747,7 @@ vendors:
       - model
       - EOL dates
       - replacement
+    category: Hybrid
   aruba_networks:
     id: aruba_networks
     name: HPE Aruba Networking
@@ -7622,6 +7774,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: product_status_or_notice_candidate_retain_raw_vendor_fields
       ingestion_priority: high
+    category: Hardware
   hp_inc:
     id: hp_inc
     name: HP Inc.
@@ -7646,6 +7799,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   veeam:
     id: veeam
     name: Veeam Software
@@ -7683,6 +7837,7 @@ vendors:
       - General Availability (GA)
       - End of Fix
       - End of Support and Security Fix
+    category: Software
   lantronix:
     id: lantronix
     name: Lantronix Inc.
@@ -7706,6 +7861,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   cradlepoint:
     id: cradlepoint
     name: Ericsson Cradlepoint
@@ -7729,6 +7885,7 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: general_support_or_discovery_only
       ingestion_priority: low
+    category: Hardware
   samsara:
     id: samsara
     name: Samsara Inc.
@@ -7753,6 +7910,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Hardware
   genetec:
     id: genetec
     name: Genetec Inc.
@@ -7776,6 +7934,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Software
   milestone_systems:
     id: milestone_systems
     name: Milestone Systems
@@ -7802,6 +7961,7 @@ vendors:
       - vendor_terminology_explainer_candidate
       evidence_authority: vendor_terminology_or_policy_definition_not_sku_status
       ingestion_priority: medium
+    category: Software
   analog_devices:
     id: analog_devices
     name: Analog Devices
@@ -7867,6 +8027,7 @@ vendors:
       - publication date
       - affected model list
       - replacement part
+    category: Hardware
   renesas:
     id: renesas
     name: Renesas Electronics
@@ -7908,6 +8069,7 @@ vendors:
       - site_search_by_part_number
       - crawler_adapter_selection_pending
       expected_fields: []
+    category: Hardware
   onsemi:
     id: onsemi
     name: onsemi
@@ -7955,6 +8117,7 @@ vendors:
       - PCN type
       - OPNs
       - replacement part
+    category: Hardware
   lattice_semiconductor:
     id: lattice_semiconductor
     name: Lattice Semiconductor
@@ -7984,6 +8147,7 @@ vendors:
       - Discontinued
       - Use for New Designs
       - Discontinuance PCN
+    category: Hardware
   oriental_motor:
     id: oriental_motor
     name: Oriental Motor
@@ -8081,6 +8245,7 @@ vendors:
       - Discontinued Product label
       - product category
       - catalogue pagination
+    category: Hardware
   rittal:
     id: rittal
     name: Rittal
@@ -8116,6 +8281,7 @@ vendors:
       - EOS SA
       - EOP SP
       - EOS SP
+    category: Hardware
   nvidia:
     id: nvidia
     name: NVIDIA
@@ -8158,6 +8324,7 @@ vendors:
       - version_support_matrix
       - crawler_adapter_selection_pending
       expected_fields: DLS software release lifecycle and support matrix
+    category: Hardware
   amd:
     id: amd
     name: Advanced Micro Devices (AMD)
@@ -8194,6 +8361,7 @@ vendors:
       - crawler_adapter_selection_pending
       expected_fields:
       - Spartan-6 availability through at least 2030
+    category: Hardware
   infineon:
     id: infineon
     name: Infineon Technologies
@@ -8253,6 +8421,7 @@ vendors:
       - discontinued result state
       - product detail/part number
       - replacement if exposed
+    category: Hardware
   rohm_semiconductor:
     id: rohm_semiconductor
     name: ROHM Semiconductor
@@ -8310,6 +8479,7 @@ vendors:
       - product name
       - family
       - product detail URL
+    category: Hardware
   nexperia:
     id: nexperia
     name: Nexperia
@@ -8368,6 +8538,7 @@ vendors:
       - affected products
       - effective date
       - replacement/impact
+    category: Hardware
   broadcom:
     id: broadcom
     name: Broadcom Inc.
@@ -8414,6 +8585,7 @@ vendors:
       - EOS
       - EOL
       - EOSL
+    category: Hardware
   qorvo:
     id: qorvo
     name: Qorvo
@@ -8473,6 +8645,7 @@ vendors:
       - part number
       - EOL inventory status
       - replacement if exposed
+    category: Hardware
   f5:
     id: f5
     name: F5, Inc.
@@ -8580,6 +8753,7 @@ vendors:
       - EoRMA 2016-10-01
       - EoTS 2016-10-01
       - F5-ARX-1500 replacement
+    category: Hybrid
   kawasaki_robotics:
     id: kawasaki_robotics
     name: Kawasaki Robotics
@@ -8607,6 +8781,7 @@ vendors:
       - reason for discontinuation
       - replacement/successor context where shown
       - replacement-parts support duration
+    category: Hardware
   kollmorgen:
     id: kollmorgen
     name: Kollmorgen
@@ -8646,6 +8821,7 @@ vendors:
       - obsolete former product family
       - motor/drive family identifiers
       - legacy downloads/discontinued catalogue links
+    category: Hardware
   codesys:
     id: codesys
     name: CODESYS
@@ -8684,6 +8860,7 @@ vendors:
       - discontinuation date
       - remark/alternative
       - page last updated date
+    category: Software
   keb_automation:
     id: keb_automation
     name: KEB Automation
@@ -8763,6 +8940,7 @@ vendors:
       - market launch
       - further development/replacement
       - availability/service context
+    category: Hardware
   hilscher:
     id: hilscher
     name: Hilscher Gesellschaft für Systemautomation
@@ -8819,6 +8997,7 @@ vendors:
       - date
       - hardware availability
       - release notes
+    category: Hardware
   nord_drivesystems:
     id: nord_drivesystems
     name: NORD DRIVESYSTEMS
@@ -8847,6 +9026,7 @@ vendors:
       expected_fields: Definitions of NEW, SERIES, PHASE OUT, DISCONTINUED; typical
         phase durations; availability, engineering, support/service, training and
         digital order options.
+    category: Hardware
   balluff:
     id: balluff
     name: Balluff
@@ -8932,10 +9112,11 @@ vendors:
       ingestion_priority: high
       expected_fields: Product BOS00AZ; raw status Canceled; recommended successor
         BOS0126.
+    category: Hardware
   ge_healthcare:
     id: ge_healthcare
     name: GE HealthCare
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -8965,10 +9146,11 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: lifecycle_support_context_not_model_status
       ingestion_priority: medium
+    category: Hardware
   siemens_healthineers:
     id: siemens_healthineers
     name: Siemens Healthineers
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -8999,10 +9181,11 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: official_dated_product_family_sales_and_support_notice
       ingestion_priority: high
+    category: Hardware
   mindray:
     id: mindray
     name: Mindray
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9033,10 +9216,11 @@ vendors:
       - lifecycle_policy_or_context_candidate
       evidence_authority: official_lifecycle_support_context
       ingestion_priority: medium
+    category: Hardware
   masimo:
     id: masimo
     name: Masimo Corporation
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9057,10 +9241,11 @@ vendors:
       - model_status_or_notice_candidate
       evidence_authority: official_discontinued_product_family_status
       ingestion_priority: high
+    category: Hardware
   nihon_kohden:
     id: nihon_kohden
     name: Nihon Kohden
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9090,10 +9275,11 @@ vendors:
       - connected_patient_monitoring
       evidence_authority: product_identity_only_lifecycle_not_proven
       ingestion_priority: low
+    category: Hardware
   bd:
     id: bd
     name: Becton Dickinson (BD)
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9126,10 +9312,11 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: official_product_discontinuation_notice_index
       ingestion_priority: high
+    category: Hardware
   resmed:
     id: resmed
     name: ResMed
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9162,10 +9349,11 @@ vendors:
       - product_identity
       evidence_authority: official_product_detail_status
       ingestion_priority: medium
+    category: Hardware
   baxter:
     id: baxter
     name: Baxter International
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9187,10 +9375,11 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: official_product_discontinuation_communication
       ingestion_priority: high
+    category: Hardware
   heidelberg_engineering:
     id: heidelberg_engineering
     name: Heidelberg Engineering
-    sector: IoT
+    sector: IoMT
     sectors:
     - Medical
     - IoMT
@@ -9212,6 +9401,7 @@ vendors:
       - lifecycle_source_candidate
       evidence_authority: official_model_level_production_sales_and_service_dates
       ingestion_priority: high
+    category: Hardware
   zscaler:
     id: zscaler
     name: Zscaler
@@ -9236,6 +9426,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Software
   okta:
     id: okta
     name: Okta
@@ -9260,6 +9451,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Software
   crowdstrike:
     id: crowdstrike
     name: CrowdStrike
@@ -9286,6 +9478,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Software
   semtech_sierra:
     id: semtech_sierra
     name: Semtech (Sierra Wireless)
@@ -9311,6 +9504,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   universal_robots:
     id: universal_robots
     name: Universal Robots
@@ -9336,6 +9530,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   tridium:
     id: tridium
     name: Tridium
@@ -9361,10 +9556,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Software
   drager:
     id: drager
     name: Dräger
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9386,10 +9582,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   stryker:
     id: stryker
     name: Stryker
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9411,10 +9608,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   medtronic:
     id: medtronic
     name: Medtronic
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9436,10 +9634,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   getinge:
     id: getinge
     name: Getinge
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9461,10 +9660,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   bbraun:
     id: bbraun
     name: B. Braun
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9486,10 +9686,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   fresenius_medical_care:
     id: fresenius_medical_care
     name: Fresenius Medical Care
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9511,10 +9712,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   canon_medical:
     id: canon_medical
     name: Canon Medical Systems
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9536,10 +9738,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   fujifilm_healthcare:
     id: fujifilm_healthcare
     name: FUJIFILM Healthcare
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9561,6 +9764,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   shimadzu:
     id: shimadzu
     name: Shimadzu
@@ -9586,6 +9790,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   agilent:
     id: agilent
     name: Agilent Technologies
@@ -9611,10 +9816,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   roche_diagnostics:
     id: roche_diagnostics
     name: Roche Diagnostics
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9636,10 +9842,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   abbott:
     id: abbott
     name: Abbott
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9661,10 +9868,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   beckman_coulter:
     id: beckman_coulter
     name: Beckman Coulter
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9686,6 +9894,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   thermo_fisher:
     id: thermo_fisher
     name: Thermo Fisher Scientific
@@ -9711,10 +9920,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   wer_fen:
     id: wer_fen
     name: Werfen
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9736,10 +9946,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   olympus:
     id: olympus
     name: Olympus
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9761,10 +9972,11 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   karl_storz:
     id: karl_storz
     name: KARL STORZ
-    sector: IoT
+    sector: IoMT
     sectors:
     - IoMT
     - Medical
@@ -9786,6 +9998,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   bosch_building_technologies:
     id: bosch_building_technologies
     name: Bosch Building Technologies
@@ -9811,6 +10024,7 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
   i_pro:
     id: i_pro
     name: i-PRO
@@ -9836,3 +10050,112 @@ vendors:
       - product family
       - model or product identifier
       - support status or lifecycle notice when published
+    category: Hardware
+  smiths_medical:
+    id: smiths_medical
+    name: Smiths Medical
+    category: Hardware
+    sector: IoMT
+    sectors:
+    - IoMT
+    website: https://www.smiths-medical.com
+    allowed_domains:
+    - smiths-medical.com
+    - icumed.com
+    entry_points:
+    - name: Smiths Medical Infusion Systems Catalog
+      url: https://www.smiths-medical.com/products/infusion-systems
+      strategy: sitemap
+      crawler_type: sitemap
+      category: Medical Infusion Pumps
+      confidence: high
+  hillrom:
+    id: hillrom
+    name: Hillrom
+    category: Hardware
+    sector: IoMT
+    sectors:
+    - IoMT
+    website: https://www.hillrom.com
+    allowed_domains:
+    - hillrom.com
+    - welchallyn.com
+    - baxter.com
+    entry_points:
+    - name: Hillrom Welch Allyn Vital Signs Catalog
+      url: https://www.hillrom.com/en/products/category/patient-monitoring
+      strategy: dom_table
+      crawler_type: dom_table
+      category: Patient Monitoring Hardware
+      confidence: high
+  te_connectivity:
+    id: te_connectivity
+    name: TE Connectivity
+    category: Hardware
+    sector: IoT
+    sectors:
+    - IoT
+    - OT
+    website: https://www.te.com
+    allowed_domains:
+    - te.com
+    entry_points:
+    - name: TE Connectivity Industrial Sensors Catalog
+      url: https://www.te.com/en/products/sensors.html
+      strategy: sitemap
+      crawler_type: sitemap
+      category: Industrial Sensors & Connectivity
+      confidence: high
+  sensata:
+    id: sensata
+    name: Sensata Technologies
+    category: Hardware
+    sector: IoT
+    sectors:
+    - IoT
+    - OT
+    website: https://www.sensata.com
+    allowed_domains:
+    - sensata.com
+    entry_points:
+    - name: Sensata Industrial Pressure & Temperature Sensor Catalog
+      url: https://www.sensata.com/products/pressure-sensors
+      strategy: dom_table
+      crawler_type: dom_table
+      category: Industrial Sensors
+      confidence: high
+  horiba:
+    id: horiba
+    name: HORIBA
+    category: Hardware
+    sector: OT
+    sectors:
+    - OT
+    website: https://www.horiba.com
+    allowed_domains:
+    - horiba.com
+    entry_points:
+    - name: HORIBA Process & Semiconductor Equipment Catalog
+      url: https://www.horiba.com/en_en/products/process-and-environmental/
+      strategy: dom_table
+      crawler_type: dom_table
+      category: Industrial & Process Instrumentation
+      confidence: high
+  meidensha:
+    id: meidensha
+    name: Meidensha Corporation
+    category: Hardware
+    sector: OT
+    sectors:
+    - OT
+    website: https://www.meidensha.com
+    allowed_domains:
+    - meidensha.com
+    - meidensha.co.jp
+    entry_points:
+    - name: Meidensha Industrial Power & Drive Systems
+      url: https://www.meidensha.com/products/industry/index.html
+      strategy: dom_table
+      crawler_type: dom_table
+      category: Industrial Drives & Substation Equipment
+      confidence: high

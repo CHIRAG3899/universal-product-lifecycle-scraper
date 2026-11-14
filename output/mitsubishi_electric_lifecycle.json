@@ -1,7 +1,7 @@
 {
   "vendor_id": "mitsubishi_electric",
   "vendor_name": "Mitsubishi Electric",
-  "total_records": 1472,
+  "total_records": 1475,
   "products": [
     {
       "fingerprint": "de07be964bd594b2",
@@ -31138,6 +31138,66 @@
         "fallback_date_applied": true,
         "region": "Europe"
       }
+    },
+    {
+      "fingerprint": "a4fe21a6743ae4cd",
+      "vendor_name": "Mitsubishi Electric",
+      "model_name": "GT25-WLAN",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "End of Life",
+      "stage": "End of Life",
+      "vendor_status": "End of Life",
+      "stage_date_utc": "2023-08-17T00:00:00Z",
+      "source_url": "",
+      "category": "General Automation",
+      "product_category": "General Automation",
+      "replacement": null,
+      "canonical_status": "Obsolete",
+      "first_discovered_utc": "2026-11-14T17:15:51Z",
+      "last_updated_utc": "2026-11-14T17:15:51Z",
+      "metadata": {}
+    },
+    {
+      "fingerprint": "e34142856a46f0d4",
+      "vendor_name": "Mitsubishi Electric",
+      "model_name": "GT25-WLAN",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Last Time Buy",
+      "stage": "Last Time Buy",
+      "vendor_status": "Last Time Buy",
+      "stage_date_utc": "2025-01-28T00:00:00Z",
+      "source_url": "",
+      "category": "General Automation",
+      "product_category": "General Automation",
+      "replacement": null,
+      "canonical_status": "End of Sale",
+      "first_discovered_utc": "2026-11-14T17:15:51Z",
+      "last_updated_utc": "2026-11-14T17:15:51Z",
+      "metadata": {}
+    },
+    {
+      "fingerprint": "57738fe918f1bca2",
+      "vendor_name": "Mitsubishi Electric",
+      "model_name": "FX5-EIP-CALC",
+      "aliases": null,
+      "os": null,
+      "firmware": null,
+      "status": "Discontinued",
+      "stage": "Discontinued",
+      "vendor_status": "Discontinued",
+      "stage_date_utc": "2025-01-01T00:00:00Z",
+      "source_url": "",
+      "category": "General Automation",
+      "product_category": "General Automation",
+      "replacement": null,
+      "canonical_status": "Obsolete",
+      "first_discovered_utc": "2026-11-14T17:15:51Z",
+      "last_updated_utc": "2026-11-14T17:15:51Z",
+      "metadata": {}
     }
   ]
 }

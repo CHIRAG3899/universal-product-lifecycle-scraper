@@ -4,7 +4,10 @@ Validates FrameworkAdapter, LifecyclePlugin, and LangChainToolAdapter
 for pluggability, conversion utilities, and security threat prevention.
 """
 
+import shutil
+import tempfile
 import unittest
+from pathlib import Path
 
 import pandas as pd
 
@@ -21,8 +24,8 @@ from scraper.security import SecurityThreatError
 class TestFrameworkAdapters(unittest.TestCase):
 
     def setUp(self):
-        self.adapter = FrameworkAdapter()
-        self.langchain_adapter = LangChainToolAdapter(self.adapter)
+        self.test_dir = Path(tempfile.mkdtemp(prefix="test_adapters_"))
+        self.master_csv = self.test_dir / "eol_products_lifecycle.csv"
 
         # Create sample records for adapter tests
         self.sample_records = [
@@ -43,6 +46,17 @@ class TestFrameworkAdapters(unittest.TestCase):
                 replacement="GT27-WLAN",
             ),
         ]
+
+        self.adapter = FrameworkAdapter(
+            master_csv_path=self.master_csv,
+            output_dir=self.test_dir,
+        )
+        self.adapter.storage_manager.upsert_and_persist(self.sample_records)
+        self.langchain_adapter = LangChainToolAdapter(self.adapter)
+
+    def tearDown(self):
+        if self.test_dir.exists():
+            shutil.rmtree(self.test_dir, ignore_errors=True)
 
     # -------------------------------------------------------------------------
     # 1. FrameworkAdapter Initialization & Relative Reference Paths

@@ -86,6 +86,7 @@ class DeltaCache:
         url: str,
         content: str,
         etag: Optional[str] = None,
+        last_modified: Optional[str] = None,
         record_count: int = 0,
         vendor_id: str = "",
     ) -> None:
@@ -95,12 +96,27 @@ class DeltaCache:
         self._entries[url] = {
             "content_hash": c_hash,
             "etag": etag,
+            "last_modified": last_modified,
             "record_count": record_count,
             "vendor_id": vendor_id,
             "last_scraped_utc": now_utc,
         }
         self._save()
         logger.debug(f"[DELTA_CACHE] Updated cache entry for {url} (hash={c_hash[:8]})")
+
+    def get_conditional_headers(self, url: str) -> Dict[str, str]:
+        """
+        Generates HTTP conditional request headers (If-None-Match, If-Modified-Since)
+        for a URL if previously cached with ETag or Last-Modified.
+        """
+        headers: Dict[str, str] = {}
+        entry = self.get_entry(url)
+        if entry:
+            if entry.get("etag"):
+                headers["If-None-Match"] = str(entry["etag"]).strip()
+            if entry.get("last_modified"):
+                headers["If-Modified-Since"] = str(entry["last_modified"]).strip()
+        return headers
 
     def get_entry(self, url: str) -> Optional[Dict[str, Any]]:
         """Retrieves cached metadata for a given URL."""

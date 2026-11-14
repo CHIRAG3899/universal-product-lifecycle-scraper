@@ -1,6 +1,6 @@
 # Multi-Vendor Lifecycle Scraping - Batch Execution & Knowledge Base Progress
 
-> **Last Synchronized:** `2026-11-14T16:22:38.229899+00:00`
+> **Last Synchronized:** `2026-11-14T17:23:53.451838+00:00`
 
 | Vendor ID | Cycle | Discovered | Done | Pending | Batches Left | Harvested | Duplicates | Step4 Purged | LLM Rejected | EOL CSV | Active CSV | Progress % | Status | Data Status |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -116,7 +116,7 @@
 | `milesight` | 1 | 4 | 4 | 0 | **0** | 258 | 0 | 0 | 0 | 0 | 0 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `milestone_systems` | 1 | 1 | 1 | 0 | **0** | 0 | 0 | 0 | 0 | 0 | 0 | 100.0% | `CYCLE_COMPLETE` | `NO_DATA` |
 | `mindray` | 1 | 2 | 2 | 0 | **0** | 0 | 0 | 0 | 0 | 0 | 0 | 100.0% | `CYCLE_COMPLETE` | `NO_DATA` |
-| `mitsubishi` | 3 | 4 | 1 | 3 | **3** | 6600 | 0 | 0 | 0 | 1472 | 0 | 25.0% | `IN_PROGRESS` | `ACTIVE_DATA` |
+| `mitsubishi` | 3 | 4 | 1 | 3 | **3** | 6648 | 0 | 0 | 0 | 1422 | 0 | 25.0% | `IN_PROGRESS` | `ACTIVE_DATA` |
 | `mobotix` | 1 | 2 | 2 | 0 | **0** | 0 | 0 | 0 | 0 | 0 | 0 | 100.0% | `CYCLE_COMPLETE` | `NO_DATA` |
 | `moog` | 1 | 4 | 4 | 0 | **0** | 12 | 0 | 0 | 0 | 0 | 0 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |
 | `moxa` | 2 | 2 | 2 | 0 | **0** | 3090 | 0 | 2 | 11 | 131 | 1359 | 100.0% | `CYCLE_COMPLETE` | `ACTIVE_DATA` |

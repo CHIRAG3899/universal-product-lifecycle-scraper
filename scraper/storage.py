@@ -8,6 +8,7 @@ import hashlib
 import json
 import logging
 import re
+import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -15,11 +16,13 @@ import pandas as pd
 
 from scraper.models import (
     ProductRecord,
+    compare_and_select_latest_record,
     extract_candidate_article_or_page_date,
     extract_date_from_bulletin_code,
     is_valid_product_model,
     is_valid_replacement_model,
     is_well_known_os_or_software,
+    normalize_to_canonical_status,
     parse_to_utc_iso,
     resolve_fallback_stage_date,
     sanitize_alias_string,
@@ -85,12 +88,129 @@ def is_eol_status(status: str) -> bool:
     eol_keywords = (
         "discontinued", "end of life", "eol", "end of support", "end of service",
         "end of sale", "end of engineering", "end of sw support", "last time buy",
-        "ltb", "retired", "obsolete", "phase-out", "phaseout", "classic", "limited",
+        "ltb", "retired", "obsolete", "phase-out", "phaseout", "phase out", "classic", "limited",
         "stop shipment", "end-of-service", "end-of-build", "end-of-sale", "end-of-life",
         "eosl", "repair termination", "production termination", "withdrawal",
         "abkündigung", "produktabkündigung", "auslauf", "pm400", "pm410", "pm490"
     )
     return any(k in s for k in eol_keywords)
+
+
+class SQLiteStagingBuffer:
+    """
+    Append-only high-performance SQLite staging buffer.
+    Eliminates redundant disk I/O caused by re-reading and re-writing the 162k+ row
+    master CSVs across iterative multi-vendor runs.
+    """
+
+    def __init__(self, db_path: Optional[Path] = None):
+        self.db_path = Path(db_path or Path("output/staging_buffer.db"))
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._init_db()
+
+    def _init_db(self) -> None:
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS staging_records (
+                    fingerprint TEXT PRIMARY KEY,
+                    vendor_name TEXT NOT NULL,
+                    model_name TEXT NOT NULL,
+                    aliases TEXT DEFAULT '',
+                    status TEXT NOT NULL,
+                    canonical_status TEXT NOT NULL,
+                    stage_date_utc TEXT NOT NULL,
+                    source_url TEXT DEFAULT '',
+                    os TEXT DEFAULT '',
+                    firmware TEXT DEFAULT '',
+                    category TEXT DEFAULT '',
+                    replacement TEXT DEFAULT '',
+                    metadata TEXT DEFAULT '{}',
+                    is_eol INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_staging_vendor_model
+                ON staging_records (vendor_name, model_name, canonical_status)
+            """)
+            conn.commit()
+
+    def stage_records(self, flat_records: List[Dict[str, Any]]) -> int:
+        """Inserts or updates flat records in the staging buffer using an atomic transaction."""
+        if not flat_records:
+            return 0
+
+        rows_to_insert = []
+        for r in flat_records:
+            v = str(r.get("vendor_name") or "").strip()
+            m = str(r.get("model_name") or "").strip()
+            st = str(r.get("status") or "").strip()
+            cs = str(r.get("canonical_status") or normalize_to_canonical_status(st, v)).strip()
+            os_val = str(r.get("os") or "").strip()
+            fp = str(r.get("Fingerprint") or r.get("fingerprint") or "").strip()
+            if not fp:
+                model_part = (m or os_val).strip().upper()
+                fp_key = f"{v.strip().upper()}|{model_part}|{cs.strip().upper()}"
+                fp = hashlib.sha256(fp_key.encode("utf-8")).hexdigest()[:16]
+            dt = str(r.get("stage_date_utc") or "").strip()
+            aliases = str(r.get("aliases") or "").strip()
+            src = str(r.get("source_url") or "").strip()
+            fw = str(r.get("firmware") or "").strip()
+            cat = str(r.get("category") or "").strip()
+            repl = str(r.get("replacement") or "").strip()
+            meta = r.get("metadata") or "{}"
+            if isinstance(meta, dict):
+                meta = json.dumps(meta, ensure_ascii=False)
+            is_eol = 1 if is_eol_status(st) else 0
+
+            rows_to_insert.append((fp, v, m, aliases, st, cs, dt, src, os_val, fw, cat, repl, meta, is_eol))
+
+        with sqlite3.connect(self.db_path) as conn:
+            conn.executemany("""
+                INSERT INTO staging_records (
+                    fingerprint, vendor_name, model_name, aliases, status, canonical_status,
+                    stage_date_utc, source_url, os, firmware, category, replacement, metadata, is_eol, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(fingerprint) DO UPDATE SET
+                    aliases = CASE WHEN excluded.aliases != '' THEN excluded.aliases ELSE staging_records.aliases END,
+                    replacement = CASE WHEN excluded.replacement != '' THEN excluded.replacement ELSE staging_records.replacement END,
+                    source_url = CASE WHEN excluded.source_url != '' THEN excluded.source_url ELSE staging_records.source_url END,
+                    stage_date_utc = CASE WHEN excluded.stage_date_utc > staging_records.stage_date_utc THEN excluded.stage_date_utc ELSE staging_records.stage_date_utc END,
+                    category = CASE WHEN excluded.category != '' THEN excluded.category ELSE staging_records.category END,
+                    metadata = excluded.metadata,
+                    updated_at = CURRENT_TIMESTAMP
+            """, rows_to_insert)
+            conn.commit()
+
+        return len(rows_to_insert)
+
+    def get_all_records(self) -> List[Dict[str, Any]]:
+        """Retrieves all staged records as a list of dictionaries."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT fingerprint, vendor_name, model_name, aliases, status, canonical_status,
+                       stage_date_utc, source_url, os, firmware, category, replacement, metadata, is_eol
+                FROM staging_records
+            """)
+            rows = cursor.fetchall()
+            return [dict(r) for r in rows]
+
+    def count(self) -> int:
+        """Returns total number of records in the staging buffer."""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM staging_records")
+            res = cursor.fetchone()
+            return int(res[0]) if res else 0
+
+    def clear(self) -> None:
+        """Clears all records from the staging buffer."""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("DELETE FROM staging_records")
+            conn.commit()
 
 
 class MasterStorageManager:
@@ -107,6 +227,7 @@ class MasterStorageManager:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.eol_csv_path = self.output_dir / "eol_products_lifecycle.csv"
         self.active_csv_path = self.output_dir / "active_products_lifecycle.csv"
+        self.staging_buffer = SQLiteStagingBuffer(self.output_dir / "staging_buffer.db")
         if master_csv_path and Path(master_csv_path).name != "all_vendors_lifecycle.csv":
             self.master_csv_path = Path(master_csv_path)
         else:
@@ -162,7 +283,7 @@ class MasterStorageManager:
 
     def load_existing_records(self) -> Dict[str, Dict[str, Any]]:
         """Loads existing records from active and eol CSVs indexed by fingerprint, filtering out any invalid rows."""
-        records = {}
+        records: Dict[str, Dict[str, Any]] = {}
         source_paths = [self.eol_csv_path, self.active_csv_path]
         if self.master_csv_path.exists() and self.master_csv_path not in source_paths and self.master_csv_path.name != "all_vendors_lifecycle.csv":
             source_paths.insert(0, self.master_csv_path)
@@ -239,15 +360,21 @@ class MasterStorageManager:
                             row_dict["stage_date_utc"] = fb_dt
 
                     # Recompute deterministic canonical case-insensitive SHA-256 hash
+                    c_status = normalize_to_canonical_status(status, v_name)
+                    row_dict["canonical_status"] = c_status
+                    row_dict["status"] = c_status
                     model_part = (model or os_val).strip().upper()
-                    key = f"{v_name.strip().upper()}|{model_part}|{status.strip().upper()}|{d_utc.strip()}"
+                    key = f"{v_name.strip().upper()}|{model_part}|{c_status.strip().upper()}"
                     fp = hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
                     row_dict["Fingerprint"] = fp
 
                     if not is_genuine_lifecycle_record(row_dict):
                         continue
 
-                    records[fp] = row_dict
+                    if fp in records:
+                        records[fp] = compare_and_select_latest_record(records[fp], row_dict)
+                    else:
+                        records[fp] = row_dict
             except Exception as e:
                 logger.warning(f"Could not read {src_path} ({e}). Starting fresh for this source.")
 
@@ -256,10 +383,13 @@ class MasterStorageManager:
 
     def upsert_and_persist(
         self,
-        new_products: List[ProductRecord]
+        new_products: List[ProductRecord],
+        flush: bool = True,
     ) -> Tuple[int, int, int]:
         """
         Merges new products into storage without overwriting existing historical data.
+        If flush=True, commits to dual CSVs atomically.
+        If flush=False, stages to SQLite buffer and per-vendor JSON without heavy master CSV rewrites.
         Returns (total_records, new_appended, updated_existing).
         """
         existing_records = self.load_existing_records()
@@ -306,8 +436,13 @@ class MasterStorageManager:
                 d_utc = resolve_fallback_stage_date(None, candidate_date=cand_d, metadata=meta)
                 meta["fallback_date_applied"] = True
 
+            c_status = getattr(p, "canonical_status", None) or normalize_to_canonical_status(status_val, v_name)
+            meta["canonical_status"] = c_status
+            if status_val != c_status:
+                meta["raw_vendor_status"] = status_val
+
             model_part = (m_name or p.os or "").strip().upper()
-            fp_key = f"{v_name.strip().upper()}|{model_part}|{status_val.strip().upper()}|{d_utc.strip()}"
+            fp_key = f"{v_name.strip().upper()}|{model_part}|{c_status.strip().upper()}"
             fp = hashlib.sha256(fp_key.encode("utf-8")).hexdigest()[:16]
 
             # Consolidate all secondary attributes cleanly into metadata dictionary
@@ -335,7 +470,8 @@ class MasterStorageManager:
                 "vendor_name": sanitize_csv_cell(v_name, "vendor_name"),
                 "model_name": sanitize_csv_cell(m_name, "model_name"),
                 "aliases": sanitize_csv_cell(clean_aliases, "aliases"),
-                "status": sanitize_csv_cell(status_val, "status"),
+                "status": sanitize_csv_cell(c_status, "status"),
+                "canonical_status": c_status,
                 "stage_date_utc": sanitize_csv_cell(d_utc, "stage_date_utc"),
                 "source_url": sanitize_csv_cell(source_url, "source_url"),
                 "os": sanitize_csv_cell(p.os or "", "os"),
@@ -347,31 +483,20 @@ class MasterStorageManager:
 
             if fp in merged_map:
                 existing_rec = merged_map[fp]
-                existing_repl = str(existing_rec.get("replacement") or "").strip()
-                # If new replacement is empty but existing had a genuine replacement, preserve it
-                if not replacement and existing_repl and not any(kw in existing_repl.lower() for kw in ["consult", "representative"]):
-                    flat_record["replacement"] = existing_repl
-
-                # If new aliases is empty but existing had aliases, preserve it
-                existing_aliases = str(existing_rec.get("aliases") or "").strip()
-                if not clean_aliases and existing_aliases:
-                    flat_record["aliases"] = existing_aliases
-
-                # Update existing record: preserve first_discovered in metadata if present
-                existing_meta = {}
-                try:
-                    existing_meta = json.loads(existing_rec.get("metadata", "{}"))
-                except Exception:
-                    pass
-                if "first_discovered_utc" in existing_meta:
-                    meta["first_discovered_utc"] = existing_meta["first_discovered_utc"]
-                    flat_record["metadata"] = json.dumps(meta, ensure_ascii=False)
-
+                flat_record = compare_and_select_latest_record(existing_rec, flat_record)
                 merged_map[fp] = flat_record
                 updated_count += 1
             else:
                 merged_map[fp] = flat_record
                 new_count += 1
+
+        # Stage updated records into the persistent SQLite buffer
+        self.staging_buffer.stage_records(list(merged_map.values()))
+
+        # If flush=False (batch mode for --all-vendors), persist per-vendor JSON and bypass heavy CSV rewrite
+        if not flush:
+            self._persist_vendor_jsons(new_products)
+            return len(merged_map), new_count, updated_count
 
         # 1. Write Consolidated Master CSV (Drop internal 'Fingerprint' from CSV as required)
         df = pd.DataFrame(list(merged_map.values()))
@@ -447,8 +572,11 @@ class MasterStorageManager:
                     lambda v: sanitize_alias_string(v) or ""
                 )
 
-            # Mandatory Case-Insensitive Deduplication Pass:
-            # Enforce (vendor_name, model_name, status) uniqueness, prioritizing dated over undated records
+            # Mandatory Canonical Status & Latest Date Deduplication Pass (Requirements 11 & 12):
+            # Enforce (vendor_name, model_name, canonical_status) uniqueness, prioritizing latest date
+            if "status" in export_df.columns:
+                export_df["status"] = export_df["status"].apply(lambda s: normalize_to_canonical_status(s))
+
             export_df = export_df.sort_values(by=["stage_date_utc"], ascending=False)
             export_df["_status_dedup_key"] = (
                 export_df["vendor_name"].astype(str).str.strip().str.upper() + "|||" +
@@ -517,8 +645,17 @@ class MasterStorageManager:
         )
 
         # 2. Write Per-Vendor JSON Files
+        self._persist_vendor_jsons(new_products)
+
+        return len(merged_map), new_count, updated_count
+
+    def _persist_vendor_jsons(self, products: List[ProductRecord]) -> None:
+        """Persists or updates per-vendor modular JSON files."""
+        if not products:
+            return
+
         records_by_vendor: Dict[str, List[ProductRecord]] = {}
-        for p in new_products:
+        for p in products:
             raw_v = (p.vendor_name or "unknown").lower()
             clean_v = re.sub(r'[\/\\:*\?"<>|]+', '_', raw_v)
             v_key = re.sub(r'[\s\(\)\-]+', '_', clean_v).strip('_')
@@ -604,7 +741,49 @@ class MasterStorageManager:
             except Exception as e_vjson:
                 logger.warning(f"Could not persist vendor JSON for '{v_key}': {e_vjson}")
 
-        return len(merged_map), new_count, updated_count
+    def flush_consolidated_csvs(self) -> Tuple[int, int]:
+        """
+        Consolidates all records from the SQLite staging buffer and loads dual CSVs,
+        applying Canonical Status Normalization (Requirement 12) and Latest Date Retention (Requirement 11)
+        in a single consolidated write.
+        """
+        staged_dicts = self.staging_buffer.get_all_records()
+        records_to_flush: List[ProductRecord] = []
+        for r in staged_dicts:
+            meta = r.get("metadata")
+            if isinstance(meta, str):
+                try:
+                    meta = json.loads(meta)
+                except Exception:
+                    meta = {}
+            records_to_flush.append(ProductRecord(
+                vendor_name=r.get("vendor_name", ""),
+                model_name=r.get("model_name", ""),
+                status=r.get("status", ""),
+                stage_date_utc=r.get("stage_date_utc", ""),
+                source_url=r.get("source_url") or None,
+                aliases=r.get("aliases") or None,
+                os=r.get("os") or None,
+                firmware=r.get("firmware") or None,
+                category=r.get("category") or None,
+                replacement=r.get("replacement") or None,
+                metadata=meta or {}
+            ))
+
+        self.upsert_and_persist(records_to_flush, flush=True)
+        eol_c = 0
+        act_c = 0
+        if self.eol_csv_path.exists():
+            try:
+                eol_c = len(pd.read_csv(self.eol_csv_path, dtype=str))
+            except Exception:
+                pass
+        if self.active_csv_path.exists():
+            try:
+                act_c = len(pd.read_csv(self.active_csv_path, dtype=str))
+            except Exception:
+                pass
+        return eol_c, act_c
 
     def split_master_csv(self) -> Tuple[int, int]:
         """

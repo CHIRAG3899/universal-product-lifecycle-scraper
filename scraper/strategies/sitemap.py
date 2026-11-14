@@ -9,9 +9,11 @@ capability-based batches, and extracts structured lifecycle records.
 
 from __future__ import annotations
 
+import io
 import logging
 import re
-from typing import Any, Dict, List, Optional, Tuple
+import xml.etree.ElementTree as ET
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 from urllib.parse import urlsplit
 
 from bs4 import BeautifulSoup
@@ -25,6 +27,64 @@ from scraper.state import VendorRunState
 from scraper.strategies.base import BaseScrapingStrategy
 
 logger = logging.getLogger("ai_scraper.strategies.sitemap")
+
+
+def stream_iterparse_sitemap_urls(xml_data: Union[str, bytes]) -> Iterator[Tuple[str, Optional[str]]]:
+    """
+    Streaming XML parser using xml.etree.ElementTree.iterparse with O(1) memory consumption.
+    Extracts <loc> and <lastmod> pairs on the fly and immediately frees element DOM tree memory.
+    """
+    if isinstance(xml_data, str):
+        raw_bytes = xml_data.encode("utf-8", errors="ignore")
+    else:
+        raw_bytes = xml_data
+
+    bio = io.BytesIO(raw_bytes)
+    yielded = 0
+    try:
+        for event, elem in ET.iterparse(bio, events=("end",)):
+            tag = elem.tag.split("}")[-1].lower()
+            if tag == "url":
+                loc_val = None
+                lastmod_val = None
+                for child in elem:
+                    ctag = child.tag.split("}")[-1].lower()
+                    if ctag == "loc" and child.text:
+                        loc_val = child.text.strip()
+                    elif ctag == "lastmod" and child.text:
+                        lastmod_val = child.text.strip()
+                if loc_val:
+                    yield (loc_val, lastmod_val)
+                    yielded += 1
+                elem.clear()
+            elif tag == "sitemap":
+                loc_val = None
+                for child in elem:
+                    ctag = child.tag.split("}")[-1].lower()
+                    if ctag == "loc" and child.text:
+                        loc_val = child.text.strip()
+                if loc_val:
+                    yield (loc_val, None)
+                    yielded += 1
+                elem.clear()
+    except Exception as e:
+        logger.debug(f"[STREAM ITERPARSE] Notice during stream parsing: {e}")
+
+    # Fallback to regex extraction if XML namespaces or malformed headers prevented iterparse
+    if yielded == 0 and isinstance(xml_data, str):
+        raw_url_blocks = re.findall(r"<url>(.*?)</url>", xml_data, flags=re.DOTALL | re.IGNORECASE)
+        if raw_url_blocks:
+            for u_block in raw_url_blocks:
+                m_loc = re.search(r"<loc>\s*([^<\s]+)\s*</loc>", u_block, flags=re.IGNORECASE)
+                if m_loc:
+                    loc_t = m_loc.group(1).strip()
+                    m_lmod = re.search(r"<lastmod>\s*([^<\s]+)\s*</lastmod>", u_block, flags=re.IGNORECASE)
+                    lmod_t = m_lmod.group(1).strip() if m_lmod else None
+                    yield (loc_t, lmod_t)
+        else:
+            loc_matches = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", xml_data)
+            for loc_item in loc_matches:
+                yield (loc_item.strip(), None)
 
 
 class SitemapStrategy(BaseScrapingStrategy):
@@ -256,25 +316,8 @@ class SitemapStrategy(BaseScrapingStrategy):
                                 return clean
                             return None
 
-                        # Fast extraction of <url> blocks with <loc> and optional <lastmod>
-                        url_entries: List[Tuple[str, Optional[str]]] = []
-                        raw_url_blocks = re.findall(r"<url>(.*?)</url>", c_html, flags=re.DOTALL | re.IGNORECASE)
-                        if raw_url_blocks:
-                            for u_block in raw_url_blocks:
-                                m_loc = re.search(r"<loc>\s*([^<\s]+)\s*</loc>", u_block, flags=re.IGNORECASE)
-                                if m_loc:
-                                    loc_t = m_loc.group(1).strip()
-                                    m_lmod = re.search(r"<lastmod>\s*([^<\s]+)\s*</lastmod>", u_block, flags=re.IGNORECASE)
-                                    lmod_t = m_lmod.group(1).strip() if m_lmod else None
-                                    url_entries.append((loc_t, lmod_t))
-                        if not url_entries:
-                            loc_matches = re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", c_html)
-                            if not loc_matches:
-                                c_soup = BeautifulSoup(c_html, "html.parser")
-                                loc_matches = [t.get_text().strip() for t in c_soup.find_all("loc")]
-                            url_entries = [(loc_item, None) for loc_item in loc_matches]
-
-                        for loc_text, lastmod_text in url_entries:
+                        # Streaming O(1) memory extraction of <url> and <sitemap> entries
+                        for loc_text, lastmod_text in stream_iterparse_sitemap_urls(c_html):
                             if max_pages > 0 and (len(records) + len(batch_records)) >= max_pages:
                                 break
 

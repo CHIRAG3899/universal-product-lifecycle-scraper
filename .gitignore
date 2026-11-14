@@ -24,6 +24,11 @@ dist/
 .ruff_cache/
 htmlcov/
 
+# Local SQLite databases & staging buffers
+*.db
+*.sqlite
+output/staging_buffer.db
+
 # Virtual environments
 venv/
 .venv/

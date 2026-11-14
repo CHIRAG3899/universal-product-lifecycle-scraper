@@ -306,6 +306,7 @@ def call_llm_completion(
         if api_key:
             headers["x-api-key"] = api_key
         headers["anthropic-version"] = "2023-06-01"
+        headers["anthropic-beta"] = "prompt-caching-2024-07-31"
         system_content = next((m.get("content", "") for m in messages if m.get("role") == "system"), "")
         user_msgs = [m for m in messages if m.get("role") != "system"]
         body = {
@@ -315,7 +316,13 @@ def call_llm_completion(
             "temperature": temperature,
         }
         if system_content:
-            body["system"] = system_content
+            body["system"] = [
+                {
+                    "type": "text",
+                    "text": system_content,
+                    "cache_control": {"type": "ephemeral"}
+                }
+            ]
         r = requests.post(url, headers=headers, json=body, timeout=timeout)
         r.raise_for_status()
         data = r.json()

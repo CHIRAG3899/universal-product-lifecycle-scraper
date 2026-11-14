@@ -321,11 +321,6 @@ class TestStorage(unittest.TestCase):
         models_in_csv = set(df["model_name"].tolist())
         self.assertEqual(models_in_csv, {"Catalyst 2960-X", "Catalyst 3750-X", "PowerEdge R720", "PowerEdge R630", "ISR 4331"})
 
-
-if __name__ == "__main__":
-    unittest.main()
-
-
     def test_aliases_persistence_and_matching(self):
         """Verifies that model aliases / common names are saved and preserved in master CSV."""
         storage = MasterStorageManager(master_csv_path=self.master_csv, output_dir=self.output_dir)
@@ -343,3 +338,86 @@ if __name__ == "__main__":
         self.assertEqual(len(records), 1)
         rec = list(records.values())[0]
         self.assertIn("SIMATIC S7-1500 CPU 1516-3 PN/DP", rec.get("aliases", ""))
+
+    def test_sqlite_staging_buffer(self):
+        """Verifies SQLiteStagingBuffer staging, updating, and deduplication logic."""
+        from scraper.storage import SQLiteStagingBuffer
+
+        db_file = self.output_dir / "test_staging.db"
+        buffer = SQLiteStagingBuffer(db_path=db_file)
+        self.assertEqual(buffer.count(), 0)
+
+        records = [
+            {
+                "vendor_name": "Rockwell Automation",
+                "model_name": "1756-L75",
+                "status": "Obsolete",
+                "canonical_status": "Obsolete",
+                "stage_date_utc": "2024-01-01T00:00:00Z",
+                "aliases": "ControlLogix",
+                "replacement": "1756-L85E"
+            },
+            {
+                "vendor_name": "Schneider Electric",
+                "model_name": "BMXAMI0810",
+                "status": "Active",
+                "canonical_status": "Active",
+                "stage_date_utc": "2023-06-01T00:00:00Z"
+            }
+        ]
+
+        count = buffer.stage_records(records)
+        self.assertEqual(count, 2)
+        self.assertEqual(buffer.count(), 2)
+
+        # Re-staging with newer date and updated aliases updates cleanly
+        updated = [
+            {
+                "vendor_name": "Rockwell Automation",
+                "model_name": "1756-L75",
+                "status": "Obsolete",
+                "canonical_status": "Obsolete",
+                "stage_date_utc": "2025-06-01T00:00:00Z",
+                "aliases": "ControlLogix 5570 Controller",
+                "replacement": "1756-L85E"
+            }
+        ]
+        buffer.stage_records(updated)
+        self.assertEqual(buffer.count(), 2)
+
+        all_recs = buffer.get_all_records()
+        rockwell = next(r for r in all_recs if r["vendor_name"] == "Rockwell Automation")
+        self.assertEqual(rockwell["stage_date_utc"], "2025-06-01T00:00:00Z")
+        self.assertEqual(rockwell["aliases"], "ControlLogix 5570 Controller")
+
+    def test_batch_upsert_without_flush(self):
+        """Verifies upsert_and_persist with flush=False stages in buffer without modifying CSV."""
+        storage = MasterStorageManager(master_csv_path=self.master_csv, output_dir=self.output_dir)
+        products = [
+            ProductRecord(
+                vendor_name="Cisco",
+                model_name="WS-C2960X-24TS-L",
+                status="End of Life",
+                stage_date_utc="2025-10-31T00:00:00Z"
+            )
+        ]
+        total, new_c, upd_c = storage.upsert_and_persist(products, flush=False)
+        self.assertEqual(total, 1)
+        self.assertEqual(new_c, 1)
+
+        # Dual CSVs must NOT be written when flush=False
+        self.assertFalse(self.master_csv.exists())
+
+        # Buffer must hold staged record
+        self.assertEqual(storage.staging_buffer.count(), 1)
+
+        # Calling flush_consolidated_csvs persists to dual CSVs
+        eol_c, act_c = storage.flush_consolidated_csvs()
+        self.assertEqual(eol_c, 1)
+        self.assertEqual(act_c, 0)
+        eol_csv = self.output_dir / "eol_products_lifecycle.csv"
+        self.assertTrue(eol_csv.exists())
+
+
+if __name__ == "__main__":
+    unittest.main()

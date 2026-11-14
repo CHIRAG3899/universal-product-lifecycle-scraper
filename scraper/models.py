@@ -6,8 +6,10 @@ UTC date normalization, and record fingerprinting for append/upsert operations.
 
 import calendar
 import hashlib
+import json
 import re
 from datetime import datetime, timedelta, timezone
+from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -846,6 +848,333 @@ def sanitize_replacement_string(v: Any) -> Optional[str]:
     return s
 
 
+class CanonicalStatus(str, Enum):
+    """
+    Canonical lifecycle status ENUM across all vendor-specific terminology.
+    Normalizes multi-vendor and localized stages into 6 consistent stages.
+    """
+    ACTIVE = "Active"
+    ACTIVE_MATURE = "Active Mature"
+    PHASE_OUT = "Phase Out"
+    END_OF_SALE = "End of Sale"
+    END_OF_SUPPORT = "End of Support"
+    OBSOLETE = "Obsolete"
+
+
+CANONICAL_STATUS_MAP: Dict[str, CanonicalStatus] = {
+    # Active (General Availability, Current production, Active orderable)
+    "active": CanonicalStatus.ACTIVE,
+    "available": CanonicalStatus.ACTIVE,
+    "current": CanonicalStatus.ACTIVE,
+    "in production": CanonicalStatus.ACTIVE,
+    "normal": CanonicalStatus.ACTIVE,
+    "general availability": CanonicalStatus.ACTIVE,
+    "ga": CanonicalStatus.ACTIVE,
+    "standard": CanonicalStatus.ACTIVE,
+    "supported": CanonicalStatus.ACTIVE,
+    "orderable": CanonicalStatus.ACTIVE,
+    "mass production": CanonicalStatus.ACTIVE,
+    "lieferbar": CanonicalStatus.ACTIVE,
+    "aktuell": CanonicalStatus.ACTIVE,
+    "prodotti attivi": CanonicalStatus.ACTIVE,
+    "en vente": CanonicalStatus.ACTIVE,
+    "现货/在产": CanonicalStatus.ACTIVE,
+    "販売中": CanonicalStatus.ACTIVE,
+    "standard lifecycle": CanonicalStatus.ACTIVE,
+    "regular availability": CanonicalStatus.ACTIVE,
+    "delivery release": CanonicalStatus.ACTIVE,
+    "full support": CanonicalStatus.ACTIVE,
+    "longevity commitment": CanonicalStatus.ACTIVE,
+    "new": CanonicalStatus.ACTIVE,
+    "special order products from hid global": CanonicalStatus.ACTIVE,
+    "buy american": CanonicalStatus.ACTIVE,
+    "powerg life safety": CanonicalStatus.ACTIVE,
+
+    # Active Mature (Mature, Sustaining, NRND, Not recommended for new designs, Classic)
+    "active mature": CanonicalStatus.ACTIVE_MATURE,
+    "mature": CanonicalStatus.ACTIVE_MATURE,
+    "nrnd": CanonicalStatus.ACTIVE_MATURE,
+    "not recommended for new designs": CanonicalStatus.ACTIVE_MATURE,
+    "classic": CanonicalStatus.ACTIVE_MATURE,
+    "limited": CanonicalStatus.ACTIVE_MATURE,
+    "post-production": CanonicalStatus.ACTIVE_MATURE,
+    "reifephase": CanonicalStatus.ACTIVE_MATURE,
+    "sustaining": CanonicalStatus.ACTIVE_MATURE,
+    "maintenance only": CanonicalStatus.ACTIVE_MATURE,
+    "extended maintenance": CanonicalStatus.ACTIVE_MATURE,
+    "limited support": CanonicalStatus.ACTIVE_MATURE,
+    "care/maintenance": CanonicalStatus.ACTIVE_MATURE,
+
+    # Phase Out (Announced EOL, Pending Discontinuation, Phase-Out)
+    "phase-out": CanonicalStatus.PHASE_OUT,
+    "phase out": CanonicalStatus.PHASE_OUT,
+    "phaseout": CanonicalStatus.PHASE_OUT,
+    "phase-out product": CanonicalStatus.PHASE_OUT,
+    "phase-out announced": CanonicalStatus.PHASE_OUT,
+    "auslauftyp": CanonicalStatus.PHASE_OUT,
+    "auslaufphase": CanonicalStatus.PHASE_OUT,
+    "announced eol": CanonicalStatus.PHASE_OUT,
+    "announced discontinuation": CanonicalStatus.PHASE_OUT,
+    "end of life announced": CanonicalStatus.PHASE_OUT,
+    "pre-discontinued": CanonicalStatus.PHASE_OUT,
+    "pending discontinuation": CanonicalStatus.PHASE_OUT,
+    "abkündigung angekündigt": CanonicalStatus.PHASE_OUT,
+    "vorabkündigung": CanonicalStatus.PHASE_OUT,
+    "retiring": CanonicalStatus.PHASE_OUT,
+    "to be discontinued": CanonicalStatus.PHASE_OUT,
+
+    # End of Sale (EOS, Last Time Buy, Order Stop, Discontinued for Order)
+    "end of sale": CanonicalStatus.END_OF_SALE,
+    "end of sales": CanonicalStatus.END_OF_SALE,
+    "end of sale (eos)": CanonicalStatus.END_OF_SALE,
+    "eos": CanonicalStatus.END_OF_SALE,
+    "last time buy": CanonicalStatus.END_OF_SALE,
+    "last time buy (ltb)": CanonicalStatus.END_OF_SALE,
+    "ltb": CanonicalStatus.END_OF_SALE,
+    "end of life order": CanonicalStatus.END_OF_SALE,
+    "last buy date": CanonicalStatus.END_OF_SALE,
+    "sale stop": CanonicalStatus.END_OF_SALE,
+    "verkaufsstopp": CanonicalStatus.END_OF_SALE,
+    "fin de vente": CanonicalStatus.END_OF_SALE,
+    "販売終了": CanonicalStatus.END_OF_SALE,
+    "停止销售": CanonicalStatus.END_OF_SALE,
+    "order stop": CanonicalStatus.END_OF_SALE,
+    "discontinued for order": CanonicalStatus.END_OF_SALE,
+    "final order date": CanonicalStatus.END_OF_SALE,
+    "last order date": CanonicalStatus.END_OF_SALE,
+    "last order": CanonicalStatus.END_OF_SALE,
+    "last purchase date": CanonicalStatus.END_OF_SALE,
+    "last purchase": CanonicalStatus.END_OF_SALE,
+    "letzte bestellmöglichkeit": CanonicalStatus.END_OF_SALE,
+    "end-of-build": CanonicalStatus.END_OF_SALE,
+    "stop shipment": CanonicalStatus.END_OF_SALE,
+
+    # End of Support (EOSL, End of Service Life, End of Maintenance, EOM, LDOS)
+    "end of support": CanonicalStatus.END_OF_SUPPORT,
+    "support end": CanonicalStatus.END_OF_SUPPORT,
+    "support ends": CanonicalStatus.END_OF_SUPPORT,
+    "end of service life": CanonicalStatus.END_OF_SUPPORT,
+    "end of service life (eosl)": CanonicalStatus.END_OF_SUPPORT,
+    "eosl": CanonicalStatus.END_OF_SUPPORT,
+    "end of service": CanonicalStatus.END_OF_SUPPORT,
+    "end of service (eos)": CanonicalStatus.END_OF_SUPPORT,
+    "end-of-service": CanonicalStatus.END_OF_SUPPORT,
+    "end of maintenance": CanonicalStatus.END_OF_SUPPORT,
+    "eom": CanonicalStatus.END_OF_SUPPORT,
+    "end of vulnerability support": CanonicalStatus.END_OF_SUPPORT,
+    "eovs": CanonicalStatus.END_OF_SUPPORT,
+    "last date of support": CanonicalStatus.END_OF_SUPPORT,
+    "last date of support (ldos)": CanonicalStatus.END_OF_SUPPORT,
+    "ldos": CanonicalStatus.END_OF_SUPPORT,
+    "last support date": CanonicalStatus.END_OF_SUPPORT,
+    "engineering support expired": CanonicalStatus.END_OF_SUPPORT,
+    "premier support ended": CanonicalStatus.END_OF_SUPPORT,
+    "premier support ends": CanonicalStatus.END_OF_SUPPORT,
+    "extended support ended": CanonicalStatus.END_OF_SUPPORT,
+    "extended support ends": CanonicalStatus.END_OF_SUPPORT,
+    "sustaining support ended": CanonicalStatus.END_OF_SUPPORT,
+    "end of updates": CanonicalStatus.END_OF_SUPPORT,
+    "end of sw maintenance": CanonicalStatus.END_OF_SUPPORT,
+    "end of software maintenance": CanonicalStatus.END_OF_SUPPORT,
+    "end of engineering": CanonicalStatus.END_OF_SUPPORT,
+    "limited support end": CanonicalStatus.END_OF_SUPPORT,
+    "wartungsende": CanonicalStatus.END_OF_SUPPORT,
+    "supportende": CanonicalStatus.END_OF_SUPPORT,
+    "fin de support": CanonicalStatus.END_OF_SUPPORT,
+    "サポート終了": CanonicalStatus.END_OF_SUPPORT,
+    "停止技术支持": CanonicalStatus.END_OF_SUPPORT,
+    "service discontinued": CanonicalStatus.END_OF_SUPPORT,
+    "pc service": CanonicalStatus.END_OF_SUPPORT,
+    "repair": CanonicalStatus.END_OF_SUPPORT,
+    "repair end": CanonicalStatus.END_OF_SUPPORT,
+    "repair termination": CanonicalStatus.END_OF_SUPPORT,
+    "einstellung der reparatur": CanonicalStatus.END_OF_SUPPORT,
+    "ersatzteilende": CanonicalStatus.END_OF_SUPPORT,
+
+    # Obsolete (Discontinued, Vintage, Historical, Legacy, EOL, Retired)
+    "obsolete": CanonicalStatus.OBSOLETE,
+    "discontinued": CanonicalStatus.OBSOLETE,
+    "discontinued model": CanonicalStatus.OBSOLETE,
+    "discontinued product": CanonicalStatus.OBSOLETE,
+    "discontinuation notification": CanonicalStatus.OBSOLETE,
+    "vintage": CanonicalStatus.OBSOLETE,
+    "historical": CanonicalStatus.OBSOLETE,
+    "legacy": CanonicalStatus.OBSOLETE,
+    "legacy product": CanonicalStatus.OBSOLETE,
+    "retired": CanonicalStatus.OBSOLETE,
+    "nla": CanonicalStatus.OBSOLETE,
+    "no longer available": CanonicalStatus.OBSOLETE,
+    "no longer sold": CanonicalStatus.OBSOLETE,
+    "abgekündigt": CanonicalStatus.OBSOLETE,
+    "eingestellt": CanonicalStatus.OBSOLETE,
+    "obsoleto": CanonicalStatus.OBSOLETE,
+    "discontinuado": CanonicalStatus.OBSOLETE,
+    "produit obsolète": CanonicalStatus.OBSOLETE,
+    "废弃": CanonicalStatus.OBSOLETE,
+    "淘汰": CanonicalStatus.OBSOLETE,
+    "生産終了": CanonicalStatus.OBSOLETE,
+    "完全停产": CanonicalStatus.OBSOLETE,
+    "end of life": CanonicalStatus.OBSOLETE,
+    "end of life (eol)": CanonicalStatus.OBSOLETE,
+    "endoflife": CanonicalStatus.OBSOLETE,
+    "eol": CanonicalStatus.OBSOLETE,
+    "end-of-life": CanonicalStatus.OBSOLETE,
+    "product end of life": CanonicalStatus.OBSOLETE,
+    "end of life cycle": CanonicalStatus.OBSOLETE,
+    "produktabkündigung": CanonicalStatus.OBSOLETE,
+    "abkündigung": CanonicalStatus.OBSOLETE,
+    "product cancellation": CanonicalStatus.OBSOLETE,
+    "product discontinuation": CanonicalStatus.OBSOLETE,
+    "production termination": CanonicalStatus.OBSOLETE,
+    "production withdrawal": CanonicalStatus.OBSOLETE,
+    "withdrawal": CanonicalStatus.OBSOLETE,
+    "inactive": CanonicalStatus.OBSOLETE,
+    "deprecated": CanonicalStatus.OBSOLETE,
+}
+
+
+def normalize_to_canonical_status(raw_status: Optional[str], vendor_name: Optional[str] = None) -> str:
+    """
+    Normalizes vendor-specific status string into one of 6 canonical ENUM statuses:
+    - Active
+    - Active Mature
+    - Phase Out
+    - End of Sale
+    - End of Support
+    - Obsolete
+    """
+    if not raw_status or not isinstance(raw_status, str):
+        return CanonicalStatus.OBSOLETE.value
+
+    cleaned = raw_status.strip()
+    cleaned = re.sub(r'[\*\_\#\`]', '', cleaned).strip()
+    cleaned = re.sub(r':$', '', cleaned).strip()
+    s_lower = cleaned.lower()
+
+    if not s_lower:
+        return CanonicalStatus.OBSOLETE.value
+
+    # 1. Exact match in canonical dictionary
+    if s_lower in CANONICAL_STATUS_MAP:
+        return CANONICAL_STATUS_MAP[s_lower].value
+
+    # 2. Explicit 'end of ...' patterns (ensures modifiers like 'standard' or 'regular' do not misclassify)
+    if re.search(r'\bend\s+of\s+(?:[a-z]+\s+)?(?:support|service|maintenance|engineering|updates|warranty)\b', s_lower):
+        return CanonicalStatus.END_OF_SUPPORT.value
+    if re.search(r'\bend\s+of\s+(?:[a-z]+\s+)?(?:sale|sales|order|build)\b', s_lower):
+        return CanonicalStatus.END_OF_SALE.value
+    if re.search(r'\bend\s+of\s+(?:[a-z]+\s+)?(?:life|availability)\b', s_lower):
+        return CanonicalStatus.OBSOLETE.value
+
+    # 3. Check for substring match (prioritizing specific lifecycle phases, longest first)
+    for pattern, canon in sorted(CANONICAL_STATUS_MAP.items(), key=lambda x: len(x[0]), reverse=True):
+        if pattern in s_lower:
+            return canon.value
+
+    # 3. Fallback keywords
+    if any(k in s_lower for k in ["support", "service", "maintenance", "eom", "eosl", "vulnerability", "patch"]):
+        return CanonicalStatus.END_OF_SUPPORT.value
+    if any(k in s_lower for k in ["sale", "order", "buy", "purchase", "eos", "ltb", "shipment"]):
+        return CanonicalStatus.END_OF_SALE.value
+    if any(k in s_lower for k in ["phase", "pre-discontinued", "pending", "retiring", "auslauf"]):
+        return CanonicalStatus.PHASE_OUT.value
+    if any(k in s_lower for k in ["mature", "nrnd", "classic", "limited", "sustaining"]):
+        return CanonicalStatus.ACTIVE_MATURE.value
+    if any(k in s_lower for k in ["active", "available", "current", "production", "ga", "standard", "orderable"]):
+        return CanonicalStatus.ACTIVE.value
+
+    return CanonicalStatus.OBSOLETE.value
+
+
+def compare_and_select_latest_record(rec_a: Dict[str, Any], rec_b: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Enforces Requirement 11 & 12:
+    When two records match on (vendor, model, canonical_status), strictly retains
+    the record with the latest date, and merges non-empty replacements, aliases, and metadata.
+    """
+    dt_a_str = str(rec_a.get("stage_date_utc") or "").strip()
+    dt_b_str = str(rec_b.get("stage_date_utc") or "").strip()
+
+    dt_a = parse_to_utc_iso(dt_a_str) if dt_a_str else None
+    dt_b = parse_to_utc_iso(dt_b_str) if dt_b_str else None
+
+    # Determine winner based on date
+    if dt_a and dt_b:
+        winner = rec_b if dt_b > dt_a else rec_a
+        loser = rec_a if dt_b > dt_a else rec_b
+    elif dt_b and not dt_a:
+        winner, loser = rec_b, rec_a
+    else:
+        winner, loser = rec_a, rec_b
+
+    result = dict(winner)
+
+    # Merge non-empty fields from loser if winner is empty
+    for field in ("replacement", "aliases", "os", "firmware", "source_url", "category"):
+        if not str(result.get(field) or "").strip() and str(loser.get(field) or "").strip():
+            result[field] = loser[field]
+
+    # Merge metadata
+    meta_win: Dict[str, Any] = {}
+    meta_lose: Dict[str, Any] = {}
+    try:
+        raw_mw = result.get("metadata")
+        meta_win = json.loads(raw_mw) if isinstance(raw_mw, str) else dict(raw_mw or {})
+    except Exception:
+        pass
+    try:
+        raw_ml = loser.get("metadata")
+        meta_lose = json.loads(raw_ml) if isinstance(raw_ml, str) else dict(raw_ml or {})
+    except Exception:
+        pass
+    merged_meta = {**meta_lose, **meta_win}
+    result["metadata"] = json.dumps(merged_meta, ensure_ascii=False) if isinstance(result.get("metadata"), str) else merged_meta
+
+    return result
+
+
+def classify_hardware_or_software(
+    vendor_name: str,
+    model_name: str,
+    os_name: Optional[str] = None,
+    category: Optional[str] = None
+) -> Tuple[str, Optional[str]]:
+    """
+    Determines if a product is Hardware, Software, Firmware, or Operating System.
+    Returns (category_classification: str, extracted_os: Optional[str]).
+    """
+    m_clean = (model_name or "").strip()
+    o_clean = (os_name or "").strip()
+    c_clean = (category or "").strip()
+
+    # Check if model name itself is an Operating System (e.g. Apple iOS, macOS, watchOS, Windows, Ubuntu)
+    os_match = re.search(
+        r'^(?:Apple\s+)?(iOS|iPadOS|macOS|watchOS|tvOS|visionOS|OS X|Windows|Ubuntu|Red Hat|RHEL|SUSE|CentOS|Debian|Android)\b(?:\s+([A-Za-z]+))?\s*(.*)?$',
+        m_clean,
+        re.IGNORECASE
+    )
+    if os_match:
+        os_family = os_match.group(1).strip()
+        os_sub = os_match.group(2).strip() if os_match.group(2) else ""
+        os_ver = os_match.group(3).strip() if os_match.group(3) else ""
+        parts = [p for p in (os_family, os_sub, os_ver) if p]
+        full_os = " ".join(parts).strip()
+        return "Software - OS", full_os
+
+    # Check if model name represents firmware
+    if re.search(r'\bfirmware\s+update\b', m_clean, re.IGNORECASE):
+        return "Firmware", o_clean or None
+
+    # Check if category or model represents software / apps / SDKs
+    if any(kw in m_clean.lower() for kw in [" software", " sdk", " driver", " application", " plugin", " connect ", " music ", " pages ", " keynote ", " numbers ", " garageband ", " safari "]):
+        return "Software", o_clean or None
+
+    if is_well_known_os_or_software(category=c_clean, os_name=o_clean, model_name=m_clean):
+        return ("Software - OS" if (o_clean or any(w in m_clean.lower() for w in ["windows", "linux", "ios", "macos", "android"])) else "Software"), (o_clean or None)
+
+    return "Hardware", o_clean or None
+
+
 class ProductRecord(BaseModel):
     """
     Database-ready product lifecycle record representing a single status milestone.
@@ -872,6 +1201,7 @@ class ProductRecord(BaseModel):
     category: Optional[str] = Field(default="General Automation", description="Normalized category: PLC, Industrial PC, HMI, Inverter, etc.")
     product_category: Optional[str] = Field(default="General Automation", description="Normalized category")
     replacement: Optional[str] = Field(default=None, description="Successor / migration model recommendation")
+    canonical_status: Optional[str] = Field(default=None, description="Canonical ENUM status (Active, Active Mature, Phase Out, End of Sale, End of Support, Obsolete)")
     first_discovered_utc: Optional[str] = Field(default=None, description="Timestamp when record was first extracted")
     last_updated_utc: Optional[str] = Field(default=None, description="Timestamp of the most recent scrape update")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Metadata dictionary containing all additional attributes in JSON")
@@ -924,6 +1254,31 @@ class ProductRecord(BaseModel):
             os_val = (data.get("os") or "").strip()
             model_val = data.get("model_name")
             is_sw_or_os = is_well_known_os_or_software(category=cat, os_name=os_val, model_name=str(model_val or ""))
+
+            # Hardware vs Software / OS classification
+            v_name = str(data.get("vendor_name") or "")
+            prod_class, ext_os = classify_hardware_or_software(
+                vendor_name=v_name,
+                model_name=str(model_val or ""),
+                os_name=os_val or None,
+                category=cat or None
+            )
+            if ext_os and not data.get("os"):
+                data["os"] = ext_os
+            if not cat or cat.lower() in ("general automation", "general", "it", "ot", "iot"):
+                if prod_class and prod_class != "Hardware":
+                    data["category"] = prod_class
+                    data["product_category"] = prod_class
+
+            # Derive and populate canonical_status
+            raw_st = data.get("status") or data.get("vendor_status") or chosen
+            c_status = normalize_to_canonical_status(raw_st, v_name)
+            data["canonical_status"] = c_status
+            if "metadata" in data and isinstance(data["metadata"], dict):
+                data["metadata"]["canonical_status"] = c_status
+                if chosen and chosen != c_status:
+                    data["metadata"]["raw_vendor_status"] = chosen
+
             if not model_val or (isinstance(model_val, str) and model_val.strip().lower() in ("", "n/a", "none", "null", "nan")):
                 if is_sw_or_os:
                     data["model_name"] = os_val or ""
