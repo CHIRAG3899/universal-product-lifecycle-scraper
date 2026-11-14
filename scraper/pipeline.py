@@ -29,9 +29,11 @@ from scraper.dlq import get_global_dlq
 from scraper.models import (
     ProductRecord,
     ScrapedDataset,
+    extract_candidate_article_or_page_date,
     is_valid_product_model,
     is_valid_replacement_model,
     is_well_known_os_or_software,
+    resolve_fallback_stage_date,
 )
 from scraper.observability import AlertDispatcher, PipelineMetricsCollector
 from scraper.security import clean_and_sanitize_identifier, inspect_security_threats, is_safe_url
@@ -578,11 +580,13 @@ class LifecyclePipeline:
                 if not st_val or st_val.lower() in ("n/a", "none", "null", "nan") or len(st_val) > 40:
                     purged_noise_count += 1
                     continue
-                # Missing date should never drop the record: all models reaching end of lifecycle must have an entry
+                # Missing date fallback logic: use article, page creation, or release date (at least 1 month old), or 1 month old from current date
                 if not dt_val or dt_val.lower() in ("n/a", "none", "null", "nan"):
-                    p.stage_date_utc = None
+                    cand_dt = extract_candidate_article_or_page_date(p.metadata if isinstance(p.metadata, dict) else None)
+                    p.stage_date_utc = resolve_fallback_stage_date(None, candidate_date=cand_dt, metadata=p.metadata if isinstance(p.metadata, dict) else None)
                     if isinstance(p.metadata, dict):
                         p.metadata["missing_date"] = True
+                        p.metadata["fallback_date_applied"] = True
 
                 # Strict Alias Sanitization Guard (Reject dates, noise, self-identity)
                 if p.aliases:

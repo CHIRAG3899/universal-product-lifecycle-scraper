@@ -7,6 +7,7 @@ per-vendor JSON datasets, and state fingerprinting.
 import hashlib
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -518,81 +519,90 @@ class MasterStorageManager:
         # 2. Write Per-Vendor JSON Files
         records_by_vendor: Dict[str, List[ProductRecord]] = {}
         for p in new_products:
-            v_key = p.vendor_name.lower().replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
+            raw_v = (p.vendor_name or "unknown").lower()
+            clean_v = re.sub(r'[\/\\:*\?"<>|]+', '_', raw_v)
+            v_key = re.sub(r'[\s\(\)\-]+', '_', clean_v).strip('_')
+            v_key = re.sub(r'_+', '_', v_key)
+            if not v_key:
+                v_key = "unknown_vendor"
             if v_key not in records_by_vendor:
                 records_by_vendor[v_key] = []
             records_by_vendor[v_key].append(p)
 
         for v_key, v_products in records_by_vendor.items():
-            vendor_json_path = self.output_dir / f"{v_key}_lifecycle.json"
-            
-            # If vendor JSON exists, load and merge
-            existing_v_list = []
-            if vendor_json_path.exists():
-                try:
-                    with open(vendor_json_path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        existing_v_list = data.get("products", [])
-                except Exception:
-                    pass
+            try:
+                vendor_json_path = self.output_dir / f"{v_key}_lifecycle.json"
+                
+                # If vendor JSON exists, load and merge
+                existing_v_list = []
+                if vendor_json_path.exists():
+                    try:
+                        with open(vendor_json_path, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                            existing_v_list = data.get("products", [])
+                    except Exception:
+                        pass
 
-            # Merge vendor products by case-insensitive fingerprint, enforcing genuine lifecycle filter
-            v_map = {}
-            for item in existing_v_list:
-                if isinstance(item, dict) and is_genuine_lifecycle_record(item):
+                # Merge vendor products by case-insensitive fingerprint, enforcing genuine lifecycle filter
+                v_map = {}
+                for item in existing_v_list:
+                    if isinstance(item, dict) and is_genuine_lifecycle_record(item):
+                        m_part = (item.get("model_name") or item.get("os") or "").strip().upper()
+                        v_part = str(item.get("vendor_name") or "").strip().upper()
+                        s_part = str(item.get("status") or item.get("vendor_status") or item.get("stage") or "").strip().upper()
+                        d_part = str(item.get("stage_date_utc") or "").strip()
+                        c_key = f"{v_part}|{m_part}|{s_part}|{d_part}"
+                        c_fp = hashlib.sha256(c_key.encode("utf-8")).hexdigest()[:16]
+                        item["fingerprint"] = c_fp
+                        v_map[c_fp] = item
+
+                for p in v_products:
+                    p_dump = p.model_dump()
+                    if is_genuine_lifecycle_record(p_dump):
+                        m_part = (p.model_name or p.os or "").strip().upper()
+                        v_part = (p.vendor_name or "").strip().upper()
+                        s_part = (p.status or p.vendor_status or p.stage or "").strip().upper()
+                        d_part = (p.stage_date_utc or "").strip()
+                        c_key = f"{v_part}|{m_part}|{s_part}|{d_part}"
+                        c_fp = hashlib.sha256(c_key.encode("utf-8")).hexdigest()[:16]
+                        p_dump["fingerprint"] = c_fp
+                        v_map[c_fp] = p_dump
+
+                # Deduplicate vendor products by (vendor, model, status), prioritizing dated records
+                v_dedup: Dict[str, Dict[str, Any]] = {}
+                for fp, item in v_map.items():
                     m_part = (item.get("model_name") or item.get("os") or "").strip().upper()
                     v_part = str(item.get("vendor_name") or "").strip().upper()
                     s_part = str(item.get("status") or item.get("vendor_status") or item.get("stage") or "").strip().upper()
-                    d_part = str(item.get("stage_date_utc") or "").strip()
-                    c_key = f"{v_part}|{m_part}|{s_part}|{d_part}"
-                    c_fp = hashlib.sha256(c_key.encode("utf-8")).hexdigest()[:16]
-                    item["fingerprint"] = c_fp
-                    v_map[c_fp] = item
+                    v_key_triple = f"{v_part}|{m_part}|{s_part}"
+                    existing = v_dedup.get(v_key_triple)
+                    if not existing or (item.get("stage_date_utc") and not existing.get("stage_date_utc")):
+                        v_dedup[v_key_triple] = item
 
-            for p in v_products:
-                p_dump = p.model_dump()
-                if is_genuine_lifecycle_record(p_dump):
-                    m_part = (p.model_name or p.os or "").strip().upper()
-                    v_part = (p.vendor_name or "").strip().upper()
-                    s_part = (p.status or p.vendor_status or p.stage or "").strip().upper()
-                    d_part = (p.stage_date_utc or "").strip()
-                    c_key = f"{v_part}|{m_part}|{s_part}|{d_part}"
-                    c_fp = hashlib.sha256(c_key.encode("utf-8")).hexdigest()[:16]
-                    p_dump["fingerprint"] = c_fp
-                    v_map[c_fp] = p_dump
+                # Only persist vendor JSON if genuine records exist
+                if not v_dedup:
+                    if vendor_json_path.exists():
+                        try:
+                            vendor_json_path.unlink()
+                        except Exception:
+                            pass
+                    continue
 
-            # Deduplicate vendor products by (vendor, model, status), prioritizing dated records
-            v_dedup: Dict[str, Dict[str, Any]] = {}
-            for fp, item in v_map.items():
-                m_part = (item.get("model_name") or item.get("os") or "").strip().upper()
-                v_part = str(item.get("vendor_name") or "").strip().upper()
-                s_part = str(item.get("status") or item.get("vendor_status") or item.get("stage") or "").strip().upper()
-                v_key_triple = f"{v_part}|{m_part}|{s_part}"
-                existing = v_dedup.get(v_key_triple)
-                if not existing or (item.get("stage_date_utc") and not existing.get("stage_date_utc")):
-                    v_dedup[v_key_triple] = item
+                vendor_dataset = {
+                    "vendor_id": v_key,
+                    "vendor_name": v_products[0].vendor_name if v_products else "Unknown",
+                    "total_records": len(v_dedup),
+                    "products": list(v_dedup.values())
+                }
 
-            # Only persist vendor JSON if genuine records exist
-            if not v_dedup:
-                if vendor_json_path.exists():
-                    try:
-                        vendor_json_path.unlink()
-                    except Exception:
-                        pass
-                continue
-
-            vendor_dataset = {
-                "vendor_id": v_key,
-                "vendor_name": v_products[0].vendor_name if v_products else "Unknown",
-                "total_records": len(v_dedup),
-                "products": list(v_dedup.values())
-            }
-
-            temp_json = vendor_json_path.with_suffix(".tmp")
-            with open(temp_json, "w", encoding="utf-8") as f:
-                json.dump(vendor_dataset, f, indent=2, ensure_ascii=False)
-            _safe_atomic_replace(temp_json, vendor_json_path)
-            logger.info(f"Persisted per-vendor JSON for '{v_key}' ({len(v_map)} records): {vendor_json_path}")
+                temp_json = vendor_json_path.with_suffix(".tmp")
+                temp_json.parent.mkdir(parents=True, exist_ok=True)
+                with open(temp_json, "w", encoding="utf-8") as f:
+                    json.dump(vendor_dataset, f, indent=2, ensure_ascii=False)
+                _safe_atomic_replace(temp_json, vendor_json_path)
+                logger.info(f"Persisted per-vendor JSON for '{v_key}' ({len(v_map)} records): {vendor_json_path}")
+            except Exception as e_vjson:
+                logger.warning(f"Could not persist vendor JSON for '{v_key}': {e_vjson}")
 
         return len(merged_map), new_count, updated_count
 
